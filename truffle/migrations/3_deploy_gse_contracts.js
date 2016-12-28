@@ -1,0 +1,23 @@
+module.exports = function(deployer) {
+  deployer.deploy(Stages);
+  deployer.autolink(Goal);
+  deployer.deploy(Goal);
+  deployer.autolink(withGoals);
+  deployer.deploy(withGoals);
+  deployer.deploy(owned);
+  deployer.autolink(staged);
+  deployer.deploy(staged);
+  deployer.deploy(withDreamer);
+  deployer.autolink(GoalsStockExchange);
+  deployer.deploy(GoalsStockExchange);
+  // deployer.autolink();
+  // deployer.deploy(Goal);
+  // deployer.autolink();
+  // deployer.deploy(Stages);
+  // deployer.autolink();
+  // deployer.deploy(owned);
+  // deployer.autolink();
+  // deployer.deploy(staged);
+  // deployer.autolink();
+  // deployer.deploy(GoalsStockExchange);
+};

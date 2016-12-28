@@ -1,0 +1,12 @@
+/*.log
+/target
+/*-init.clj
+/resources/public/js/compiled
+out
+/figwheel_server.log
+/.idea/
+/.nrepl-port
+/clojurescript-ethereum-example.iml
+/truffle/build
+/resources/public/contracts/build
+/resources/public/css
