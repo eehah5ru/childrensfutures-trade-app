@@ -10,62 +10,53 @@
 (def col (r/adapt-react-class js/ReactFlexboxGrid.Col))
 (def row (r/adapt-react-class js/ReactFlexboxGrid.Row))
 
-(defn- new-tweet-component []
-  (let [settings (subscribe [:db/settings])
-        new-tweet (subscribe [:db/new-tweet])
+(defn- new-goal-component []
+  (let [new-goal (subscribe [:db/new-goal])
         my-addresses (subscribe [:db/my-addresses])
-        balance (subscribe [:new-tweet/selected-address-balance])]
+        balance (subscribe [:new-goal/selected-address-balance])]
     (fn []
       [row
        [col {:xs 12 :sm 12 :md 10 :lg 6 :md-offset 1 :lg-offset 3}
         [ui/paper {:style {:padding "0 20px 20px"}}
-         [ui/text-field {:default-value (:name @new-tweet)
-                         :on-change #(dispatch [:new-tweet/update :name (u/evt-val %)])
-                         :name "name"
-                         :max-length (:max-name-length @settings)
-                         :floating-label-text "Your Name"
+         [ui/text-field {:default-value (:description @new-goal)
+                         :on-change #(dispatch [:new-goal/update :description (u/evt-val %)])
+                         :name "description"
+                         :max-length 120
+                         :floating-label-text "Goal's description"
                          :style {:width "100%"}}]
          [:br]
-         [ui/text-field {:default-value (:text @new-tweet)
-                         :on-change #(dispatch [:new-tweet/update :text (u/evt-val %)])
-                         :name "tweet"
-                         :max-length (:max-tweet-length @settings)
-                         :floating-label-text "What's happening?"
-                         :style {:width "100%"}}]
-         [:br]
+
          [address-select-field
           @my-addresses
-          (:address @new-tweet)
-          [:new-tweet/update :address]]
+          (:address @new-goal)
+          [:new-goal/update :address]]
          [:br]
          [:h3 "Balance: " (u/eth @balance)]
          [:br]
          [ui/raised-button
           {:secondary true
-           :disabled (or (empty? (:text @new-tweet))
-                         (empty? (:name @new-tweet))
-                         (empty? (:address @new-tweet))
-                         (:sending? @new-tweet))
-           :label "Tweet"
+           :disabled (or (empty? (:description @new-goal))
+                         (empty? (:address @new-goal))
+                         (:sending? @new-goal))
+           :label "Place on Exchange"
            :style {:margin-top 15}
-           :on-touch-tap #(dispatch [:new-tweet/send])}]]]])))
+           :on-touch-tap #(dispatch [:new-goal/send])}]]]])))
 
-(defn- tweets-component []
-  (let [tweets (subscribe [:db/tweets])]
+(defn- goals-component []
+  (let [goals (subscribe [:db/goals])]
     (fn []
       [row
        [col {:xs 12 :sm 12 :md 10 :lg 6 :md-offset 1 :lg-offset 3}
         [ui/paper {:style {:padding 20 :margin-top 20}}
-         [:h1 "Tweets"]
-         (for [{:keys [tweet-key name text date author-address]} @tweets]
+         [:h1 "Goals"]
+         (for [{:keys [goal-id owner description]} @goals]
            [:div {:style {:margin-top 20}
-                  :key tweet-key}
-            [:h3 name]
-            [:h5 (u/format-date date)]
+                  :key goal-id}
+            [:h3 owner]
             [:div {:style {:margin-top 5}}
-             text]
+             description]
             [:h3 {:style {:margin "5px 0 10px"}}
-             author-address]
+             owner]
             [ui/divider]])]]])))
 
 (defn main-panel []
@@ -75,6 +66,6 @@
        {:mui-theme (get-mui-theme {:palette {:primary1-color (color :light-blue500)
                                              :accent1-color (color :amber700)}})}
        [:div
-        [ui/app-bar {:title "Simple Decentralized Twitter"}]
-        [new-tweet-component]
-        [tweets-component]]])))
+        [ui/app-bar {:title "Goals Exchange Market"}]
+        [new-goal-component]
+        [goals-component]]])))

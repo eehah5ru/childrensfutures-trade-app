@@ -7,21 +7,26 @@
     (:my-addresses db)))
 
 (reg-sub
-  :db/tweets
+  :db/goals
+  ;; (fn [db]
+  ;;   (sort-by :date #(compare %2 %1) (:tweets db)))
+  ;; TODO: add sort by date???
   (fn [db]
-    (sort-by :date #(compare %2 %1) (:tweets db))))
+    (:goals db)))
+
+
 
 (reg-sub
-  :db/new-tweet
+  :db/new-goal
   (fn [db]
-    (:new-tweet db)))
+    (:new-goal db)))
+
+;; (reg-sub
+;;   :db/settings
+;;   (fn [db]
+;;     (:settings db)))
 
 (reg-sub
-  :db/settings
+  :new-goal/selected-address-balance
   (fn [db]
-    (:settings db)))
-
-(reg-sub
-  :new-tweet/selected-address-balance
-  (fn [db]
-    (get-in db [:accounts (:address (:new-tweet db)) :balance])))
+    (get-in db [:accounts (:address (:new-goal db)) :balance])))
