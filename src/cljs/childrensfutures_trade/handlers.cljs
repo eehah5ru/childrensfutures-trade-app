@@ -27,6 +27,12 @@
 ;;   (dispatch [:blockchain/unlock-account "0x43100e355296c4fe3d2c0a356aa4151f1257393b" "m"])
 ;;   )
 
+
+;;;
+;;;
+;;; initial event
+;;;
+;;;
 (reg-event-fx
   :initialize
   (fn [_ _]
@@ -44,13 +50,19 @@
          {:web3 (:web3 db/default-db)
           :fns [[web3-eth/accounts :blockchain/my-addresses-loaded :log-error]]}}))))
 
+;;;
+;;;
+;;; when get access to ethereum node accounts
+;;;
+;;;
 (reg-event-fx
   :blockchain/my-addresses-loaded
   interceptors
   (fn [{:keys [db]} [addresses]]
     {:db (-> db
            (assoc :my-addresses addresses)
-           (assoc-in [:new-goal :address] (first addresses)))
+           (assoc-in [:new-goal :address] (first addresses))
+           (assoc :current-address (first addresses)))
      :web3-fx.blockchain/balances
      {:web3 (:web3 db/default-db)
       :addresses addresses
@@ -58,6 +70,12 @@
       :blockchain-filter-opts "latest"
       :dispatches [:blockchain/balance-loaded :log-error]}}))
 
+
+;;;
+;;;
+;;; register handlers for contract events
+;;;
+;;;
 (reg-event-fx
   :contract/abi-loaded
   interceptors
@@ -71,7 +89,9 @@
        {:instance contract-instance
         :db db
         :db-path [:contract :events]
-        :events [[:GoalAdded {} {:from-block 0} :contract/on-goal-loaded :log-error]]}
+        :events [[:GoalAdded {} {:from-block 0} :contract/on-goal-loaded :log-error]
+                 [:GoalCancelled {} {:from-block 0} :contract/on-goal-cancelled :log-error
+                  ]]}
 
 
        ;; :web3-fx.contract/constant-fns
@@ -79,55 +99,113 @@
        ;;  :fns [[:get-settings :contract/settings-loaded :log-error]]}
        })))
 
+;;;
+;;;
+;;; ETHEREUM EVENTS
+;;;
+;;;
+
+;;;
+;;;
+;;; event for GoalAdded contract event
+;;;
+;;;
 (reg-event-db
-  :contract/on-goal-loaded
+ :contract/on-goal-loaded
+ interceptors
+ (fn [db [goal]]
+   (assoc-in db [:goals (:goal-id goal)] (merge (db/default-goal)
+                                                (select-keys goal [:owner :description :goal-id])))))
+
+
+
+;;;
+;;;
+;;; GoalCancelled contract event
+;;;
+;;;
+(reg-event-db
+  :contract/on-goal-cancelled
   interceptors
   (fn [db [goal]]
-    (update db :goals conj (merge (select-keys goal [:owner :description])
-                                   {;; :date (u/big-number->date-time (:date tweet))
-                                    :goal-id (.toString (:goal-id goal))}))))
+    (assoc-in db [:goals (:goal-id goal) :cancelled?] true)))
 
-;; (reg-event-db
-;;   :contract/settings-loaded
-;;   interceptors
-;;   (fn [db [[max-name-length max-tweet-length]]]
-;;     (assoc db :settings {:max-name-length (.toNumber max-name-length)
-;;                          :max-tweet-length (.toNumber max-tweet-length)})))
 
+;;;
+;;;
+;;; update balance
+;;;
+;;;
 (reg-event-db
   :blockchain/balance-loaded
   interceptors
   (fn [db [balance address]]
     (assoc-in db [:accounts address :balance] balance)))
 
+
+;;;
+;;;
+;;; update current address
+;;;
+;;;
+(reg-event-db
+ :current-address/update
+ interceptors
+ (fn [db [new-current-address]]
+   (assoc db :current-address new-current-address)))
+
+
+;;;
+;;;
+;;; NEW GOAL
+;;;
+;;;
+
+;;;
+;;;
+;;; update goal values while editing goal
+;;;
+;;;
 (reg-event-db
   :new-goal/update
   interceptors
   (fn [db [key value]]
     (assoc-in db [:new-goal key] value)))
 
+;;;
+;;; send new goal to ethereum contract
+;;;
 (reg-event-fx
   :new-goal/send
   interceptors
   (fn [{:keys [db]} []]
-    (let [{:keys [description address]} (:new-goal db)]
+    (let [{:keys [description owner]} (:new-goal db)]
       {:web3-fx.contract/state-fn
        {:instance (:instance (:contract db))
         :web3 (:web3 db)
         :db-path [:contract :send-goal]
         :fn [:new-goal description
-             {:from address
+             {:from owner
               :gas goal-gas-limit}
              :new-goal/confirmed
              :log-error
              :new-goal/transaction-receipt-loaded]}})))
 
+
+;;;
+;;; change new-goal's state to sending
+;;; fired after the trx has been confirmed
+;;; see event handler above
+;;;
 (reg-event-db
   :new-goal/confirmed
   interceptors
   (fn [db [transaction-hash]]
     (assoc-in db [:new-goal :sending?] true)))
 
+;;;
+;;; confirms that goal was sent to ethereum contract
+;;;
 (reg-event-db
   :new-goal/transaction-receipt-loaded
   interceptors
@@ -136,6 +214,84 @@
     (when (= gas-used goal-gas-limit)
       (console :error "All gas used"))
     (assoc-in db [:new-goal :sending?] false)))
+
+
+;;;
+;;;
+;;; CANCEL GOAL
+;;;
+;;;
+
+;;;
+;;; make cancel goal trx in the ethereum contract
+;;;
+(reg-event-fx
+ :cancel-goal/send
+ interceptors
+ (fn [{:keys [db]} [goal-id]]
+   (let [address (:current-address db)]
+     {:web3-fx.contract/state-fn
+      {:instance (:instance (:contract db))
+       :web3 (:web3 db)
+       :db-path [:contract :cancel-goal (keyword goal-id)]
+       :fn [:cancel-goal goal-id
+            {:from address
+             :gas goal-gas-limit}
+            [:cancel-goal/confirmed goal-id]
+            :log-error
+            [:cancel-goal/transaction-receipt-loaded goal-id]]}})))
+
+;;;
+;;; change state of cancelled goal
+;;; if trx was confirmed by user
+;;;
+(reg-event-db
+  :cancel-goal/confirmed
+  interceptors
+  (fn [db [goal-id tx-hash]]
+    (assoc-in db [:goals goal-id :cancelling?] true)))
+
+;;;
+;;; confirms that goal was cancelled
+;;;
+(reg-event-db
+ :cancel-goal/transaction-receipt-loaded
+ interceptors
+ (fn [db [goal-id & {:keys [gas-used] :as transaction-receipt}]]
+   (console :log transaction-receipt)
+   (when (= gas-used goal-gas-limit)
+     (console :error "All gas used"))
+   (-> db
+       (assoc-in [:goals goal-id :cancelling?] false)
+       (assoc-in [:goals goal-id :cancelled?] true))))
+
+
+
+;;;
+;;;
+;;; LOGGER
+;;;
+;;;
+(reg-event-fx
+  :log-error
+  interceptors
+  (fn [_ [err]]
+    (js/console.log :error err)
+    {}))
+
+;;;
+;;;
+;;; OLD STUFF
+;;;
+;;;
+
+;; (reg-event-db
+;;   :contract/settings-loaded
+;;   interceptors
+;;   (fn [db [[max-name-length max-tweet-length]]]
+;;     (assoc db :settings {:max-name-length (.toNumber max-name-length)
+;;                          :max-tweet-length (.toNumber max-tweet-length)})))
+
 
 ;; (reg-event-fx
 ;;   :contract/fetch-compiled-code
@@ -187,10 +343,3 @@
 ;;   (fn [_ [contract-instance]]
 ;;     (when-let [address (aget contract-instance "address")]
 ;;       (console :log "Contract deployed at" address))))
-
-(reg-event-fx
-  :log-error
-  interceptors
-  (fn [_ [err]]
-    (console :error err)
-    {}))
