@@ -3,13 +3,32 @@ pragma solidity ^0.4.2;
 import "./Stages.sol";
 
 library Goal {
-  /*
-    goal structure
-   */
+  //
+  //
+  // GOAL STRUCTURE
+  //
+  //
   struct Goal {
     address owner;
     string description;
     Stages.Stage stage;
+
+    //
+    // BIDS on goal
+    // bid-owner-address => Bid struct
+    //
+    mapping (address => Bid) bids;
+  }
+
+  //
+  //
+  // BID STRUCTURE
+  //
+  //
+  struct Bid {
+    address owner;
+    string description;
+    // TODO: accepted?
   }
 
   //
@@ -25,7 +44,7 @@ library Goal {
     internal
     returns(bool)
   {
-    if (_goal.owner == 0) {
+    if (_goal.owner == address(0x0)) {
       return false;
     }
     // TODO: add more checks
@@ -52,7 +71,7 @@ library Goal {
   function mkGoalId(address owner, string description)
     returns(bytes32)
   {
-    return sha3(msg.sender, description);
+    return sha3(now, msg.sender, description);
   }
 
 
@@ -73,12 +92,12 @@ contract withGoals {
   // modifiers
   //
   //
-  modifier onlyDreamer(Goal.Goal _goal) {
-    if(_goal.owner != msg.sender) {
-      throw;
-    }
-    _;
-  }
+  // modifier onlyDreamer(Goal.Goal _goal) {
+  //   if(_goal.owner != msg.sender) {
+  //     throw;
+  //   }
+  //   _;
+  // }
 
   modifier onlyExisted(bytes32 _goalId) {
     if(!(goals[_goalId].exists())) {
@@ -86,6 +105,15 @@ contract withGoals {
     }
     _;
   }
+
+  modifier notBidded(bytes32 _goalId) {
+    // if exists in mapping then bid already placed
+    if(goals[_goalId].bids[msg.sender].owner == msg.sender) {
+      throw;
+    }
+    _;
+  }
+
 
   //
   //

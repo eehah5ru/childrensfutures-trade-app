@@ -89,6 +89,36 @@ contract('GoalsStockExchange', function(accounts) {
   };
 
   //
+  // performs cancelGoal transaction
+  // returns GoalCancelled args
+  //
+  var performPlaceBid = function(goalId, bidDescription, options) {
+    var watcher = gse().BidPlaced({}, {fromBlock: 'latest'});
+
+    var deferredEvent = new Promise(function(resolve, reject) {
+      watcher.watch(function(error, event) {
+        if(!error) {
+          watcher.stopWatching();
+          resolve(event.args);
+        } else {
+          watcher.stopWatching();
+          resolve(error);
+        }
+      });
+    });
+
+    return gse().placeBid(goalId, bidDescription, options)
+      .catch(function(e) {
+        watcher.stopWatching();
+        throw ("placeBid: " + e.toString());
+      })
+      .then(function() {
+        return deferredEvent;
+      });
+  };
+
+
+  //
   //
   // specs
   //
@@ -132,86 +162,82 @@ contract('GoalsStockExchange', function(accounts) {
   //
   //
   describe("#newGoal", function() {
-    //
-    // helpers
-    //
-    var addGoalAndCatchEvent = function(descr, options) {
-      // options = options || {};
-
-      var watcher = gse().GoalAdded({}, {fromBlock: 'latest'});
-
-      var deferredEvent = new Promise(function(resolve, reject) {
-        watcher.watch(function(error, event) {
-          if(!error) {
-            watcher.stopWatching();
-            resolve(event.args);
-          } else {
-            watcher.stopWatching();
-            resolve(error);
-          }
-        });
-      });
-
-      return gse().newGoal(descr, options)
-        .then(function() {
-          return deferredEvent;
-        });
-    };
-
-    it("should be fulfilled", function() {
-      var p = gse().newGoal("aaa");
-
-      return expect(p).to.be.fulfilled;
-    });
-
-    it("should throw exception if description is empty", function() {
-      var p = gse().newGoal();
-
-      return expect(p).to.be.rejected;
-    });
-
     describe("fire GoalAdded event", function() {
       it("that has goalId", function() {
-        return expect(addGoalAndCatchEvent("aaa")).to.be.fulfilled
+        return expect(
+          performAddGoal("aaa", {from: accounts[1]})
+        ).to.be.fulfilled
           .and.eventually.have.deep.property("goalId");
       });
 
       it("that has description", function() {
-        return expect(addGoalAndCatchEvent("aaa")).to.eventually
+        return expect(
+          performAddGoal("aaa", {from: accounts[1]})
+        ).to.eventually
           .have.deep.property("description", "aaa");
       });
 
       it("that has owner", function() {
-        return expect(addGoalAndCatchEvent("aaa", {from: accounts[1]})).to.eventually
+        return expect(
+          performAddGoal("aaa", {from: accounts[1]})
+        ).to.eventually
           .have.deep.property("owner", accounts[1]);
       });
 
       it("goalId should be a string", function() {
-        return expect(addGoalAndCatchEvent("aaa")).to.be.fulfilled
+        return expect(
+          performAddGoal("aaa")
+        ).to.be.fulfilled
           .and.eventually.have.deep.property("goalId").that.is.a("string");
       });
+    });
+
+    it("should be fulfilled", function() {
+      return expect(
+        performAddGoal("bbb")
+      ).to.be.fulfilled;
+    });
+
+    it("should throw exception if description is empty", function() {
+      return expect(
+        performAddGoal("")
+      ).to.be.rejected;
     });
 
     it("should increase numGoals", function() {
       var prevNumGoals = null;
       var curNumGoals = null;
 
-      return gse().newGoal("aaa")
+      return performAddGoal("aaa")
           .then(function() {
             return gse().getNumGoals.call();
           })
         .then(function(n) {
           prevNumGoals = n.toNumber();
 
-          return gse().newGoal("bbb");
+          return performAddGoal("bbb");
         })
         .then(function() {
-          return gse().getNumGoals();
+          return gse().getNumGoals.call();
         })
         .then(function(n) {
           curNumGoals = n.toNumber();
 
           expect(prevNumGoals + 1).to.be.equal(curNumGoals);
+        });
+    });
+
+    it("two calls of #newGoal should generate different goalId", function() {
+      var firstGoalId = null;
+
+      return performAddGoal("aaa")
+        .then(function(gaData) {
+          firstGoalId = gaData.goalId;
+
+          return performAddGoal("aaa"); // same description and owner
+        })
+        .then(function(gaData) {
+          expect(firstGoalId).to.be.not.equal(gaData.goalId);
         });
     });
   });
@@ -332,7 +358,7 @@ contract('GoalsStockExchange', function(accounts) {
             return performCancelGoal(gaData.goalId, {from: accounts[1]});
           })
           .then(function(gcData) {
-            expect(gcData.goalId).to.be.equal(gId);
+            return expect(gcData.goalId).to.be.equal(gId);
           });
       });
 
@@ -394,5 +420,118 @@ contract('GoalsStockExchange', function(accounts) {
           })
       ).to.be.rejected;
     });
+  });
+
+  //
+  //
+  // placeBid
+  //
+  //
+  describe("placeBid", function() {
+    describe("BidPlaced event", function() {
+      it("has goalId property", function() {
+        var gId = null;
+
+        return performAddGoal("234", {from: accounts[1]})
+          .then(function(gaData) {
+            gId = gaData.goalId;
+
+            return performPlaceBid(gaData.goalId, "aaaa", {from: accounts[2]});
+          })
+          .then(function(pbData) {
+            return expect(pbData.goalId).to.be.equal(gId);
+          });
+      });
+
+      it("has goalOwner property", function() {
+        return expect(
+          performAddGoal("2345", {from: accounts[2]})
+            .then(function(gaData) {
+              return performPlaceBid(gaData.goalId, "aaaaaa", {from: accounts[3]});
+            })
+        ).to.eventually.have.property("goalOwner", accounts[2]);
+      });
+
+      it("has bidOwner property", function() {
+        return expect(
+          performAddGoal("23456", {from: accounts[2]})
+            .then(function(gaData) {
+              return performPlaceBid(gaData.goalId, "aaaaaa", {from: accounts[3]});
+            })
+        ).to.eventually.have.property("bidOwner", accounts[3]);
+
+      });
+
+      it("has description property", function() {
+        return expect(
+          performAddGoal("23478", {from: accounts[2]})
+            .then(function(gaData) {
+              return performPlaceBid(gaData.goalId, "aaaaaa", {from: accounts[3]});
+            })
+        ).to.eventually.have.property("description", "aaaaaa");
+      });
+    });
+
+    it("should be fulfilled", function() {
+      return expect(
+        performAddGoal("aaa", {from: accounts[1]})
+          .then(function(gaData) {
+            return performPlaceBid(gaData.goalId, "aaa", {from: accounts[2]});
+          })
+      ).to.be.fulfilled;
+    });
+
+    it("goal's owner can't place bid on her own goal", function() {
+      return expect(
+        performAddGoal("bbb", {from: accounts[0]})
+          .then(function(gaData) {
+            return performPlaceBid(gaData.goalId, "aaa", {from: accounts[0]});
+          })
+      ).to.be.rejected;
+    });
+
+    it("it is possible to place bid only on existing goal", function() {
+      return expect(
+        performPlaceBid("-1", "aaa", {from: accounts[1]})
+      ).to.be.rejected;
+    });
+
+    it("is's impossible to place bit on the same goal twice", function() {
+      var goalId = null;
+
+      return expect(
+        performAddGoal("aaaa", {from: accounts[3]})
+          .then(function(gaData) {
+            goalId = gaData.goalId;
+
+            return performPlaceBid(goalId, "aaaa", {from: accounts[4]});
+          })
+          .then(function(pbData) {
+            return performPlaceBid(goalId, "bbb", {from: accounts[4]});
+          })
+      ).to.be.rejected;
+    });
+
+    it("should fail when bidDescription is mepty", function() {
+      return expect(
+        performAddGoal("aaa", {from: accounts[4]})
+          .then(function(gaData) {
+            return performPlaceBid(gaData.goalId, "", {from: accounts[5]});
+          })
+      ).to.be.rejected;
+    });
+
+    it("it's not possible to place bid on already cancelled goal", function() {
+      return expect(
+        performAddGoal("aaa", {from: accounts[5]})
+          .then(function(gaData) {
+            return performCancelGoal(gaData.goalId, {from: accounts[5]});
+          })
+          .then(function(gcData) {
+            return performPlaceBid(gcData.goalId, "nnn", {from: accounts[4]});
+          })
+      ).to.be.rejected;
+    });
+
   });
 });

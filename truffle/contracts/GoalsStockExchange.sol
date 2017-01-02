@@ -26,6 +26,16 @@ contract withDreamer {
     }
     _;
   }
+
+  //
+  // any person except dremear can perform smth
+  //
+  modifier notDreamer(Goal.Goal _goal) {
+    if (_goal.owner == msg.sender) {
+      throw;
+    }
+    _;
+  }
 }
 
 
@@ -59,7 +69,10 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
                       address owner,
                       string description);
 
-
+  event BidPlaced(bytes32 goalId,
+                  address goalOwner,
+                  address bidOwner,
+                  string description);
   /*
    *
    * functions
@@ -114,6 +127,11 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
 
     bytes32 goalId = Goal.mkGoalId(msg.sender, description);
 
+    // this goal already exists
+    if(goals[goalId].exists()) {
+      throw;
+    }
+
     Goal.Goal g = goals[goalId];
     g.description = description;
     g.owner = msg.sender;
@@ -144,6 +162,46 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
     goals[_goalId].stage = Stages.Stage.Cancelled;
     GoalCancelled(_goalId, goals[_goalId].owner, goals[_goalId].description);
     return true;
+  }
+
+  //
+  // place bid
+  //
+  function placeBid(bytes32 _goalId, string _bidDescription)
+    notBeforeStage(Stages.Stage.Created, goals[_goalId])
+    notAtStage(Stages.Stage.Cancelled, goals[_goalId])
+    onlyExisted(_goalId)
+    notDreamer(goals[_goalId])
+    notBidded(_goalId)
+    public
+    returns(bool)
+  {
+
+    if(!(Goal.isValidDescription(_bidDescription))) {
+      throw;
+    }
+
+    //
+    // add bid to goal
+    //
+    Goal.Bid b = goals[_goalId].bids[msg.sender];
+
+    b.owner = msg.sender;
+    b.description = _bidDescription;
+
+
+    //
+    // change goal's stage to BidPlaced
+    //
+    goals[_goalId].stage = Stages.Stage.BidPlaced;
+
+    //
+    // fire event
+    //
+    BidPlaced(_goalId, goals[_goalId].owner, msg.sender, b.description);
+
+    return true;
+
   }
 
 

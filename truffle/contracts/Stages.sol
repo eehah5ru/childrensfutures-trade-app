@@ -7,6 +7,7 @@ library Stages {
   enum Stage {
     Unknown,
     Created,
+    BidPlaced,
     Cancelled
   }
 
