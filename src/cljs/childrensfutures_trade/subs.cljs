@@ -2,7 +2,11 @@
   (:require [re-frame.core :refer [reg-sub subscribe]]))
 
 
-
+;;;
+;;;
+;;; ADDRESSES AND BALANCES
+;;;
+;;;
 (reg-sub
  :db/my-addresses
  (fn [db]
@@ -15,26 +19,47 @@
    (first my-addresses)))
 
 (reg-sub
+ :new-goal/selected-address-balance
+ (fn [db]
+   (get-in db [:accounts (:address (:new-goal db)) :balance])))
+
+
+;;;
+;;;
+;;; GOAL RELATED
+;;;
+;;;
+
+;;;
+;;; sorted goals
+;;;
+(reg-sub
  :db/goals
- ;; (fn [db]
- ;;   (sort-by :date #(compare %2 %1) (:tweets db)))
- ;; TODO: add sort by date???
  (fn [db]
    (sort-by :created-at (vals (:goals db)))))
 
 
-
+;;;
+;;; new goal
+;;;
 (reg-sub
  :db/new-goal
  (fn [db]
    (:new-goal db)))
 
-;; (reg-sub
-;;   :db/settings
-;;   (fn [db]
-;;     (:settings db)))
-
+;;;
+;;; new bid for goal
+;;;
 (reg-sub
- :new-goal/selected-address-balance
- (fn [db]
-   (get-in db [:accounts (:address (:new-goal db)) :balance])))
+ :db/new-bid
+ (fn [db [_ goal-id]]
+   (get-in db [:goals goal-id :new-bid])))
+
+
+;;;
+;;; show new bid indicator
+;;;
+(reg-sub
+ :db/show-new-bid?
+ (fn [db [_ goal-id]]
+   (get-in db [:goals goal-id :show-new-bid?])))

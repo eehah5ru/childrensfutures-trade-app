@@ -5,6 +5,7 @@
     [cljs-web3.eth :as web3-eth]
     [cljs-web3.personal :as web3-personal]
     [cljsjs.web3]
+    [cljs.spec :as s]
     [childrensfutures-trade.db :as db]
     [day8.re-frame.http-fx]
     [goog.string :as gstring]
@@ -13,8 +14,51 @@
     [re-frame.core :refer [reg-event-db reg-event-fx path trim-v after debug reg-fx console dispatch]]
     [childrensfutures-trade.utils :as u]))
 
-(def interceptors [#_(when ^boolean js/goog.DEBUG debug)
+;;;
+;;;
+;;; INTERCEPTORS
+;;;
+;;;
+
+;;;
+;;; spec
+;;;
+(defn check-and-throw
+  "throw an exception if db doesn't match the spec"
+  [a-spec db]
+  (when-not (s/valid? a-spec db)
+    (throw (ex-info (str "spec check failed: " (s/explain-str a-spec db)) {}))))
+
+;;;
+;;; interceptor for usual event handlers
+;;;
+(def check-spec-interceptor (after (partial check-and-throw :childrensfutures-trade.db/db)))
+
+;;;
+;;; interceptor for FX event handlers
+;;;
+(def check-spec-interceptor-fx (after
+                                (fn [db]
+                                  (js/console.log :debug :interceptor-fx db)
+                                  (check-and-throw :childrensfutures-trade.db/db db))))
+
+;;;
+;;; INTERCEPTORS DEFINITION
+;;;
+(def interceptors [check-spec-interceptor
+                   #_(when ^boolean js/goog.DEBUG debug)
                    trim-v])
+
+;;; interceptors for fx events
+;; (def interceptors-fx [
+;;                       check-spec-interceptor-fx
+;;                       trim-v])
+
+(defn interceptors-fx [{:keys [spec]}]
+  (let [default-interceptors [trim-v]]
+    (if spec
+      (conj default-interceptors check-spec-interceptor-fx)
+      default-interceptors)))
 
 (def goal-gas-limit 1000000)
 
@@ -26,6 +70,8 @@
 ;;   (dispatch [:blockchain/unlock-account "0x522f9c6b122f4ca8067eb5459c10d03a35798ed9" "m"])
 ;;   (dispatch [:blockchain/unlock-account "0x43100e355296c4fe3d2c0a356aa4151f1257393b" "m"])
 ;;   )
+
+
 
 
 ;;;
@@ -57,7 +103,7 @@
 ;;;
 (reg-event-fx
   :blockchain/my-addresses-loaded
-  interceptors
+  (interceptors-fx :spec true)
   (fn [{:keys [db]} [addresses]]
     {:db (-> db
            (assoc :my-addresses addresses)
@@ -78,7 +124,7 @@
 ;;;
 (reg-event-fx
   :contract/abi-loaded
-  interceptors
+  (interceptors-fx :spec true)
   (fn [{:keys [db]} [abi]]
     (let [web3 (:web3 db)
           contract-instance (web3-eth/contract-at web3 abi (:address (:contract db)))]
@@ -90,14 +136,15 @@
         :db db
         :db-path [:contract :events]
         :events [[:GoalAdded {} {:from-block 0} :contract/on-goal-loaded :log-error]
-                 [:GoalCancelled {} {:from-block 0} :contract/on-goal-cancelled :log-error
-                  ]]}
+                 [:GoalCancelled {} {:from-block 0} :contract/on-goal-cancelled :log-error]
+                 [:BidPlaced {} {:from-block 0} :contract/on-bid-placed :log-error]]}
 
 
        ;; :web3-fx.contract/constant-fns
        ;; {:instance contract-instance
        ;;  :fns [[:get-settings :contract/settings-loaded :log-error]]}
        })))
+
 
 ;;;
 ;;;
@@ -130,6 +177,23 @@
   (fn [db [goal]]
     (assoc-in db [:goals (:goal-id goal) :cancelled?] true)))
 
+
+;;;
+;;;
+;;; BidPlaced contract event
+;;;
+;;;
+(reg-event-db
+ :contract/on-bid-placed
+ interceptors
+ (fn [db [bid]]
+   (js/console.log :info :bid-placed bid)
+   (assoc-in db
+             [:goals (:goal-id bid) :bids (:bid-owner bid)]
+             (merge (db/default-bid)
+                    (let [{:keys [bid-owner description]} bid]
+                      {:owner bid-owner
+                       :description description})))))
 
 ;;;
 ;;;
@@ -177,7 +241,7 @@
 ;;;
 (reg-event-fx
   :new-goal/send
-  interceptors
+  (interceptors-fx :spec false)
   (fn [{:keys [db]} []]
     (let [{:keys [description owner]} (:new-goal db)]
       {:web3-fx.contract/state-fn
@@ -227,7 +291,7 @@
 ;;;
 (reg-event-fx
  :cancel-goal/send
- interceptors
+ (interceptors-fx :spec false)
  (fn [{:keys [db]} [goal-id]]
    (let [address (:current-address db)]
      {:web3-fx.contract/state-fn
@@ -266,6 +330,85 @@
        (assoc-in [:goals goal-id :cancelled?] true))))
 
 
+;;;
+;;;
+;;; PLACE BID ON GOAL
+;;;
+;;;
+
+;;;
+;;; make place bid trx in the ethereum
+;;;
+(reg-event-fx
+ :place-bid/send
+ (interceptors-fx :spec false)
+  (fn [{:keys [db]} [goal-id]]
+    (let [address (:current-address db)
+          {:keys [description]} (get-in db [:goals goal-id :new-bid])]
+     {:web3-fx.contract/state-fn
+      {:instance (:instance (:contract db))
+       :web3 (:web3 db)
+       :db-path [:contract :place-bid (keyword goal-id)]
+       :fn [:place-bid goal-id description
+            {:from address
+             :gas goal-gas-limit}
+            [:place-bid/confirmed goal-id]
+            :log-error
+            [:place-bid/transaction-receipt-loaded goal-id]]}})))
+
+;;;
+;;; change state of placed bid
+;;; if trx was confirmed by user
+;;;
+(reg-event-db
+  :place-bid/confirmed
+  interceptors
+  (fn [db [goal-id tx-hash]]
+    (assoc-in db [:goals goal-id :new-bid :placing?] true)))
+
+;;;
+;;; confirms that bid was placed
+;;;
+(reg-event-db
+ :place-bid/transaction-receipt-loaded
+ interceptors
+ (fn [db [goal-id & {:keys [gas-used] :as transaction-receipt}]]
+   (console :log transaction-receipt)
+   (when (= gas-used goal-gas-limit)
+     (console :error "All gas used"))
+   (-> db
+       (assoc-in [:goals goal-id :new-bid :placing?] false))))
+
+;;;
+;;; show new bid form
+;;;
+(reg-event-db
+ :place-bid/show-new-bid
+ interceptors
+ (fn [db [goal-id]]
+   (assoc-in db [:goals goal-id :show-new-bid?] true)))
+
+;;;
+;;; update new bid values while editing bid
+;;;
+(reg-event-db
+  :place-bid/update
+  interceptors
+  (fn [db [goal-id key value]]
+    (js/console.log (get-in db [:goals goal-id :new-bid]))
+    (assoc-in db [:goals goal-id :new-bid key] value)))
+
+
+;;;
+;;; cancel new bid
+;;;
+(reg-event-db
+ :place-bid/cancel
+ interceptors
+ (fn [db [goal-id]]
+   (-> db
+       (assoc-in [:goals goal-id :show-new-bid?] false)
+       (assoc-in [:goals goal-id :new-bid] (db/default-bid)))))
 
 ;;;
 ;;;
@@ -274,7 +417,7 @@
 ;;;
 (reg-event-fx
   :log-error
-  interceptors
+  (interceptors-fx :spec false)
   (fn [_ [err]]
     (js/console.log :error err)
     {}))

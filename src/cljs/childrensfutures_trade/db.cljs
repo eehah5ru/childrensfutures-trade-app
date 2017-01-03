@@ -1,6 +1,14 @@
 (ns childrensfutures-trade.db
-  (:require [cljs-web3.core :as web3]))
+  (:require [cljs-web3.core :as web3]
+            [cljs.reader]
+            [cljs.spec :as s]))
 
+
+;;;
+;;;
+;;; UTILS
+;;;
+;;;
 (defn mk-web3 []
   (or (aget js/window "web3")
              (if goog.DEBUG
@@ -13,8 +21,21 @@
 
 ;;;
 ;;;
-;;; GOAL UTILS
+;;; DEFAULT VALUES
 ;;;
+;;;
+
+;;;
+;;; default bid
+;;;
+(defn default-bid []
+  {:created-at (js/Date.now)
+   :description ""
+   :owner nil
+   :placing? false})
+
+;;;
+;;; default goal
 ;;;
 (defn default-goal []
   {:created-at (js/Date.now)
@@ -22,11 +43,74 @@
    :owner nil
    :sending? false
    :cancelling? false
-   :cancelled? false})
+   :cancelled? false
+   :bids (hash-map)
+   :new-bid (default-bid)
+   :show-new-bid? false})
 
+
+
+;;;
+;;;
+;;; SPECS
+;;;
+;;;
+(s/def ::goal-id string?)
+(s/def ::description string?)
+(s/def ::created-at int?)
+(s/def ::indicator boolean?)
+(s/def ::owner (s/or :nil nil?
+                     :string string?))
+(s/def ::sending? boolean?)
+(s/def ::cancelling boolean?)
+(s/def ::cancelled? boolean?)
+(s/def ::placing? boolean?)
+(s/def ::show-new-bid? boolean?)
+(s/def ::current-address string?)
+
+(s/def ::bid (s/keys :req-un [::created-at
+                              ::description
+                              ::owner
+                              ::placing?]))
+
+(s/def ::bids (s/map-of ::owner ::bid))
+
+(s/def ::new-bid #(s/conform ::bid %))
+
+(s/def ::goal (s/keys :req-un [::created-at
+                               ::description
+                               ::owner
+                               ::sending?
+                               ::cancelling?
+                               ::cancelled?
+                               ::bids
+                               ::new-bid
+                               ::show-new-bid?]))
+
+(s/def ::new-goal #(s/conform ::goal %))
+
+;;; goals structure
+(s/def ::goals (s/map-of ::goal-id ::goal))
+
+;;; DB structure
+(s/def ::db (s/keys :req-un [::goals
+                             ::new-goal
+                             ::current-address]))
+;;;
+;;;
+;;; END OF SPECS
+;;;
+;;;
+
+
+;;;
+;;;
+;;; STATE
+;;;
+;;;
 (def default-db
   {:goals (hash-map)
-   :settings {}
+   :settings {}                         ;FIXME: remove
    :my-addresses []
    :current-address ""
    :accounts {}
@@ -37,4 +121,4 @@
               :abi nil
               :bin nil
               :instance nil
-              :address "0x407b422779b63fad1de37c3a4c3d6300d8e97fbd"}})
+              :address "0xc38f59cef7819eaff09f614e246c8af7d5ecb7ad"}})

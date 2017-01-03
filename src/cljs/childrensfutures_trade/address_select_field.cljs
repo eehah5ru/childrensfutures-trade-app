@@ -14,7 +14,7 @@
      (r/merge-props
        {:value selected-address
         :on-change #(let [v %3]
-                      (dispatch (map (fn [x] (conj x v)) dispatch-vec)))
+                      (apply  dispatch (vec (map (fn [x] (conj x v)) dispatch-vec))))
         :disabled no-addresses?
         :style {:text-align :left}
         :floating-label-text (if no-addresses? "No Accounts Connected" "Choose your account")}

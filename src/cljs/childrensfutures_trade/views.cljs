@@ -22,7 +22,7 @@
          [ui/text-field {:default-value (:description @new-goal)
                          :on-change #(dispatch [:new-goal/update :description (u/evt-val %)])
                          :name "description"
-                         :max-length 120
+                         :max-length 120 ;FIXME
                          :floating-label-text "Goal's description"
                          :style {:width "100%"}}]
          [:br]
@@ -43,12 +43,38 @@
            :style {:margin-top 15}
            :on-touch-tap #(dispatch [:new-goal/send])}]]]])))
 
+;;;
+;;; NEW BID VIEW
+;;;
+(defn- new-bid-view [goal-id]
+  (let [new-bid (subscribe [:db/new-bid goal-id])]
+    [:div
+     [:h3 "Place Bid"]
+     [ui/text-field {:default-value (:description @new-bid)
+                     :on-change #(dispatch [:place-bid/update goal-id :description (u/evt-val %)])
+                     :name "description"
+                     :max-length 120    ;FIXME
+                     :floating-label-text "Bid's description"
+                     :style {:width "100%"}}]
+     [:br]
+     [ui/raised-button
+      {:secondary false
+       :disabled (empty? (:description @new-bid))
+       :label "Place new bid"
+       :on-touch-tap #(dispatch [:place-bid/send goal-id])}]
+     [ui/flat-button
+      {:secondary true
+       :disabled false
+       :label "cancel"
+       :on-touch-tap #(dispatch [:place-bid/cancel goal-id])}]]))
+
 
 ;;;
 ;;; goal view
 ;;;
 (defn- goal-component [goal]
-  (let [{:keys [goal-id owner description cancelled? cancelling?]} goal]
+  (let [{:keys [goal-id owner description cancelled? cancelling?]} goal
+        show-new-bid? (subscribe [:db/show-new-bid? goal-id])]
     [:div {:style {:margin-top 20}
            :key goal-id}
      [:h3
@@ -58,22 +84,24 @@
         :disabled (or cancelled?
                       cancelling?
                       (not (= @(subscribe [:db/current-address]) owner)))
-        :label "Cancel"
+        :label "Delete"
         :on-touch-tap #(dispatch [:cancel-goal/send goal-id])}]
 
       [ui/flat-button
        {:secondary false
         :disabled false
         :label "place bid"
-        :on-touch-tap #(dispatch [:goal/place-bid goal-id])}]]
+        :on-touch-tap #(dispatch [:place-bid/show-new-bid goal-id])}]]
 
      [:div {:style {:margin-top 5}}
       "goalId: "
-      (u/truncate goal-id 15)
+      goal-id
       ]
      [:div {:style {:margin-top 5}}
       "owner: "
-      (u/truncate owner 15)]
+      owner]
+     (when @show-new-bid?
+       (new-bid-view goal-id))
      [ui/divider]]))
 
 
