@@ -31,13 +31,36 @@
 ;;;
 
 ;;;
-;;; sorted goals
+;;; goals
+;;; @returns map
 ;;;
 (reg-sub
  :db/goals
  (fn [db]
-   (sort-by :created-at (vals (:goals db)))))
+   (:goals db)))
 
+;;;
+;;; sorted goals
+;;; @returns sequence
+;;;
+(reg-sub
+ :db/sorted-goals
+ :<- [:db/goals]
+ (fn [goals _]
+   (sort-by :created-at (vals goals))))
+
+
+;;;
+;;; is it my goal?
+;;; @returns boolean
+;;;
+(reg-sub
+ :db/my-goal?
+ :<- [:db/current-address]
+ :<- [:db/goals]
+ (fn [[current-address goals] [_ goal-id]]
+   (= current-address
+      (get-in goals [goal-id :owner]))))
 
 ;;;
 ;;; new goal
@@ -55,6 +78,43 @@
  (fn [db [_ goal-id]]
    (get-in db [:goals goal-id :new-bid])))
 
+
+;;;
+;;; bids for goal
+;;;
+(reg-sub
+ :db/bids
+ (fn [db [_ goal-id]]
+   (get-in db [:goals goal-id :bids])))
+
+
+;;;
+;;; bids for goal as sorted vector
+;;;
+(reg-sub
+ :db/sorted-bids
+
+ ;; input
+ (fn [[_ goal-id] _]
+   (subscribe [:db/bids goal-id]))
+
+ ;; reaction
+ (fn [bids _]
+   (sort-by :created-at (vals bids)))
+ )
+
+(reg-sub
+ :db/already-bidded?
+ ;; input
+ (fn [[_ goal-id] _]
+   [(subscribe [:db/current-address])
+    (subscribe [:db/bids goal-id])])
+
+ ;; reaction
+ (fn [[current-address bids] _]
+   (contains? bids
+              current-address))
+ )
 
 ;;;
 ;;; show new bid indicator

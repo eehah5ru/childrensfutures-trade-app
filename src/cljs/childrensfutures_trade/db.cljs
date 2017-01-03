@@ -46,7 +46,8 @@
    :cancelled? false
    :bids (hash-map)
    :new-bid (default-bid)
-   :show-new-bid? false})
+   :show-new-bid? false
+   :show-details? false})
 
 
 
@@ -66,6 +67,7 @@
 (s/def ::cancelled? boolean?)
 (s/def ::placing? boolean?)
 (s/def ::show-new-bid? boolean?)
+(s/def ::show-details? boolean?)
 (s/def ::current-address string?)
 
 (s/def ::bid (s/keys :req-un [::created-at
@@ -85,7 +87,8 @@
                                ::cancelled?
                                ::bids
                                ::new-bid
-                               ::show-new-bid?]))
+                               ::show-new-bid?
+                               ::show-details?]))
 
 (s/def ::new-goal #(s/conform ::goal %))
 
@@ -121,4 +124,4 @@
               :abi nil
               :bin nil
               :instance nil
-              :address "0xc38f59cef7819eaff09f614e246c8af7d5ecb7ad"}})
+              :address "0x7e6bf73a53104a2e5c9ed050bc6bd1c3a23fc4fc"}})

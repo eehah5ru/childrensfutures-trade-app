@@ -221,6 +221,21 @@
 
 ;;;
 ;;;
+;;; GOAL
+;;;
+;;;
+
+;;;
+;;; toggle details visibility
+;;;
+(reg-event-db
+ :goal/toggle-details
+ interceptors
+ (fn [db [goal-id]]
+   (update-in db [:goals goal-id :show-details?] not)))
+
+;;;
+;;;
 ;;; NEW GOAL
 ;;;
 ;;;

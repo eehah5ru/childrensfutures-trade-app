@@ -31,9 +31,11 @@
           @my-addresses
           (:address @new-goal)
           [[:new-goal/update :owner] [:current-address/update]]]
+
          [:br]
          [:h3 "Balance: " (u/eth @balance)]
          [:br]
+
          [ui/raised-button
           {:secondary true
            :disabled (or (empty? (:description @new-goal))
@@ -41,7 +43,11 @@
                          (:sending? @new-goal))
            :label "Place on Exchange"
            :style {:margin-top 15}
-           :on-touch-tap #(dispatch [:new-goal/send])}]]]])))
+           :on-touch-tap #(dispatch [:new-goal/send])}]]]
+
+      [ui/snackbar {:message "Adding Goal"
+                    :open (:sending? @new-goal)}]]
+      )))
 
 ;;;
 ;;; NEW BID VIEW
@@ -66,19 +72,57 @@
       {:secondary true
        :disabled false
        :label "cancel"
-       :on-touch-tap #(dispatch [:place-bid/cancel goal-id])}]]))
+       :on-touch-tap #(dispatch [:place-bid/cancel goal-id])}]
 
+     [ui/snackbar {:message "Placing bid"
+                   :open (:placing? @new-bid)}]]))
+
+;;;
+;;; BID VIEW
+;;;
+(defn- bid-view [bid]
+  (let [{:keys [owner description]} bid]
+    [:div.bid
+     [:h4 description]
+     [ui/divider]]))
 
 ;;;
 ;;; goal view
 ;;;
 (defn- goal-component [goal]
-  (let [{:keys [goal-id owner description cancelled? cancelling?]} goal
-        show-new-bid? (subscribe [:db/show-new-bid? goal-id])]
+  (let [{:keys [goal-id owner description cancelled? cancelling? show-details?]} goal
+        show-new-bid? (subscribe [:db/show-new-bid? goal-id])
+        my-goal? (subscribe [:db/my-goal? goal-id])
+        bids (subscribe [:db/sorted-bids goal-id])
+        already-bidded? (subscribe [:db/already-bidded? goal-id])]
     [:div {:style {:margin-top 20}
            :key goal-id}
      [:h3
       description
+      ;;
+      ;; place bid
+      ;;
+      [ui/flat-button
+       {:secondary false
+        :disabled (or @my-goal?
+                      @already-bidded?)
+        :label "place bid"
+        :on-touch-tap #(dispatch [:place-bid/show-new-bid goal-id])}]
+      ;;
+      ;; show details
+      ;; FIXME: for debug only
+      ;;
+      [ui/flat-button
+       {:secondary true
+        :disabled false
+        :label (if show-details?
+                 "hide details"
+                 "show details")
+        :on-touch-tap #(dispatch [:goal/toggle-details goal-id])}]
+
+      ;;
+      ;; cancel goal
+      ;;
       [ui/flat-button
        {:secondary true
         :disabled (or cancelled?
@@ -86,22 +130,30 @@
                       (not (= @(subscribe [:db/current-address]) owner)))
         :label "Delete"
         :on-touch-tap #(dispatch [:cancel-goal/send goal-id])}]
-
-      [ui/flat-button
-       {:secondary false
-        :disabled false
-        :label "place bid"
-        :on-touch-tap #(dispatch [:place-bid/show-new-bid goal-id])}]]
-
-     [:div {:style {:margin-top 5}}
-      "goalId: "
-      goal-id
       ]
-     [:div {:style {:margin-top 5}}
-      "owner: "
-      owner]
+
+     ;;
+     ;; details view
+     ;;
+     (when show-details?
+       [:div.goal-details
+        [:div {:style {:margin-top 5}}
+         "goalId: "
+         goal-id]
+        [:div {:style {:margin-top 5}}
+         "owner: "
+         owner]])
+     ;;
+     ;; new bid view
+     ;;
      (when @show-new-bid?
        (new-bid-view goal-id))
+
+     (when (not (empty? @bids))
+       [:h3 "Bids"])
+     (for [bid @bids]
+       ^{:key (:owner bid)} [bid-view bid])
+
      [ui/divider]]))
 
 
@@ -109,7 +161,7 @@
 ;;; goals list view
 ;;;
 (defn- goals-component []
-  (let [goals (subscribe [:db/goals])]
+  (let [goals (subscribe [:db/sorted-goals])]
     (fn []
       [row
        [col {:xs 12 :sm 12 :md 10 :lg 6 :md-offset 1 :lg-offset 3}
@@ -123,8 +175,8 @@
   (let []
     (fn []
       [ui/mui-theme-provider
-       {:mui-theme (get-mui-theme {:palette {:primary1-color (color :light-blue500)
-                                             :accent1-color (color :amber700)}})}
+       {:mui-theme (get-mui-theme {:palette {:primary-color (color :light-blue500)
+                                             :accent-color (color :amber700)}})}
        [:div
         [ui/app-bar {:title "Goals Exchange Market"}]
         [new-goal-component]
