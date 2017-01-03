@@ -90,12 +90,18 @@
                     :timeout 6000
                     :response-format (ajax/json-response-format {:keywords? true})
                     :on-success [:contract/abi-loaded]
-                    :on-failure [:log-error]}}
-      (when (:provides-web3? db/default-db)
-        {:web3-fx.blockchain/fns
-         {:web3 (:web3 db/default-db)
-          :fns [[web3-eth/accounts :blockchain/my-addresses-loaded :log-error]]}}))))
+                    :on-failure [:log-error]}
+       :dispatch [:blockchain/load-my-addresses]})))
 
+
+(reg-event-fx
+ :blockchain/load-my-addresses
+ (interceptors-fx :spec false)
+ (fn [{:keys [db]}]
+   (when (:provides-web3? db)
+     {:web3-fx.blockchain/fns
+      {:web3 (:web3 db)
+       :fns [[web3-eth/accounts :blockchain/my-addresses-loaded :log-error]]}})))
 ;;;
 ;;;
 ;;; when get access to ethereum node accounts
@@ -107,7 +113,6 @@
   (fn [{:keys [db]} [addresses]]
     {:db (-> db
            (assoc :my-addresses addresses)
-           (assoc-in [:new-goal :address] (first addresses))
            (assoc :current-address (first addresses)))
      :web3-fx.blockchain/balances
      {:web3 (:web3 db/default-db)
@@ -144,6 +149,18 @@
        ;; {:instance contract-instance
        ;;  :fns [[:get-settings :contract/settings-loaded :log-error]]}
        })))
+
+;;;
+;;;
+;;; update balance
+;;;
+;;;
+(reg-event-db
+  :blockchain/balance-loaded
+  interceptors
+  (fn [db [balance address]]
+    (assoc-in db [:accounts address :balance] balance)))
+
 
 
 ;;;
@@ -194,18 +211,6 @@
                     (let [{:keys [bid-owner description]} bid]
                       {:owner bid-owner
                        :description description})))))
-
-;;;
-;;;
-;;; update balance
-;;;
-;;;
-(reg-event-db
-  :blockchain/balance-loaded
-  interceptors
-  (fn [db [balance address]]
-    (assoc-in db [:accounts address :balance] balance)))
-
 
 ;;;
 ;;;

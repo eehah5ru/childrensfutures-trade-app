@@ -19,7 +19,7 @@
   ;; IMPORTANT!!!! let outside fn!!!
   (let [my-addresses (subscribe [:db/my-addresses])
         current-address (subscribe [:db/current-address])
-        balance (subscribe [:new-goal/selected-address-balance])]
+        balance (subscribe [:db/selected-address-balance])]
     (fn []
       [row
        [col {:xs 12 :sm 12 :md 10 :lg 6 :md-offset 1 :lg-offset 3}
@@ -40,41 +40,39 @@
 ;;;
 (defn- new-goal-component []
   (let [new-goal (subscribe [:db/new-goal])]
-    (fn []
-      [row
-       [col {:xs 12 :sm 12 :md 10 :lg 6 :md-offset 1 :lg-offset 3}
-        [ui/paper {:style {:padding 20 :margin-top 20}}
-         [:h1 "New Goal"]
-         [ui/text-field {:default-value (:description @new-goal)
-                         :on-change #(dispatch [:new-goal/update :description (u/evt-val %)])
-                         :name "description"
-                         :max-length 120 ;FIXME
-                         :floating-label-text "Goal's description"
-                         :style {:width "100%"}}]
-         [:br]
-         ;;
-         ;; add goal
-         ;;
-         [ui/raised-button
-          {:secondary true
-           :disabled (or (empty? (:description @new-goal))
-                         (empty? (:owner @new-goal))
-                         (:sending? @new-goal))
-           :label "Place on Exchange"
-           :style {:margin-top 15}
-           :on-touch-tap #(dispatch [:new-goal/send])}]
-         ;;
-         ;; cancel
-         ;;
-         [ui/flat-button
-          {:secondary true
-           :disabled false
-           :label "cancel"
-           :on-touch-tap #(dispatch [:new-goal/toggle-view])}]
-         ]]
+    [row
+     [col {:xs 12 :sm 12 :md 10 :lg 6 :md-offset 1 :lg-offset 3}
+      [ui/paper {:style {:padding 20 :margin-top 20}}
+       [:h1 "New Goal"]
+       [ui/text-field {:default-value (:description @new-goal)
+                       :on-change #(dispatch [:new-goal/update :description (u/evt-val %)])
+                       :name "description"
+                       :max-length 120 ;FIXME
+                       :floating-label-text "Goal's description"
+                       :style {:width "100%"}}]
+       [:br]
+       ;;
+       ;; add goal
+       ;;
+       [ui/raised-button
+        {:secondary true
+         :disabled (or (empty? (:description @new-goal))
+                       (:sending? @new-goal))
+         :label "Place on Exchange"
+         :style {:margin-top 15}
+         :on-touch-tap #(dispatch [:new-goal/send])}]
+       ;;
+       ;; cancel
+       ;;
+       [ui/flat-button
+        {:secondary true
+         :disabled false
+         :label "cancel"
+         :on-touch-tap #(dispatch [:new-goal/toggle-view])}]
+       ]]
 
-       ]
-      )))
+     ]
+    ))
 
 ;;;
 ;;; NEW BID VIEW
@@ -229,7 +227,8 @@
                                          [ui/icon-button
                                           {:tooltip "Change account"
                                            :children (icons/notification-sync)
-                                           :on-touch-tap #(dispatch [:accounts/toggle-view])}]])}])))
+                                           :on-touch-tap #(do (dispatch [:blockchain/load-my-addresses])
+                                                              (dispatch [:accounts/toggle-view]))}]])}])))
 
 ;;;
 ;;; main panel

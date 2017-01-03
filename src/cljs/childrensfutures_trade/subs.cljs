@@ -19,9 +19,9 @@
    (first my-addresses)))
 
 (reg-sub
- :new-goal/selected-address-balance
+ :db/selected-address-balance
  (fn [db]
-   (get-in db [:accounts (:address (:new-goal db)) :balance])))
+   (get-in db [:accounts (:current-address db) :balance])))
 
 
 ;;;
