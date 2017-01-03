@@ -26,9 +26,25 @@
 
 ;;;
 ;;;
+;;; UI RELATED
+;;;
+;;;
+(reg-sub
+ :db/show-new-goal?
+ (fn [db]
+   (:show-new-goal? db)))
+
+(reg-sub
+ :db/show-accounts?
+ (fn [db]
+   (:show-accounts? db)))
+
+;;;
+;;;
 ;;; GOAL RELATED
 ;;;
 ;;;
+
 
 ;;;
 ;;; goals
@@ -47,7 +63,7 @@
  :db/sorted-goals
  :<- [:db/goals]
  (fn [goals _]
-   (sort-by :created-at (vals goals))))
+   (sort-by :created-at #(compare %2 %1) (vals goals))))
 
 
 ;;;
@@ -70,6 +86,13 @@
  (fn [db]
    (:new-goal db)))
 
+(reg-sub
+ :db/sending-new-goal?
+ :<- [:db/new-goal]
+ (fn [new-goal _]
+   (:sending? new-goal)))
+
+
 ;;;
 ;;; new bid for goal
 ;;;
@@ -77,7 +100,6 @@
  :db/new-bid
  (fn [db [_ goal-id]]
    (get-in db [:goals goal-id :new-bid])))
-
 
 ;;;
 ;;; bids for goal
@@ -103,6 +125,9 @@
    (sort-by :created-at (vals bids)))
  )
 
+;;;
+;;; returns tru if current goal already bidded by user
+;;;
 (reg-sub
  :db/already-bidded?
  ;; input

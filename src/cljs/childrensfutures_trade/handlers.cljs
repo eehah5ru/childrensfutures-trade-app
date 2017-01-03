@@ -226,6 +226,12 @@
 ;;;
 
 ;;;
+;;;
+;;; UI RELATED
+;;;
+;;;
+
+;;;
 ;;; toggle details visibility
 ;;;
 (reg-event-db
@@ -235,10 +241,35 @@
    (update-in db [:goals goal-id :show-details?] not)))
 
 ;;;
+;;; TOGGLE NEW GOAL VIEW VISIBILITY
+;;;
+(reg-event-db
+ :new-goal/toggle-view
+ interceptors
+ (fn [db]
+   (update db :show-new-goal? not)))
+
+;;;
+;;; toggle accounts view
+;;;
+(reg-event-db
+ :accounts/toggle-view
+ interceptors
+ (fn [db]
+   (update db :show-accounts? not)))
+
+;;;
+;;;
+;;; GOAL ACTIONS
+;;;
+;;;
+
+;;;
 ;;;
 ;;; NEW GOAL
 ;;;
 ;;;
+
 
 ;;;
 ;;;
@@ -280,7 +311,9 @@
   :new-goal/confirmed
   interceptors
   (fn [db [transaction-hash]]
-    (assoc-in db [:new-goal :sending?] true)))
+    (-> db
+        (assoc-in [:new-goal :sending?] true)
+        (update :show-new-goal? not))))
 
 ;;;
 ;;; confirms that goal was sent to ethereum contract
@@ -292,7 +325,9 @@
     (console :log transaction-receipt)
     (when (= gas-used goal-gas-limit)
       (console :error "All gas used"))
-    (assoc-in db [:new-goal :sending?] false)))
+    (-> db
+        (assoc :new-goal (db/default-goal))
+        (assoc-in [:new-goal :owner] (:current-address db)))))
 
 
 ;;;

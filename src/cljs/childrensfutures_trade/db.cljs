@@ -68,6 +68,8 @@
 (s/def ::placing? boolean?)
 (s/def ::show-new-bid? boolean?)
 (s/def ::show-details? boolean?)
+(s/def ::show-new-goal? boolean?)
+(s/def ::show-accounts? boolean?)
 (s/def ::current-address string?)
 
 (s/def ::bid (s/keys :req-un [::created-at
@@ -98,7 +100,9 @@
 ;;; DB structure
 (s/def ::db (s/keys :req-un [::goals
                              ::new-goal
-                             ::current-address]))
+                             ::current-address
+                             ::show-new-goal?
+                             ::show-accounts?]))
 ;;;
 ;;;
 ;;; END OF SPECS
@@ -118,6 +122,8 @@
    :current-address ""
    :accounts {}
    :new-goal (default-goal)
+   :show-new-goal? false
+   :show-accounts? false
    :web3 (mk-web3)
    :provides-web3? (or (aget js/window "web3") goog.DEBUG)
    :contract {:name "GoalsStockExchange"
