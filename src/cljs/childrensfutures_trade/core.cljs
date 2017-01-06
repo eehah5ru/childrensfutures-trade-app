@@ -1,19 +1,25 @@
 (ns childrensfutures-trade.core
   (:require
-    [cljs-time.extend]
-    [cljsjs.material-ui]
-    [cljsjs.react-flexbox-grid]
-    [cljsjs.web3]
-    [childrensfutures-trade.handlers]
-    [childrensfutures-trade.subs]
-    [childrensfutures-trade.views :as views]
-    [print.foo.preloads.devtools]
-    [re-frame.core :as re-frame]
-    [reagent.core :as reagent]
-    ))
+   [cljs-time.extend]
+   [cljsjs.material-ui]
+   [cljsjs.react-flexbox-grid]
+   [cljsjs.web3]
+   [childrensfutures-trade.handlers]
+   [childrensfutures-trade.subs]
+   [childrensfutures-trade.views :as views]
+   [childrensfutures-trade.routes :refer [routes]]
+   [print.foo.preloads.devtools]
+   [re-frame.core :as re-frame :refer [dispatch subscribe]]
+   [reagent.core :as reagent]
+   [pushy.core :as pushy]
+   [bidi.bidi :as bidi]
+   ))
 
 
 (enable-console-print!)
+
+(def history
+  (pushy/pushy #(dispatch [:set-current-page %]) (partial bidi/match-route routes)))
 
 (defn mount-root []
   (reagent/render [views/main-panel]
@@ -21,4 +27,5 @@
 
 (defn ^:export init []
   (re-frame/dispatch-sync [:initialize])
+  (pushy/start! history)
   (mount-root))

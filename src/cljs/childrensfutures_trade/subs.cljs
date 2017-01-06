@@ -26,6 +26,16 @@
 
 ;;;
 ;;;
+;;; CONTRACT
+;;;
+;;;
+(reg-sub
+  :contract/active-state?
+  (fn [db]
+    (= :active (get-in db [:contract :state]))))
+
+;;;
+;;;
 ;;; UI RELATED
 ;;;
 ;;;
@@ -38,6 +48,25 @@
  :db/show-accounts?
  (fn [db]
    (:show-accounts? db)))
+
+(reg-sub
+ :ui/drawer-open?
+ (fn [db]
+   (:drawer-open? db)))
+
+(reg-sub
+ :ui/current-page
+ (fn [db]
+   (:current-page db)))
+
+;;;
+;;; show new bid indicator
+;;;
+(reg-sub
+ :db/show-new-bid?
+ (fn [db [_ goal-id]]
+   (get-in db [:goals goal-id :show-new-bid?])))
+
 
 ;;;
 ;;;
@@ -94,6 +123,12 @@
 
 
 ;;;
+;;;
+;;; BIDS
+;;;
+;;;
+
+;;;
 ;;; new bid for goal
 ;;;
 (reg-sub
@@ -126,7 +161,7 @@
  )
 
 ;;;
-;;; returns tru if current goal already bidded by user
+;;; returns true if current goal already bidded by user
 ;;;
 (reg-sub
  :db/already-bidded?
@@ -138,13 +173,36 @@
  ;; reaction
  (fn [[current-address bids] _]
    (contains? bids
-              current-address))
- )
+              current-address)))
+
 
 ;;;
-;;; show new bid indicator
+;;; is it my bid?
+;;; @returns boolean
 ;;;
 (reg-sub
- :db/show-new-bid?
- (fn [db [_ goal-id]]
-   (get-in db [:goals goal-id :show-new-bid?])))
+ :db/my-bid?
+
+ ;; input
+ (fn [[_ goal-id bid-id] _]
+   [(subscribe [:db/current-address])
+    (subscribe [:db/bids goal-id])])
+
+ ;; reaction
+ (fn [[current-address bids] [_ goal-id bid-id]]
+   (= current-address
+      (get-in bids [bid-id :owner]))))
+
+;;;
+;;; returns true if goal has already selected bid
+;;;
+(reg-sub
+ :db/goal-has-selected-bid?
+
+ ;; input
+ (fn [[_ goal-id] _]
+   (subscribe [:db/bids goal-id]))
+
+ ;; reaction
+ (fn [bids _]
+   false))

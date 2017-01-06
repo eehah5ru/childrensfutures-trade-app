@@ -1,18 +1,18 @@
 (ns childrensfutures-trade.handlers
   (:require
-    [ajax.core :as ajax]
-    [cljs-web3.core :as web3]
-    [cljs-web3.eth :as web3-eth]
-    [cljs-web3.personal :as web3-personal]
-    [cljsjs.web3]
-    [cljs.spec :as s]
-    [childrensfutures-trade.db :as db]
-    [day8.re-frame.http-fx]
-    [goog.string :as gstring]
-    [goog.string.format]
-    [madvas.re-frame.web3-fx]
-    [re-frame.core :refer [reg-event-db reg-event-fx path trim-v after debug reg-fx console dispatch]]
-    [childrensfutures-trade.utils :as u]))
+   [ajax.core :as ajax]
+   [cljs-web3.core :as web3]
+   [cljs-web3.eth :as web3-eth]
+   [cljs-web3.personal :as web3-personal]
+   [cljsjs.web3]
+   [cljs.spec :as s]
+   [childrensfutures-trade.db :as db]
+   [day8.re-frame.http-fx]
+   [goog.string :as gstring]
+   [goog.string.format]
+   [madvas.re-frame.web3-fx]
+   [re-frame.core :refer [reg-event-db reg-event-fx path trim-v after debug reg-fx console dispatch]]
+   [childrensfutures-trade.utils :as u]))
 
 ;;;
 ;;;
@@ -80,18 +80,18 @@
 ;;;
 ;;;
 (reg-event-fx
-  :initialize
-  (fn [_ _]
-    (merge
-      {:db db/default-db
-       :http-xhrio {:method :get
-                    :uri (gstring/format "./contracts/build/%s.abi"
-                                         (get-in db/default-db [:contract :name]))
-                    :timeout 6000
-                    :response-format (ajax/json-response-format {:keywords? true})
-                    :on-success [:contract/abi-loaded]
-                    :on-failure [:log-error]}
-       :dispatch [:blockchain/load-my-addresses]})))
+ :initialize
+ (fn [_ _]
+   (merge
+    {:db db/default-db
+     :http-xhrio {:method :get
+                  :uri (gstring/format "./contracts/build/%s.abi"
+                                       (get-in db/default-db [:contract :name]))
+                  :timeout 6000
+                  :response-format (ajax/json-response-format {:keywords? true})
+                  :on-success [:contract/abi-loaded]
+                  :on-failure [:log-error]}
+     :dispatch [:blockchain/load-my-addresses]})))
 
 
 (reg-event-fx
@@ -108,18 +108,18 @@
 ;;;
 ;;;
 (reg-event-fx
-  :blockchain/my-addresses-loaded
-  (interceptors-fx :spec true)
-  (fn [{:keys [db]} [addresses]]
-    {:db (-> db
-           (assoc :my-addresses addresses)
-           (assoc :current-address (first addresses)))
-     :web3-fx.blockchain/balances
-     {:web3 (:web3 db/default-db)
-      :addresses addresses
-      :watch? true
-      :blockchain-filter-opts "latest"
-      :dispatches [:blockchain/balance-loaded :log-error]}}))
+ :blockchain/my-addresses-loaded
+ (interceptors-fx :spec true)
+ (fn [{:keys [db]} [addresses]]
+   {:db (-> db
+            (assoc :my-addresses addresses)
+            (assoc :current-address (first addresses)))
+    :web3-fx.blockchain/balances
+    {:web3 (:web3 db/default-db)
+     :addresses addresses
+     :watch? true
+     :blockchain-filter-opts "latest"
+     :dispatches [:blockchain/balance-loaded :log-error]}}))
 
 
 ;;;
@@ -128,27 +128,27 @@
 ;;;
 ;;;
 (reg-event-fx
-  :contract/abi-loaded
-  (interceptors-fx :spec true)
-  (fn [{:keys [db]} [abi]]
-    (let [web3 (:web3 db)
-          contract-instance (web3-eth/contract-at web3 abi (:address (:contract db)))]
+ :contract/abi-loaded
+ (interceptors-fx :spec true)
+ (fn [{:keys [db]} [abi]]
+   (let [web3 (:web3 db)
+         contract-instance (web3-eth/contract-at web3 abi (:address (:contract db)))]
+     {:db (assoc-in db [:contract :instance] contract-instance)
 
-      {:db (assoc-in db [:contract :instance] contract-instance)
+      :web3-fx.contract/events
+      {:instance contract-instance
+       :db db
+       :db-path [:contract :events]
+       :events [[:GoalAdded {} {:from-block 0} :contract/on-goal-loaded :log-error]
+                [:GoalCancelled {} {:from-block 0} :contract/on-goal-cancelled :log-error]
+                [:BidPlaced {} {:from-block 0} :contract/on-bid-placed :log-error]
+                [:BidSelected {} {:from-block 0} :contract/on-bid-selected :log-error]]}
 
-       :web3-fx.contract/events
-       {:instance contract-instance
-        :db db
-        :db-path [:contract :events]
-        :events [[:GoalAdded {} {:from-block 0} :contract/on-goal-loaded :log-error]
-                 [:GoalCancelled {} {:from-block 0} :contract/on-goal-cancelled :log-error]
-                 [:BidPlaced {} {:from-block 0} :contract/on-bid-placed :log-error]]}
 
-
-       ;; :web3-fx.contract/constant-fns
-       ;; {:instance contract-instance
-       ;;  :fns [[:get-settings :contract/settings-loaded :log-error]]}
-       })))
+      ;; :web3-fx.contract/constant-fns
+      ;; {:instance contract-instance
+      ;;  :fns [[:get-settings :contract/settings-loaded :log-error]]}
+      })))
 
 ;;;
 ;;;
@@ -156,10 +156,10 @@
 ;;;
 ;;;
 (reg-event-db
-  :blockchain/balance-loaded
-  interceptors
-  (fn [db [balance address]]
-    (assoc-in db [:accounts address :balance] balance)))
+ :blockchain/balance-loaded
+ interceptors
+ (fn [db [balance address]]
+   (assoc-in db [:accounts address :balance] balance)))
 
 
 
@@ -189,10 +189,10 @@
 ;;;
 ;;;
 (reg-event-db
-  :contract/on-goal-cancelled
-  interceptors
-  (fn [db [goal]]
-    (assoc-in db [:goals (:goal-id goal) :cancelled?] true)))
+ :contract/on-goal-cancelled
+ interceptors
+ (fn [db [goal]]
+   (assoc-in db [:goals (:goal-id goal) :cancelled?] true)))
 
 
 ;;;
@@ -206,11 +206,26 @@
  (fn [db [bid]]
    (js/console.log :info :bid-placed bid)
    (assoc-in db
-             [:goals (:goal-id bid) :bids (:bid-owner bid)]
+             [:goals (:goal-id bid) :bids (:bid-owner bid)] ; FIXME: bid-owner -> bid-id
              (merge (db/default-bid)
                     (let [{:keys [bid-owner description]} bid]
                       {:owner bid-owner
                        :description description})))))
+
+
+;;;
+;;;
+;;; BidSelected
+;;;
+;;;
+(reg-event-db
+ :contract/on-bid-selected
+ interceptors
+ (fn [db [{:keys [goal-id bid-id]}]]
+   (js/console.log :info :bid-selected goal-id bid-id)
+   (assoc-in db
+             [:goals goal-id :bids bid-id :selected?]
+             true)))
 
 ;;;
 ;;;
@@ -254,6 +269,16 @@
  (fn [db]
    (update db :show-new-goal? not)))
 
+
+;;;
+;;;
+;;;
+(reg-event-db
+ :drawer/toggle-view
+ interceptors
+ (fn [db]
+   (update db :drawer-open? not)))
+
 ;;;
 ;;; toggle accounts view
 ;;;
@@ -262,6 +287,15 @@
  interceptors
  (fn [db]
    (update db :show-accounts? not)))
+
+(reg-event-fx
+ :set-current-page
+ interceptors
+ (fn [{:keys [db]} [match]]
+   {:db (assoc db :current-page match
+               :drawer-open? false)
+    ;; :ga/page-view [(apply u/path-for (:handler match) (flatten (into [] (:route-params match))))]
+    }))
 
 ;;;
 ;;;
@@ -282,29 +316,29 @@
 ;;;
 ;;;
 (reg-event-db
-  :new-goal/update
-  interceptors
-  (fn [db [key value]]
-    (assoc-in db [:new-goal key] value)))
+ :new-goal/update
+ interceptors
+ (fn [db [key value]]
+   (assoc-in db [:new-goal key] value)))
 
 ;;;
 ;;; send new goal to ethereum contract
 ;;;
 (reg-event-fx
-  :new-goal/send
-  (interceptors-fx :spec false)
-  (fn [{:keys [db]} []]
-    (let [{:keys [description owner]} (:new-goal db)]
-      {:web3-fx.contract/state-fn
-       {:instance (:instance (:contract db))
-        :web3 (:web3 db)
-        :db-path [:contract :send-goal]
-        :fn [:new-goal description
-             {:from owner
-              :gas goal-gas-limit}
-             :new-goal/confirmed
-             :log-error
-             :new-goal/transaction-receipt-loaded]}})))
+ :new-goal/send
+ (interceptors-fx :spec false)
+ (fn [{:keys [db]} []]
+   (let [{:keys [description owner]} (:new-goal db)]
+     {:web3-fx.contract/state-fn
+      {:instance (:instance (:contract db))
+       :web3 (:web3 db)
+       :db-path [:contract :send-goal]
+       :fn [:new-goal description
+            {:from owner
+             :gas goal-gas-limit}
+            :new-goal/confirmed
+            :log-error
+            :new-goal/transaction-receipt-loaded]}})))
 
 
 ;;;
@@ -313,26 +347,26 @@
 ;;; see event handler above
 ;;;
 (reg-event-db
-  :new-goal/confirmed
-  interceptors
-  (fn [db [transaction-hash]]
-    (-> db
-        (assoc-in [:new-goal :sending?] true)
-        (update :show-new-goal? not))))
+ :new-goal/confirmed
+ interceptors
+ (fn [db [transaction-hash]]
+   (-> db
+       (assoc-in [:new-goal :sending?] true)
+       (update :show-new-goal? not))))
 
 ;;;
 ;;; confirms that goal was sent to ethereum contract
 ;;;
 (reg-event-db
-  :new-goal/transaction-receipt-loaded
-  interceptors
-  (fn [db [{:keys [gas-used] :as transaction-receipt}]]
-    (console :log transaction-receipt)
-    (when (= gas-used goal-gas-limit)
-      (console :error "All gas used"))
-    (-> db
-        (assoc :new-goal (db/default-goal))
-        (assoc-in [:new-goal :owner] (:current-address db)))))
+ :new-goal/transaction-receipt-loaded
+ interceptors
+ (fn [db [{:keys [gas-used] :as transaction-receipt}]]
+   (console :log transaction-receipt)
+   (when (= gas-used goal-gas-limit)
+     (console :error "All gas used"))
+   (-> db
+       (assoc :new-goal (db/default-goal))
+       (assoc-in [:new-goal :owner] (:current-address db)))))
 
 
 ;;;
@@ -365,10 +399,10 @@
 ;;; if trx was confirmed by user
 ;;;
 (reg-event-db
-  :cancel-goal/confirmed
-  interceptors
-  (fn [db [goal-id tx-hash]]
-    (assoc-in db [:goals goal-id :cancelling?] true)))
+ :cancel-goal/confirmed
+ interceptors
+ (fn [db [goal-id tx-hash]]
+   (assoc-in db [:goals goal-id :cancelling?] true)))
 
 ;;;
 ;;; confirms that goal was cancelled
@@ -397,9 +431,9 @@
 (reg-event-fx
  :place-bid/send
  (interceptors-fx :spec false)
-  (fn [{:keys [db]} [goal-id]]
-    (let [address (:current-address db)
-          {:keys [description]} (get-in db [:goals goal-id :new-bid])]
+ (fn [{:keys [db]} [goal-id]]
+   (let [address (:current-address db)
+         {:keys [description]} (get-in db [:goals goal-id :new-bid])]
      {:web3-fx.contract/state-fn
       {:instance (:instance (:contract db))
        :web3 (:web3 db)
@@ -416,10 +450,10 @@
 ;;; if trx was confirmed by user
 ;;;
 (reg-event-db
-  :place-bid/confirmed
-  interceptors
-  (fn [db [goal-id tx-hash]]
-    (assoc-in db [:goals goal-id :new-bid :placing?] true)))
+ :place-bid/confirmed
+ interceptors
+ (fn [db [goal-id tx-hash]]
+   (assoc-in db [:goals goal-id :new-bid :placing?] true)))
 
 ;;;
 ;;; confirms that bid was placed
@@ -447,11 +481,11 @@
 ;;; update new bid values while editing bid
 ;;;
 (reg-event-db
-  :place-bid/update
-  interceptors
-  (fn [db [goal-id key value]]
-    (js/console.log (get-in db [:goals goal-id :new-bid]))
-    (assoc-in db [:goals goal-id :new-bid key] value)))
+ :place-bid/update
+ interceptors
+ (fn [db [goal-id key value]]
+   (js/console.log (get-in db [:goals goal-id :new-bid]))
+   (assoc-in db [:goals goal-id :new-bid key] value)))
 
 
 ;;;
@@ -465,17 +499,68 @@
        (assoc-in [:goals goal-id :show-new-bid?] false)
        (assoc-in [:goals goal-id :new-bid] (db/default-bid)))))
 
+
+;;;
+;;;
+;;; SELECT BID
+;;;
+;;;
+
+;;;
+;;; make select bid trx in the ethereum
+;;;
+(reg-event-fx
+ :select-bid/send
+ (interceptors-fx :spec false)
+ (fn [{:keys [db]} [goal-id bid-id]]
+   (let [address (:current-address db)
+         {:keys [description]} (get-in db [:goals goal-id :new-bid])]
+     {:web3-fx.contract/state-fn
+      {:instance (:instance (:contract db))
+       :web3 (:web3 db)
+       :db-path [:contract :select-bid (keyword goal-id) (keyword bid-id)]
+       :fn [:select-bid goal-id bid-id
+            {:from address
+             :gas goal-gas-limit}
+            [:select-bid/confirmed goal-id bid-id]
+            :log-error
+            [:select-bid/transaction-receipt-loaded goal-id bid-id]]}})))
+
+;;;
+;;; change state of selected bid
+;;; if trx was confirmed by user
+;;;
+(reg-event-db
+ :select-bid/confirmed
+ interceptors
+ (fn [db [goal-id bid-id tx-hash]]
+   (assoc-in db [:goals goal-id :bids bid-id :selecting?] true)))
+
+;;;
+;;; confirms that bid was selected
+;;;
+(reg-event-db
+ :select-bid/transaction-receipt-loaded
+ interceptors
+ (fn [db [goal-id bid-id & {:keys [gas-used] :as transaction-receipt}]]
+   (console :log transaction-receipt)
+   (when (= gas-used goal-gas-limit)
+     (console :error "All gas used"))
+   (-> db
+       (assoc-in [:goals goal-id :bids bid-id :selecting?] false))))
+
+
 ;;;
 ;;;
 ;;; LOGGER
 ;;;
 ;;;
 (reg-event-fx
-  :log-error
-  (interceptors-fx :spec false)
-  (fn [_ [err]]
-    (js/console.log :error err)
-    {}))
+ :log-error
+ (interceptors-fx :spec false)
+ (fn [_ [err]]
+   (js/console.log :error err)
+   {}))
 
 ;;;
 ;;;

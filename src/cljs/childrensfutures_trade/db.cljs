@@ -32,7 +32,9 @@
   {:created-at (js/Date.now)
    :description ""
    :owner nil
-   :placing? false})
+   :placing? false
+   :selected? false
+   :selecting? false})
 
 ;;;
 ;;; default goal
@@ -71,11 +73,16 @@
 (s/def ::show-new-goal? boolean?)
 (s/def ::show-accounts? boolean?)
 (s/def ::current-address string?)
+(s/def ::selected? boolean?)
+(s/def ::selecting? boolean?)
+(s/def ::drawer-open? boolean?)
 
 (s/def ::bid (s/keys :req-un [::created-at
                               ::description
                               ::owner
-                              ::placing?]))
+                              ::placing?
+                              ::selected?
+                              ::selecting?]))
 
 (s/def ::bids (s/map-of ::owner ::bid))
 
@@ -102,7 +109,8 @@
                              ::new-goal
                              ::current-address
                              ::show-new-goal?
-                             ::show-accounts?]))
+                             ::show-accounts?
+                             ::drawer-open?]))
 ;;;
 ;;;
 ;;; END OF SPECS
@@ -124,10 +132,11 @@
    :new-goal (default-goal)
    :show-new-goal? false
    :show-accounts? false
+   :drawer-open? false
    :web3 (mk-web3)
    :provides-web3? (or (aget js/window "web3") goog.DEBUG)
    :contract {:name "GoalsStockExchange"
               :abi nil
               :bin nil
               :instance nil
-              :address "0x7e6bf73a53104a2e5c9ed050bc6bd1c3a23fc4fc"}})
+              :address "0xb2b115268849a014827e0fafa66c831ce449666a"}})

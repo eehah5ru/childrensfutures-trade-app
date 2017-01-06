@@ -2,7 +2,9 @@
   (:require [cljs-time.coerce :refer [to-date-time to-long to-local-date-time]]
             [cljs-time.core :refer [date-time to-default-time-zone]]
             [cljs-time.format :as time-format]
-            [cljs-web3.core :as web3]))
+            [cljs-web3.core :as web3]
+            [bidi.bidi :as bidi]
+            [childrensfutures-trade.routes :refer [routes]]))
 
 (defn truncate
   "Truncate a string with suffix (ellipsis by default) if it is
@@ -27,3 +29,16 @@
 
 (defn format-date [date]
   (time-format/unparse-local (time-format/formatters :rfc822) (to-default-time-zone (to-date-time date))))
+
+(defn extract-props [v]
+  (let [p (nth v 0 nil)]
+    (if (map? p) p)))
+
+(defn extract-children [v]
+  (let [p (nth v 0 nil)
+        first-child (if (or (nil? p) (map? p)) 1 0)]
+    (if (> (count v) first-child)
+      (subvec v first-child))))
+
+
+(def path-for (partial bidi/path-for routes))

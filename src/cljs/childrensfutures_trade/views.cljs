@@ -7,10 +7,45 @@
     [cljs-react-material-ui.core :refer [get-mui-theme color]]
     [cljs-react-material-ui.icons :as icons]
     [childrensfutures-trade.utils :as u]
-    [childrensfutures-trade.subs :as s]))
+    [childrensfutures-trade.subs :as s]
+    [childrensfutures-trade.styles :as st]
+    [childrensfutures-trade.components.home-page :refer [home-page]]
+    ;; [childrensfutures-trade.components.how-to-play-page :refer [how-to-play-page]]
+    [childrensfutures-trade.components.about-page :refer [about-page]]
+    [childrensfutures-trade.components.layout :refer [grid row col outer-paper]]
+    ))
 
-(def col (r/adapt-react-class js/ReactFlexboxGrid.Col))
-(def row (r/adapt-react-class js/ReactFlexboxGrid.Row))
+;; (def col (r/adapt-react-class js/ReactFlexboxGrid.Col))
+;; (def row (r/adapt-react-class js/ReactFlexboxGrid.Row))
+
+;;;
+;;;
+;;; COMPONENTS
+;;;
+;;;
+
+(def pages
+  {:home home-page
+   :about about-page
+   ;; :how-to-play how-to-play-page
+   })
+
+(def menu-pages
+  [[:home "Home" icons/action-home]
+   [:how-to-play "How To Play" icons/action-help]
+   [:about "About" icons/action-info]])
+
+(defn- menu-link [[route title icon]]
+  [ui/list-item
+   {:left-icon (icon)
+    :href (u/path-for route)
+    :key route} title])
+
+;;;
+;;;
+;;; VIEWS
+;;;
+;;;
 
 ;;;
 ;;; SWITCH ACCOUNT
@@ -74,136 +109,6 @@
      ]
     ))
 
-;;;
-;;; NEW BID VIEW
-;;;
-(defn- new-bid-view [goal-id]
-  ;; FIXME move nested code to fn!!!
-  (let [new-bid (subscribe [:db/new-bid goal-id])]
-    [:div
-     [:h3 "Place Bid"]
-     [ui/text-field {:default-value (:description @new-bid)
-                     :on-change #(dispatch [:place-bid/update goal-id :description (u/evt-val %)])
-                     :name "description"
-                     :max-length 120 ;FIXME
-                     :floating-label-text "Bid's description"
-                     :style {:width "100%"}}]
-     [:br]
-     ;;
-     ;; place
-     ;;
-     [ui/raised-button
-      {:secondary false
-       :disabled (empty? (:description @new-bid))
-       :label "Place new bid"
-       :on-touch-tap #(dispatch [:place-bid/send goal-id])}]
-     ;;
-     ;; cancel
-     ;;
-     [ui/flat-button
-      {:secondary true
-       :disabled false
-       :label "cancel"
-       :on-touch-tap #(dispatch [:place-bid/cancel goal-id])}]
-
-     [ui/snackbar {:message "Placing bid"
-                   :open (:placing? @new-bid)}]]))
-
-;;;
-;;; BID VIEW
-;;;
-(defn- bid-view [bid]
-  (let [{:keys [owner description]} bid]
-    (fn []
-      [:div.bid
-            [:h4 description]
-            [ui/divider]])))
-
-;;;
-;;; goal view
-;;;
-(defn- goal-component [goal]
-  (let [{:keys [goal-id owner description cancelled? cancelling? show-details?]} goal
-        show-new-bid? (subscribe [:db/show-new-bid? goal-id])
-        my-goal? (subscribe [:db/my-goal? goal-id])
-        bids (subscribe [:db/sorted-bids goal-id])
-        already-bidded? (subscribe [:db/already-bidded? goal-id])]
-    [:div {:style {:margin-top 20}
-           :key goal-id}
-     [:h3
-      description]
-
-     ;;
-     ;; place bid
-     ;;
-     [ui/flat-button
-      {:secondary false
-       :disabled (or @my-goal?
-                     @already-bidded?)
-       :label "place bid"
-       :on-touch-tap #(dispatch [:place-bid/show-new-bid goal-id])}]
-     ;;
-     ;; show details
-     ;; FIXME: for debug only
-     ;;
-     [ui/flat-button
-      {:secondary true
-       :disabled false
-       :label (if show-details?
-                "hide details"
-                "show details")
-       :on-touch-tap #(dispatch [:goal/toggle-details goal-id])}]
-
-     ;;
-     ;; cancel goal
-     ;;
-     [ui/flat-button
-      {:secondary true
-       :disabled (or cancelled?
-                     cancelling?
-                     (not (= @(subscribe [:db/current-address]) owner)))
-       :label "Delete"
-       :on-touch-tap #(dispatch [:cancel-goal/send goal-id])}]
-
-
-    ;;
-    ;; details view
-    ;;
-    (when show-details?
-      [:div.goal-details
-       [:div {:style {:margin-top 5}}
-        "goalId: "
-        goal-id]
-       [:div {:style {:margin-top 5}}
-        "owner: "
-        owner]])
-    ;;
-    ;; new bid view
-    ;;
-    (when @show-new-bid?
-      (new-bid-view goal-id))
-
-    (when (not (empty? @bids))
-      [:h3 "Bids"])
-    (for [bid @bids]
-      ^{:key (:owner bid)} [bid-view bid])
-
-    [ui/divider]]))
-
-
-;;;
-;;; goals list view
-;;;
-(defn- goals-component []
-  (let [goals (subscribe [:db/sorted-goals])]
-    (fn []
-      [row
-       [col {:xs 12 :sm 12 :md 10 :lg 6 :md-offset 1 :lg-offset 3}
-        [ui/paper {:style {:padding 20 :margin-top 20}}
-         [:h1 "Goals"]
-         (for [goal @goals]
-           ^{:key (:goal-id goal)} [goal-component goal])
-         ]]])))
 
 
 ;;;
@@ -213,6 +118,7 @@
   (let [show-new-goal? (subscribe [:db/show-new-goal?])]
     (fn []
       [ui/app-bar {:title "Goals Exchange Market"
+                   :on-left-icon-button-touch-tap #(dispatch [:drawer/toggle-view])
                    :icon-element-right (r/as-element
                                         [row {:middle "xs"}
                                          ;; NEW GOAL BUTTON
@@ -230,19 +136,41 @@
                                            :on-touch-tap #(do (dispatch [:blockchain/load-my-addresses])
                                                               (dispatch [:accounts/toggle-view]))}]])}])))
 
+
+;;;
+;;; DRAWER
+;;;
+(defn- drawer-view []
+  (let [drawer-open? (subscribe [:ui/drawer-open?])]
+    (fn []
+      [ui/drawer {:open @drawer-open?
+                  :docked false
+                  :on-request-change #(dispatch [:drawer/toggle-view])}
+
+       [ui/app-bar {:title "myFutures"
+                    :show-menu-icon-button false}]
+       (for [menu-page menu-pages]
+          (menu-link menu-page))])))
+
 ;;;
 ;;; main panel
 ;;;
 (defn main-panel []
   (let [show-new-goal? (subscribe [:db/show-new-goal?])
         sending-new-goal? (subscribe [:db/sending-new-goal?])
-        show-accounts? (subscribe [:db/show-accounts?])]
+        show-accounts? (subscribe [:db/show-accounts?])
+        drawer-open? (subscribe [:ui/drawer-open?])
+        current-page (subscribe [:ui/current-page])]
     (fn []
+      {:fluid true}
       [ui/mui-theme-provider
        {:mui-theme (get-mui-theme {:palette {:primary-color (color :light-blue500)
                                              :accent-color (color :amber700)}})}
        [:div
         [app-bar-view]
+
+        (when @drawer-open?
+          [drawer-view])
 
         (when @show-new-goal?
           [new-goal-component])
@@ -250,7 +178,14 @@
         (when @show-accounts?
           [switch-account-view])
 
-        [goals-component]
+        ;;
+        ;; show active-page
+        ;;
+        [grid {:fluid true
+               :style st/main-grid}
+         (when-let [page (pages (:handler @current-page))]
+           [page])
+         ]
 
         [ui/snackbar {:message "Adding Goal"
-                    :open @sending-new-goal?}]]])))
+                      :open @sending-new-goal?}]]])))
