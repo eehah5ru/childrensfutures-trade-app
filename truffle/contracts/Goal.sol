@@ -12,6 +12,7 @@ library Goal {
     address owner;
     string description;
     Stages.Stage stage;
+    address selectedBidId;
 
     //
     // BIDS on goal
@@ -26,8 +27,10 @@ library Goal {
   //
   //
   struct Bid {
+    bytes32 id;
     address owner;
     string description;
+    bool selected;
     // TODO: accepted?
   }
 
@@ -52,6 +55,11 @@ library Goal {
   }
 
   //
+  //
+  //
+  //
+
+  //
   // check description for validity
   //
   function isValidDescription(string description)
@@ -68,11 +76,24 @@ library Goal {
   // utils
   //
   //
-  function mkGoalId(address owner, string description)
+
+  //
+  // make goal id
+  //
+  function mkGoalId(uint salt, address owner, string description)
     returns(bytes32)
   {
-    return sha3(now, msg.sender, description);
+    return sha3(salt, now, owner, description);
   }
+
+  //
+  // make bid id
+  //
+  // function mkBidId(address bidOwner, string description)
+  //   returns(address)
+  // {
+  //   return ;
+  // }
 
 
 
@@ -109,6 +130,13 @@ contract withGoals {
   modifier notBidded(bytes32 _goalId) {
     // if exists in mapping then bid already placed
     if(goals[_goalId].bids[msg.sender].owner == msg.sender) {
+      throw;
+    }
+    _;
+  }
+
+  modifier onlyExistingBid(bytes32 _goalId, address _bidId) {
+    if(goals[_goalId].bids[_bidId].owner == address(0x0)) {
       throw;
     }
     _;

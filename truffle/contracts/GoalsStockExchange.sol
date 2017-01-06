@@ -71,8 +71,14 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
 
   event BidPlaced(bytes32 goalId,
                   address goalOwner,
+                  address bidId,
                   address bidOwner,
                   string description);
+
+  event BidSelected(bytes32 goalId,
+                    address goalOwner,
+                    address bidId,
+                    address bidOwner);
   /*
    *
    * functions
@@ -125,7 +131,7 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
       throw;
     }
 
-    bytes32 goalId = Goal.mkGoalId(msg.sender, description);
+    bytes32 goalId = Goal.mkGoalId(numGoals, msg.sender, description);
 
     // this goal already exists
     if(goals[goalId].exists()) {
@@ -188,7 +194,7 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
 
     b.owner = msg.sender;
     b.description = _bidDescription;
-
+    b.selected = false;
 
     //
     // change goal's stage to BidPlaced
@@ -198,11 +204,41 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
     //
     // fire event
     //
-    BidPlaced(_goalId, goals[_goalId].owner, msg.sender, b.description);
+    BidPlaced(_goalId, goals[_goalId].owner, msg.sender, msg.sender, b.description);
+
+    return true;
+  }
+
+  //
+  // select bid
+  //
+  function selectBid(bytes32 _goalId, address _bidId)
+    onlyStage(Stages.Stage.BidPlaced, goals[_goalId])
+    onlyExisted(_goalId)
+    onlyExistingBid(_goalId, _bidId)
+    onlyDreamer(goals[_goalId])
+    public
+    returns(bool)
+  {
+
+    //
+    // change goal's and bid's state
+    //
+    goals[_goalId].selectedBidId = _bidId;
+    goals[_goalId].bids[_bidId].selected = true;
+
+    //
+    // change goal's stage
+    //
+    goals[_goalId].stage = Stages.Stage.BidSelected;
+
+    //
+    // fire BidSelected event
+    //
+    BidSelected(_goalId, goals[_goalId].owner, _bidId, goals[_goalId].bids[_bidId].owner);
 
     return true;
 
   }
-
 
 }

@@ -8,6 +8,7 @@ library Stages {
     Unknown,
     Created,
     BidPlaced,
+    BidSelected,
     Cancelled
   }
 

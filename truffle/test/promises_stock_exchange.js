@@ -89,8 +89,8 @@ contract('GoalsStockExchange', function(accounts) {
   };
 
   //
-  // performs cancelGoal transaction
-  // returns GoalCancelled args
+  // performs placeBid transaction
+  // returns BidPlaced args
   //
   var performPlaceBid = function(goalId, bidDescription, options) {
     var watcher = gse().BidPlaced({}, {fromBlock: 'latest'});
@@ -116,6 +116,122 @@ contract('GoalsStockExchange', function(accounts) {
         return deferredEvent;
       });
   };
+
+  //
+  // performs selectBid transaction
+  // returns BidSelected args
+  //
+  var performSelectBid = function(goalId, bidId, options) {
+    var watcher = gse().BidSelected({}, {fromBlock: 'latest'});
+
+    var deferredEvent = new Promise(function(resolve, reject) {
+      watcher.watch(function(error, event) {
+        if(!error) {
+          watcher.stopWatching();
+          resolve(event.args);
+        } else {
+          watcher.stopWatching();
+          resolve(error);
+        }
+      });
+    });
+
+    return gse().selectBid(goalId, bidId, options)
+      .catch(function(e) {
+        watcher.stopWatching();
+        throw ("selectBid: " + e.toString());
+      })
+      .then(function() {
+        return deferredEvent;
+      });
+  };
+
+  //
+  //
+  // complex actions
+  //
+  //
+
+  //
+  // add goal
+  //
+  // @returns GoalAdded event data
+  //
+  // options:
+  // - goalOwner
+  // - goalDescription || current timestamp
+  //
+  var doAddGoal = function(options) {
+    // defaults
+    options.goalDescription = options.goalDescription || Date.now().toString();
+
+    return performAddGoal(options.goalDescription,
+                          { from: options.goalOwner });
+  };
+
+
+  //
+  // add goal
+  // place bid
+  //
+  // @returns BidPlaced event data
+  //
+  // options:
+  // - goalOwner
+  // - goalDescription || || current timestamp
+  // - goalAdded - function returns GoalAdded event data
+  // - bidOwner
+  // - bidDescription || current timestamp
+  //
+  var doPlaceBid = function(options) {
+    // defaults
+    options.goalAdded = options.goalAdded || function(gaData){ return gaData; };
+    options.bidDescription = options.bidDescription || Date.now().toString();
+
+    return doAddGoal(options)
+      .then(options.goalAdded)
+      .then(function(gaData) {
+        return performPlaceBid(gaData.goalId,
+                               options.bidDescription,
+                               { from: options.bidOwner });
+      });
+  };
+
+  //
+  // add goal
+  // place bid
+  // select bid
+  //
+  // @returns BidSelected event data
+  //
+  // options:
+  // - goalOwner
+  // - goalDescription || || current timestamp
+  // - goalAdded - function returns GoalAdded event data
+  // - bidOwner
+  // - bidDescription || current timestamp
+  // - bidPlaced - function return BidBlaced event data
+  // - bidSelector || goalOwner
+  // - selectBid.bidId || id of placed bid
+  // - selectBid.goalId || id of added goal
+  var doSelectBid = function(options) {
+    // defaults
+    options.bidPlaced = options.bidPlaced || function(pbData) { return pbData; };
+    options.bidSelector = options.bidSelector || options.goalOwner;
+    options.selectBid = options.selectBid || {};
+    // options.selectBid.bidId - see below
+    // options.selectBid.goalId - see below
+
+    return doPlaceBid(options)
+      .then(options.bidPlaced)
+      .then(function(pbData) {
+        return performSelectBid(options.selectBid.goalId || pbData.goalId,
+                                options.selectBid.bidId || pbData.bidId,
+                                {from: options.bidSelector });
+      });
+  };
+
+
 
 
   //
@@ -165,28 +281,29 @@ contract('GoalsStockExchange', function(accounts) {
     describe("fire GoalAdded event", function() {
       it("that has goalId", function() {
         return expect(
-          performAddGoal("aaa", {from: accounts[1]})
+          performAddGoal(Date.now().toString(), {from: accounts[1]})
         ).to.be.fulfilled
           .and.eventually.have.deep.property("goalId");
       });
 
       it("that has description", function() {
+        var description = Date.now().toString();
         return expect(
-          performAddGoal("aaa", {from: accounts[1]})
+          performAddGoal(description, {from: accounts[1]})
         ).to.eventually
-          .have.deep.property("description", "aaa");
+          .have.deep.property("description", description);
       });
 
       it("that has owner", function() {
         return expect(
-          performAddGoal("aaa", {from: accounts[1]})
+          performAddGoal(Date.now().toString(), {from: accounts[1]})
         ).to.eventually
           .have.deep.property("owner", accounts[1]);
       });
 
       it("goalId should be a string", function() {
         return expect(
-          performAddGoal("aaa")
+          performAddGoal(Date.now().toString(), {from: accounts[1]})
         ).to.be.fulfilled
           .and.eventually.have.deep.property("goalId").that.is.a("string");
       });
@@ -194,7 +311,7 @@ contract('GoalsStockExchange', function(accounts) {
 
     it("should be fulfilled", function() {
       return expect(
-        performAddGoal("bbb")
+        performAddGoal(Date.now().toString())
       ).to.be.fulfilled;
     });
 
@@ -208,14 +325,14 @@ contract('GoalsStockExchange', function(accounts) {
       var prevNumGoals = null;
       var curNumGoals = null;
 
-      return performAddGoal("aaa")
+      return performAddGoal(Date.now().toString())
           .then(function() {
             return gse().getNumGoals.call();
           })
         .then(function(n) {
           prevNumGoals = n.toNumber();
 
-          return performAddGoal("bbb");
+          return performAddGoal(Date.now().toString());
         })
         .then(function() {
           return gse().getNumGoals.call();
@@ -243,31 +360,6 @@ contract('GoalsStockExchange', function(accounts) {
   });
 
   describe("#getGoal", function() {
-    var performAddGoal = function(descr, options) {
-      var watcher = gse().GoalAdded({}, {fromBlock: 'latest'});
-
-      var deferredEvent = new Promise(function(resolve, reject) {
-        watcher.watch(function(error, event) {
-          if(!error) {
-            watcher.stopWatching();
-            resolve(event.args);
-          } else {
-            watcher.stopWatching();
-            resolve(error);
-          }
-        });
-      });
-
-      return gse().newGoal(descr, options)
-        .then(function() {
-          return deferredEvent;
-        });
-    };
-
-    var performGetGoal = function(goalId, options) {
-      return gse().getGoal.call(goalId, options);
-    };
-
     it("should be successful", function() {
       var expectedGoalId = null;
 
@@ -382,6 +474,8 @@ contract('GoalsStockExchange', function(accounts) {
             expect(gcData.description).to.be.equal("123");
           });
       });
+
+      it("impossible to cancel goal if bid has been selected");
     });
 
 
@@ -462,6 +556,15 @@ contract('GoalsStockExchange', function(accounts) {
 
       });
 
+      it("has bidId prop", function() {
+        return expect(
+          doPlaceBid({
+            goalOwner: accounts[1],
+            bidOwner: accounts[2]
+          })
+        ).to.eventually.have.property("bidId").that.is.a("string");
+      });
+
       it("has description property", function() {
         return expect(
           performAddGoal("23478", {from: accounts[2]})
@@ -495,6 +598,8 @@ contract('GoalsStockExchange', function(accounts) {
         performPlaceBid("-1", "aaa", {from: accounts[1]})
       ).to.be.rejected;
     });
+
+    it("allows to place bids from different accounts");
 
     it("is's impossible to place bit on the same goal twice", function() {
       var goalId = null;
@@ -533,5 +638,200 @@ contract('GoalsStockExchange', function(accounts) {
       ).to.be.rejected;
     });
 
+    it("impossible to place bid on already BidSelected goal");
+  });
+
+  //
+  //
+  // slectBid
+  //
+  //
+  describe("#selectBid", function() {
+    describe("BidSelected event", function() {
+      it("has goalId prop", function() {
+        var gId = null;
+
+        return doSelectBid({
+          goalDescription: "aaa",
+          goalOwner: accounts[1],
+          bidDescription: "bbb",
+          bidOwner: accounts[2],
+          goalAdded: function(gaData) {
+            gId = gaData.goalId;
+            return gaData;
+          }})
+          .then(function(bsData) {
+            return expect(bsData.goalId).to.be.equal(gId);
+          });
+      });
+
+      it("has goalOwner prop", function() {
+        return expect(
+          doSelectBid({
+            goalDescription: "aaa",
+            goalOwner: accounts[1],
+            bidDescription: "bbb",
+            bidOwner: accounts[2]
+          })
+        ).to.eventually.have.property("goalOwner", accounts[1]);
+      });
+
+      it("has bidId prop", function() {
+        return expect(
+          doSelectBid({
+            goalDescription: "aaa",
+            goalOwner: accounts[1],
+            bidDescription: "bbb",
+            bidOwner: accounts[2]
+          })
+        ).to.eventually.have.property("bidId").that.is.a("string");
+      });
+
+      it("has bidOwner prop", function() {
+        return expect(
+          doSelectBid({
+            goalDescription: "aaa",
+            goalOwner: accounts[1],
+            bidDescription: "bbb",
+            bidOwner: accounts[2]
+          })
+        ).to.eventually.have.property("bidOwner", accounts[2]);
+      });
+    });
+
+    it("should be fulfilled", function() {
+        return expect(
+          doSelectBid({
+            goalDescription: "aaa",
+            goalOwner: accounts[1],
+            bidDescription: "bbb",
+            bidOwner: accounts[2]
+          })
+        ).to.be.fulfilled;
+    });
+
+    // FIXME: strange test
+    it("bid's owner can't select her own bid", function() {
+        return expect(
+          doSelectBid({
+            goalDescription: "aaa",
+            goalOwner: accounts[1],
+            bidDescription: "bbb",
+            bidOwner: accounts[2],
+            bidSelector: accounts[2]
+          })
+        ).to.be.rejected;
+    });
+
+    it("only goal's owner can select bid", function() {
+        return expect(
+          doSelectBid({
+            goalDescription: "aaa",
+            goalOwner: accounts[1],
+            bidDescription: "bbb",
+            bidOwner: accounts[2],
+            bidSelector: accounts[3]
+          })
+        ).to.be.rejected;
+
+    });
+
+    it("it's possible to select only existsing bid", function() {
+        return expect(
+          doSelectBid({
+            goalDescription: "aaa",
+            goalOwner: accounts[1],
+            bidDescription: "bbb",
+            bidOwner: accounts[2],
+            selectBid: {
+              bidId: "-1"
+            }
+          })
+        ).to.be.rejected;
+    });
+
+    it("it's possible to select bid only in existing goal", function() {
+        return expect(
+          doSelectBid({
+            goalDescription: "aaa",
+            goalOwner: accounts[1],
+            bidDescription: "bbb",
+            bidOwner: accounts[2],
+            selectBid: {
+              goalId: "-1"
+            }
+          })
+        ).to.be.rejected;
+    });
+
+    it("it's impossible to select bid twice", function() {
+      var bpData = null;
+
+      return expect(
+          doSelectBid({
+            goalDescription: "aaa",
+            goalOwner: accounts[1],
+            bidDescription: "bbb",
+            bidOwner: accounts[2],
+            bidPlaced: function(v) {
+              bpData = v;
+
+              return v;
+            }
+          })
+          .then(function(bsData) {
+            return performSelectBid(bsData.goalId, bpData.bidId, {from: accounts[1]});
+          })
+        ).to.be.rejected;
+
+    });
+
+    it("it's impossible to reselect bid", function() {
+      var bid1 = null;
+
+      return expect(
+          doPlaceBid({
+            goalDescription: "aaa",
+            goalOwner: accounts[1],
+            bidDescription: "bbb",
+            bidOwner: accounts[2]
+          })
+          .then(function(bpData) {
+            bid1 = bpData;
+
+            return performPlaceBid(bpData.goalId, "ccc", {from: accounts[3]});
+          })
+          .then(function(bpData) {
+            return performSelectBid(bpData.goalId, bpData.bidId, {from: accounts[1]});
+          })
+          .then(function(bsData) {
+            return performSelectBid(bsData.goalId, bid1.bidId, {from: accounts[1]});
+          })
+        ).to.be.rejected;
+    });
+
+    it("impossible to select bid in cancelled goal", function() {
+      var bid1 = null;
+
+      return expect(
+          doPlaceBid({
+            goalDescription: "aaa",
+            goalOwner: accounts[1],
+            bidDescription: "bbb",
+            bidOwner: accounts[2]
+          })
+          .then(function(bpData) {
+            bid1 = bpData;
+
+            return performCancelGoal(bpData.goalId,
+                                     {from: accounts[1]});
+          })
+          .then(function(gcData) {
+            return performSelectBid(bid1.goalId,
+                                    bid1.bidId,
+                                    {from: accounts[1]});
+          })
+      ).to.be.rejected;
+    });
   });
 });
