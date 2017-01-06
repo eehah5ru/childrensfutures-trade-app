@@ -1,5 +1,6 @@
 (defproject childrensfutures-trade "0.1.0-SNAPSHOT"
-  :dependencies [[bk/ring-gzip "0.1.1"]
+  :dependencies [[bidi "2.0.10"]
+                 [bk/ring-gzip "0.1.1"]
                  [cljs-ajax "0.5.8"]
                  [cljs-react-material-ui "0.2.22"]
                  [cljs-web3 "0.16.0-0"]
@@ -12,6 +13,7 @@
                  [http-kit "2.2.0"]
                  [madvas.re-frame/web3-fx "0.1.0"]
                  [medley "0.8.3"]
+                 [kibu/pushy "0.3.6"]
                  [org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.229"]
                  [print-foo-cljs "2.0.3"]
