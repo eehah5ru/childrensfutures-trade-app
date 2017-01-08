@@ -6,6 +6,32 @@
  (defn mount-to-root [view]
    (reagent.core/render view (.getElementById js/document "app")))
 
+ (do
+   (defn simple-blue [x]
+     [:div {:style {:background-color "red"
+                    :background-image "url(https://media.licdn.com/mpr/mpr/p/4/005/09c/368/3730a17.jpg)"
+                    :background-size "cover"
+                    :background-origin "center"
+                    :width "100%"
+                    :height "700px"
+                    :min-height "100%"}}
+      "Hello World"])
+
+   (defn paranoia-video [x]
+     ;; <video autoplay="" loop="" poster="/img/background.png" muted=""><source src="/videos/bg.webmhd.webm" type="video/webm">
+;; <source src="/videos/bg.mp4" type="video/mp4"></video>
+     [:video {:auto-play "true"
+              :loop "true"
+              :poster "https://paranoiapp.net/img/background.png"
+              :muted "true"}
+      [:source {:src "https://paranoiapp.net/videos/bg.webmhd.webm"
+                :type "video/webm"}]
+      [:source {:src "https://paranoiapp.net/videos/bg.mp4"
+                :type "video/mp4"}]])
+
+   (mount-to-root [paranoia-video 5])
+   (mount-to-root [simple-blue 5])
+   )
 ;;; play with atoms and views
  (do
    ;; (def expanded (atom true))
