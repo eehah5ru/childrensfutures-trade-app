@@ -12,66 +12,18 @@
    [goog.string.format]
    [madvas.re-frame.web3-fx]
    [re-frame.core :refer [reg-event-db reg-event-fx path trim-v after debug reg-fx console dispatch]]
-   [childrensfutures-trade.utils :as u]))
+   [childrensfutures-trade.utils :as u]
 
-;;;
-;;;
-;;; INTERCEPTORS
-;;;
-;;;
+   ;;
+   ;; event handlers
+   ;;
+   [childrensfutures-trade.handlers.interceptors :refer [interceptors
+                                                         interceptors-fx]]
+   [childrensfutures-trade.handlers.blockchain]
+   [childrensfutures-trade.handlers.contract]))
 
-;;;
-;;; spec
-;;;
-(defn check-and-throw
-  "throw an exception if db doesn't match the spec"
-  [a-spec db]
-  (when-not (s/valid? a-spec db)
-    (throw (ex-info (str "spec check failed: " (s/explain-str a-spec db)) {}))))
-
-;;;
-;;; interceptor for usual event handlers
-;;;
-(def check-spec-interceptor (after (partial check-and-throw :childrensfutures-trade.db/db)))
-
-;;;
-;;; interceptor for FX event handlers
-;;;
-(def check-spec-interceptor-fx (after
-                                (fn [db]
-                                  (js/console.log :debug :interceptor-fx db)
-                                  (check-and-throw :childrensfutures-trade.db/db db))))
-
-;;;
-;;; INTERCEPTORS DEFINITION
-;;;
-(def interceptors [check-spec-interceptor
-                   #_(when ^boolean js/goog.DEBUG debug)
-                   trim-v])
-
-;;; interceptors for fx events
-;; (def interceptors-fx [
-;;                       check-spec-interceptor-fx
-;;                       trim-v])
-
-(defn interceptors-fx [{:keys [spec]} & rest]
-  (let [default-interceptors [trim-v]]
-    (if spec
-      (conj default-interceptors check-spec-interceptor-fx)
-      default-interceptors)))
 
 (def goal-gas-limit 1000000)
-
-;; (comment
-;;   (dispatch [:contract/fetch-compiled-code [:contract/deploy-compiled-code]])
-;;   (dispatch [:blockchain/unlock-account "0x6fce64667819c82a8bcbb78e294d7b444d2e1a29" "m"])
-;;   (dispatch [:blockchain/unlock-account "0xc5aa141d3822c3368df69bfd93ef2b13d1c59aec" "m"])
-;;   (dispatch [:blockchain/unlock-account "0xe206f52728e2c1e23de7d42d233f39ac2e748977" "m"])
-;;   (dispatch [:blockchain/unlock-account "0x522f9c6b122f4ca8067eb5459c10d03a35798ed9" "m"])
-;;   (dispatch [:blockchain/unlock-account "0x43100e355296c4fe3d2c0a356aa4151f1257393b" "m"])
-;;   )
-
-
 
 
 ;;;
@@ -84,6 +36,7 @@
  (fn [_ _]
    (merge
     {:db db/default-db
+     ;; TODO: refactor and extract this code to contract/fetch-abi
      :http-xhrio {:method :get
                   :uri (gstring/format "./contracts/build/%s.abi"
                                        (get-in db/default-db [:contract :name]))
@@ -93,152 +46,6 @@
                   :on-failure [:log-error]}
      :dispatch [:blockchain/load-my-addresses]})))
 
-
-(reg-event-fx
- :blockchain/load-my-addresses
- (interceptors-fx :spec false)
- (fn [{:keys [db]}]
-   (when (:provides-web3? db)
-     {:web3-fx.blockchain/fns
-      {:web3 (:web3 db)
-       :fns [[web3-eth/accounts :blockchain/my-addresses-loaded :log-error]]}})))
-;;;
-;;;
-;;; when get access to ethereum node accounts
-;;;
-;;;
-(reg-event-fx
- :blockchain/my-addresses-loaded
- (interceptors-fx :spec true)
- (fn [{:keys [db]} [addresses]]
-   {:db (-> db
-            (assoc :my-addresses addresses)
-            (assoc :current-address (first addresses)))
-    :web3-fx.blockchain/balances
-    {:web3 (:web3 db/default-db)
-     :addresses addresses
-     :watch? true
-     :blockchain-filter-opts "latest"
-     :dispatches [:blockchain/balance-loaded :log-error]}}))
-
-
-;;;
-;;;
-;;; register handlers for contract events
-;;;
-;;;
-(reg-event-fx
- :contract/abi-loaded
- (interceptors-fx :spec true)
- (fn [{:keys [db]} [abi]]
-   (let [web3 (:web3 db)
-         contract-instance (web3-eth/contract-at web3 abi (:address (:contract db)))]
-     {:db (assoc-in db [:contract :instance] contract-instance)
-
-      :web3-fx.contract/events
-      {:instance contract-instance
-       :db db
-       :db-path [:contract :events]
-       :events [[:GoalAdded {} {:from-block 0} :contract/on-goal-loaded :log-error]
-                [:GoalCancelled {} {:from-block 0} :contract/on-goal-cancelled :log-error]
-                [:BidPlaced {} {:from-block 0} :contract/on-bid-placed :log-error]
-                [:BidSelected {} {:from-block 0} :contract/on-bid-selected :log-error]]}
-
-
-      ;; :web3-fx.contract/constant-fns
-      ;; {:instance contract-instance
-      ;;  :fns [[:get-settings :contract/settings-loaded :log-error]]}
-      })))
-
-;;;
-;;;
-;;; update balance
-;;;
-;;;
-(reg-event-db
- :blockchain/balance-loaded
- interceptors
- (fn [db [balance address]]
-   (assoc-in db [:accounts address :balance] balance)))
-
-
-
-;;;
-;;;
-;;; ETHEREUM EVENTS
-;;;
-;;;
-
-;;;
-;;;
-;;; event for GoalAdded contract event
-;;;
-;;;
-(reg-event-db
- :contract/on-goal-loaded
- interceptors
- (fn [db [goal]]
-   (assoc-in db [:goals (:goal-id goal)] (merge (db/default-goal)
-                                                (select-keys goal [:owner :description :goal-id])))))
-
-
-
-;;;
-;;;
-;;; GoalCancelled contract event
-;;;
-;;;
-(reg-event-db
- :contract/on-goal-cancelled
- interceptors
- (fn [db [goal]]
-   (js/console.log :debug :on-goal-cancelled (:goal-id goal))
-   (assoc-in db [:goals (:goal-id goal) :cancelled?] true)))
-
-
-;;;
-;;;
-;;; BidPlaced contract event
-;;;
-;;;
-(reg-event-db
- :contract/on-bid-placed
- interceptors
- (fn [db [bid]]
-   (js/console.log :info :bid-placed bid)
-   (assoc-in db
-             [:goals (:goal-id bid) :bids (:bid-owner bid)] ; FIXME: bid-owner -> bid-id
-             (merge (db/default-bid)
-                    (let [{:keys [bid-owner description goal-id]} bid]
-                      {:goal-id goal-id
-                       :owner bid-owner
-                       :description description})))))
-
-
-;;;
-;;;
-;;; BidSelected
-;;;
-;;;
-(reg-event-db
- :contract/on-bid-selected
- interceptors
- (fn [db [{:keys [goal-id bid-id]}]]
-   (js/console.log :info :bid-selected goal-id bid-id)
-   (assoc-in db
-             [:goals goal-id :bids bid-id :selected?]
-             true)))
-
-;;;
-;;;
-;;; update current address
-;;;
-;;;
-(reg-event-db
- :current-address/update
- interceptors
- (fn [db [new-current-address]]
-   (assoc db :current-address new-current-address)))
 
 
 ;;;
