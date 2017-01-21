@@ -231,6 +231,30 @@ contract('GoalsStockExchange', function(accounts) {
       });
   };
 
+  //
+  // add goal
+  // place bid
+  // select bid
+  // achieve goal
+  //
+  // @returns GoalReached event data
+  //
+  // options
+  // - goalOwner
+  // - goalDescription || || current timestamp
+  // - goalAdded - function returns GoalAdded event data
+  // - bidOwner
+  // - bidDescription || current timestamp
+  // - bidPlaced - function return BidBlaced event data
+  // - bidSelector || goalOwner
+  // - selectBid.bidId || id of placed bid
+  // - selectBid.goalId || id of added goal
+  // - achieveGoal.goalId || id of added goal
+  // - achieveGoal.sender || goal's owner
+  var doAchieveGoal = function(options) {
+    // TODO: implement
+  };
+
 
 
 
