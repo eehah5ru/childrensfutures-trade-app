@@ -9,6 +9,7 @@ library Stages {
     Created,
     BidPlaced,
     BidSelected,
+    GoalReached,
     Cancelled
   }
 

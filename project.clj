@@ -22,7 +22,9 @@
                  [ring.middleware.logger "0.5.0"]
                  [ring/ring-core "1.6.0-beta5"]
                  [ring/ring-defaults "0.3.0-beta1"]
-                 [ring/ring-devel "1.6.0-beta5"]]
+                 [ring/ring-devel "1.6.0-beta5"]
+                 [net.colourcoding/cljs-clavatar "0.2.1"]
+                 [clavatar-js "0.1.0-SNAPSHOT"]]
 
   :plugins [[lein-auto "0.1.2"]
             [lein-cljsbuild "1.1.4"]

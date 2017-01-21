@@ -3,8 +3,9 @@
             [cljs-time.core :refer [date-time to-default-time-zone]]
             [cljs-time.format :as time-format]
             [cljs-web3.core :as web3]
+
             [bidi.bidi :as bidi]
-            [childrensfutures-trade.routes :refer [routes]]))
+            ))
 
 (defn truncate
   "Truncate a string with suffix (ellipsis by default) if it is
@@ -39,6 +40,3 @@
         first-child (if (or (nil? p) (map? p)) 1 0)]
     (if (> (count v) first-child)
       (subvec v first-child))))
-
-
-(def path-for (partial bidi/path-for routes))

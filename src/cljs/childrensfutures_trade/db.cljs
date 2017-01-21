@@ -47,7 +47,6 @@
    :cancelling? false
    :cancelled? false
    :bids (hash-map)
-   :new-bid (default-bid)
    :show-new-bid? false
    :show-details? false})
 
@@ -95,7 +94,6 @@
                                ::cancelling?
                                ::cancelled?
                                ::bids
-                               ::new-bid
                                ::show-new-bid?
                                ::show-details?]))
 
@@ -107,6 +105,7 @@
 ;;; DB structure
 (s/def ::db (s/keys :req-un [::goals
                              ::new-goal
+                             ::new-bid
                              ::current-address
                              ::show-new-goal?
                              ::show-accounts?
@@ -130,6 +129,7 @@
    :current-address ""
    :accounts {}
    :new-goal (default-goal)
+   :new-bid (default-bid)
    :show-new-goal? false
    :show-accounts? false
    :drawer-open? false
@@ -139,4 +139,4 @@
               :abi nil
               :bin nil
               :instance nil
-              :address "0xb2b115268849a014827e0fafa66c831ce449666a"}})
+              :address "0x6dc29e701c4bbc33f89baba91f37b0ade58b7987"}})

@@ -7,7 +7,7 @@
    [childrensfutures-trade.handlers]
    [childrensfutures-trade.subs]
    [childrensfutures-trade.views :as views]
-   [childrensfutures-trade.routes :refer [routes]]
+   [childrensfutures-trade.pages :refer [routes]]
    [print.foo.preloads.devtools]
    [re-frame.core :as re-frame :refer [dispatch subscribe]]
    [reagent.core :as reagent]
