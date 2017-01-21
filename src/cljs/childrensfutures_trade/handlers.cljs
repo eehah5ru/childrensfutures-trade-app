@@ -209,8 +209,9 @@
    (assoc-in db
              [:goals (:goal-id bid) :bids (:bid-owner bid)] ; FIXME: bid-owner -> bid-id
              (merge (db/default-bid)
-                    (let [{:keys [bid-owner description]} bid]
-                      {:owner bid-owner
+                    (let [{:keys [bid-owner description goal-id]} bid]
+                      {:goal-id goal-id
+                       :owner bid-owner
                        :description description})))))
 
 
@@ -255,11 +256,6 @@
 ;;;
 ;;; toggle details visibility
 ;;;
-(reg-event-db
- :goal/toggle-details
- interceptors
- (fn [db [goal-id]]
-   (update-in db [:goals goal-id :show-details?] not)))
 
 ;;;
 ;;; TOGGLE NEW GOAL VIEW VISIBILITY
@@ -267,9 +263,19 @@
 (reg-event-db
  :new-goal/toggle-view
  interceptors
- (fn [db]
-   (update db :show-new-goal? not)))
+ (fn [db [goal-id]]
+   (-> db
+       (update :show-new-goal? not)
+       (update-in [:new-bid :goal-id] goal-id))))
 
+;;;
+;;; TOGGLE NEW BID DIALOG
+;;;
+(reg-event-db
+ :new-bid/toggle-view
+ interceptors
+ (fn [db]
+   (update db :show-new-bid? not)))
 
 ;;;
 ;;;
@@ -426,6 +432,17 @@
 ;;;
 
 ;;;
+;;; handle place-button
+;;;
+(reg-event-fx
+ :place-bid/place
+ (interceptors-fx :spec true)
+ (fn [{:keys [db]} [goal-id]]
+   {:db db
+    :dispatch-n [[:new-bid/toggle-view]
+               [:place-bid/send goal-id]]}))
+
+;;;
 ;;; make place bid trx in the ethereum
 ;;;
 (reg-event-fx
@@ -433,7 +450,7 @@
  (interceptors-fx :spec false)
  (fn [{:keys [db]} [goal-id]]
    (let [address (:current-address db)
-         {:keys [description]} (get-in db [:goals goal-id :new-bid])]
+         {:keys [description]} (:new-bid db) ]
      {:web3-fx.contract/state-fn
       {:instance (:instance (:contract db))
        :web3 (:web3 db)
@@ -453,7 +470,7 @@
  :place-bid/confirmed
  interceptors
  (fn [db [goal-id tx-hash]]
-   (assoc-in db [:goals goal-id :new-bid :placing?] true)))
+   (assoc-in db [:new-bid :placing?] true)))
 
 ;;;
 ;;; confirms that bid was placed
@@ -466,7 +483,7 @@
    (when (= gas-used goal-gas-limit)
      (console :error "All gas used"))
    (-> db
-       (assoc-in [:goals goal-id :new-bid :placing?] false))))
+       (assoc-in [:new-bid :placing?] false))))
 
 ;;;
 ;;; show new bid form
@@ -475,7 +492,10 @@
  :place-bid/show-new-bid
  interceptors
  (fn [db [goal-id]]
-   (assoc-in db [:goals goal-id :show-new-bid?] true)))
+   (-> db
+       (assoc :show-new-bid? true)
+       (assoc-in [:new-bid :goal-id] goal-id))))
+
 
 ;;;
 ;;; update new bid values while editing bid
@@ -484,8 +504,7 @@
  :place-bid/update
  interceptors
  (fn [db [goal-id key value]]
-   (js/console.log (get-in db [:goals goal-id :new-bid]))
-   (assoc-in db [:goals goal-id :new-bid key] value)))
+   (assoc-in db [:new-bid key] value)))
 
 
 ;;;
@@ -496,8 +515,8 @@
  interceptors
  (fn [db [goal-id]]
    (-> db
-       (assoc-in [:goals goal-id :show-new-bid?] false)
-       (assoc-in [:goals goal-id :new-bid] (db/default-bid)))))
+       (assoc :show-new-bid? false)
+       (assoc :new-bid (db/default-bid)))))
 
 
 ;;;
@@ -513,8 +532,7 @@
  :select-bid/send
  (interceptors-fx :spec false)
  (fn [{:keys [db]} [goal-id bid-id]]
-   (let [address (:current-address db)
-         {:keys [description]} (get-in db [:goals goal-id :new-bid])]
+   (let [address (:current-address db)]
      {:web3-fx.contract/state-fn
       {:instance (:instance (:contract db))
        :web3 (:web3 db)

@@ -11,40 +11,66 @@
     [reagent.core :as r]
     [clavatar-js.core :as clavatar]))
 
+
+;;;
+;;;
+;;; AVATARS
+;;;
+;;;
+
+;;;
+;;; goal avatar
+;;;
+(defn- goal-avatar [goal]
+  [ui/avatar {:style {:margin-top 5
+                      :margin-right 20}
+              :src (clavatar/gravatar (:owner goal))}])
+
+;;;
+;;; bid avatar
+;;;
+(defn- bid-avatar [bid]
+  [ui/avatar {:style {:position "absolute"
+                      :margin-left "-60px"
+                      :top "50%"
+                      :transform "translateY(-50%)"}
+              :src (clavatar/gravatar (:owner bid))}])
+
+
 ;;;
 ;;; NEW BID VIEW
 ;;;
-(defn- new-bid-view [goal-id]
-  ;; FIXME move nested code to fn!!!
-  (let [new-bid (subscribe [:db/new-bid goal-id])]
-    [:div
-     [:h3 "Place Bid"]
-     [ui/text-field {:default-value (:description @new-bid)
-                     :on-change #(dispatch [:place-bid/update goal-id :description (u/evt-val %)])
-                     :name "description"
-                     :max-length 120 ;FIXME
-                     :floating-label-text "Bid's description"
-                     :style {:width "100%"}}]
-     [:br]
-     ;;
-     ;; place
-     ;;
-     [ui/raised-button
-      {:secondary false
-       :disabled (empty? (:description @new-bid))
-       :label "Place new bid"
-       :on-touch-tap #(dispatch [:place-bid/send goal-id])}]
-     ;;
-     ;; cancel
-     ;;
-     [ui/flat-button
-      {:secondary true
-       :disabled false
-       :label "cancel"
-       :on-touch-tap #(dispatch [:place-bid/cancel goal-id])}]
+;; (defn- new-bid-view [goal-id]
+;;   ;; FIXME move nested code to fn!!!
+;;   (let [new-bid (subscribe [:db/new-bid goal-id])]
+;;     [:div
+;;      [:h3 "Place Bid"]
+;;      [ui/text-field {:default-value (:description @new-bid)
+;;                      :on-change #(dispatch [:place-bid/update goal-id :description (u/evt-val %)])
+;;                      :name "description"
+;;                      :max-length 120 ;FIXME
+;;                      :floating-label-text "Bid's description"
+;;                      :style {:width "100%"}}]
+;;      [:br]
+;;      ;;
+;;      ;; place
+;;      ;;
+;;      [ui/raised-button
+;;       {:secondary false
+;;        :disabled (empty? (:description @new-bid))
+;;        :label "Place new bid"
+;;        :on-touch-tap #(dispatch [:place-bid/send goal-id])}]
+;;      ;;
+;;      ;; cancel
+;;      ;;
+;;      [ui/flat-button
+;;       {:secondary true
+;;        :disabled false
+;;        :label "cancel"
+;;        :on-touch-tap #(dispatch [:place-bid/cancel goal-id])}]
 
-     [ui/snackbar {:message "Placing bid"
-                   :open (:placing? @new-bid)}]]))
+;;      [ui/snackbar {:message "Placing bid"
+;;                    :open (:placing? @new-bid)}]]))
 
 ;;;
 ;;; BID VIEW
@@ -84,85 +110,136 @@
 ;;; goal view
 ;;; OLD!
 ;;;
-(defn- goal-component1 [goal]
-  (let [{:keys [goal-id owner description cancelled? cancelling? show-details?]} goal
-        show-new-bid? (subscribe [:db/show-new-bid? goal-id])
-        my-goal? (subscribe [:db/my-goal? goal-id])
-        bids (subscribe [:db/sorted-bids goal-id])
-        already-bidded? (subscribe [:db/already-bidded? goal-id])]
-    [:div {:style {:margin-top 20}
-           :key goal-id}
-     [:h3
-      description]
+;; (defn- goal-component1 [goal]
+;;   (let [{:keys [goal-id owner description cancelled? cancelling? show-details?]} goal
+;;         show-new-bid? (subscribe [:ui/show-new-bid? goal-id])
+;;         my-goal? (subscribe [:db/my-goal? goal-id])
+;;         bids (subscribe [:db/sorted-bids goal-id])
+;;         already-bidded? (subscribe [:db/already-bidded? goal-id])]
+;;     [:div {:style {:margin-top 20}
+;;            :key goal-id}
+;;      [:h3
+;;       description]
 
-     ;;
-     ;; place bid
-     ;;
-     [ui/flat-button
-      {:secondary false
-       :disabled (or @my-goal?
-                     @already-bidded?)
-       :label "place bid"
-       :on-touch-tap #(dispatch [:place-bid/show-new-bid goal-id])}]
-     ;;
-     ;; show details
-     ;; FIXME: for debug only
-     ;;
-     [ui/flat-button
-      {:secondary true
-       :disabled false
-       :label (if show-details?
-                "hide details"
-                "show details")
-       :on-touch-tap #(dispatch [:goal/toggle-details goal-id])}]
+;;      ;;
+;;      ;; place bid
+;;      ;;
+;;      [ui/flat-button
+;;       {:secondary false
+;;        :disabled (or @my-goal?
+;;                      @already-bidded?)
+;;        :label "place bid"
+;;        :on-touch-tap #(dispatch [:place-bid/show-new-bid goal-id])}]
+;;      ;;
+;;      ;; show details
+;;      ;; FIXME: for debug only
+;;      ;;
+;;      [ui/flat-button
+;;       {:secondary true
+;;        :disabled false
+;;        :label (if show-details?
+;;                 "hide details"
+;;                 "show details")
+;;        :on-touch-tap #(dispatch [:goal/toggle-details goal-id])}]
 
-     ;;
-     ;; cancel goal
-     ;;
-     [ui/flat-button
-      {:secondary true
-       :disabled (or cancelled?
-                     cancelling?
-                     (not (= @(subscribe [:db/current-address]) owner)))
-       :label "Delete"
-       :on-touch-tap #(dispatch [:cancel-goal/send goal-id])}]
+;;      ;;
+;;      ;; cancel goal
+;;      ;;
+;;      [ui/flat-button
+;;       {:secondary true
+;;        :disabled (or cancelled?
+;;                      cancelling?
+;;                      (not (= @(subscribe [:db/current-address]) owner)))
+;;        :label "Delete"
+;;        :on-touch-tap #(dispatch [:cancel-goal/send goal-id])}]
 
 
-    ;;
-    ;; details view
-    ;;
-    (when show-details?
-      [:div.goal-details
-       [:div {:style {:margin-top 5}}
-        "goalId: "
-        goal-id]
-       [:div {:style {:margin-top 5}}
-        "owner: "
-        owner]])
-    ;;
-    ;; new bid view
-    ;;
-    (when @show-new-bid?
-      (new-bid-view goal-id))
+;;     ;;
+;;     ;; details view
+;;     ;;
+;;     (when show-details?
+;;       [:div.goal-details
+;;        [:div {:style {:margin-top 5}}
+;;         "goalId: "
+;;         goal-id]
+;;        [:div {:style {:margin-top 5}}
+;;         "owner: "
+;;         owner]])
+;;     ;;
+;;     ;; new bid view
+;;     ;;
+;;     (when @show-new-bid?
+;;       (new-bid-view goal-id))
 
-    (when (not (empty? @bids))
-      [:h3 "Bids"])
-    (for [bid @bids]
-      ^{:key (:owner bid)} [bid-view goal-id (:owner bid) bid]) ;FIXME somehow use bid-id here
+;;     (when (not (empty? @bids))
+;;       [:h3 "Bids"])
+;;     (for [bid @bids]
+;;       ^{:key (:owner bid)} [bid-view goal-id (:owner bid) bid]) ;FIXME somehow use bid-id here
 
-    [ui/divider]]))
+;;     [ui/divider]]))
 
+;;;
+;;;
+;;; BIDS VIEWS
+;;;
+;;;
+
+;;;
+;;; PLACE BID
+;;;
+(defn- place-bid-view []
+  (let [new-bid (subscribe [:db/new-bid])]
+    [:div
+     [:h1 "New Bid"]
+     [ui/text-field {:default-value (:description @new-bid)
+                     :on-change #(dispatch [:place-bid/update (:goal-id new-bid) :description (u/evt-val %)])
+                     :name "description"
+                     :max-length 120 ;FIXME
+                     :floating-label-text "Bid's description"
+                     :style {:width "100%"}}]]))
+
+
+(defn place-bid-dialog []
+  (let [show-new-bid? (subscribe [:ui/show-new-bid?])
+        new-bid (subscribe [:db/new-bid])
+        place-button [ui/raised-button
+                      {:secondary true
+                       :disabled (empty? (:description @new-bid))
+                       :label "Place"
+                       :on-touch-tap #(dispatch
+                                       [:place-bid/place (:goal-id @new-bid)])}]
+        cancel-button [ui/flat-button
+                       {:secondary true
+                        :disabled false
+                        :label "cancel"
+                        :on-touch-tap #(dispatch [:place-bid/cancel (:goal-id @new-bid)])}]]
+    [ui/dialog
+     {:modal true
+      :actions [(r/as-element place-button) (r/as-element cancel-button)]
+      :open @show-new-bid?}
+
+     [place-bid-view]]))
+
+
+;;;
+;;; BIDS TAB
+;;;
+(defn- bids-view [goal-id]
+  (let [bids (subscribe [:db/sorted-bids goal-id])]
+    [ui/list
+     (for [bid @bids]
+       ^{:key (:owner bid)}
+       [ui/list-item
+        {:left-avatar (r/as-element [bid-avatar bid])
+         :right-icon (icons/action-info)
+         :primary-text (:description bid)}])
+      ]))
 
 ;;;
 ;;;
 ;;; GOAL VIEW
 ;;;
 ;;;
-(defn- goal-avatar [goal]
-  [ui/avatar {:style {:margin-top 5
-                      :margin-right 20}
-              :src (clavatar/gravatar (:owner goal))}])
-
 
 ;;;
 ;;; card actions
@@ -214,7 +291,7 @@
                 cancelled?
                 cancelling?
                 show-details?]} goal
-        show-new-bid? (subscribe [:db/show-new-bid? goal-id])
+        show-new-bid? (subscribe [:ui/show-new-bid? goal-id])
         my-goal? (subscribe [:db/my-goal? goal-id])
         bids (subscribe [:db/sorted-bids goal-id])
         already-bidded? (subscribe [:db/already-bidded? goal-id])]
@@ -239,11 +316,10 @@
         {:label "Goal"}
         description]
        ;; bids
-       [ui/tab
-        {:label "Bids"}
-        (if-not (empty? @bids)
-          "Bids Yeah!"
-          "There are no bids yet")]
+       (when-not (empty? @bids)
+         [ui/tab
+          {:label "Bids"}
+          [bids-view goal-id]])
        ;; details
        [ui/tab
         {:label "Details"}

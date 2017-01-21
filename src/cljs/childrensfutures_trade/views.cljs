@@ -24,6 +24,8 @@
 
     [childrensfutures-trade.components.accounts :refer [switch-account-dialog]]
 
+    [childrensfutures-trade.components.goals :refer [place-bid-dialog]]
+
     ))
 
 ;; (def col (r/adapt-react-class js/ReactFlexboxGrid.Col))
@@ -76,6 +78,12 @@
         ;; visibility is controlled inside the dialog
         ;;
         [new-goal-dialog]
+
+        ;;
+        ;; place bid dialog
+        ;; visiblity is controlled inside
+        ;;
+        [place-bid-dialog]
 
         ;;
         ;; show active-page

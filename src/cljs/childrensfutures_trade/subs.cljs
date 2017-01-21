@@ -45,6 +45,11 @@
    (:show-new-goal? db)))
 
 (reg-sub
+ :ui/show-new-bid?
+ (fn [db]
+   (:show-new-bid? db)))
+
+(reg-sub
  :db/show-accounts?
  (fn [db]
    (:show-accounts? db)))
@@ -62,10 +67,10 @@
 ;;;
 ;;; show new bid indicator
 ;;;
-(reg-sub
- :db/show-new-bid?
- (fn [db [_ goal-id]]
-   (get-in db [:goals goal-id :show-new-bid?])))
+;; (reg-sub
+;;  :db/show-new-bid?
+;;  (fn [db [_ goal-id]]
+;;    (get-in db [:goals goal-id :show-new-bid?])))
 
 
 ;;;
@@ -133,8 +138,8 @@
 ;;;
 (reg-sub
  :db/new-bid
- (fn [db [_ goal-id]]
-   (get-in db [:goals goal-id :new-bid])))
+ (fn [db]
+   (:new-bid db)))
 
 ;;;
 ;;; bids for goal

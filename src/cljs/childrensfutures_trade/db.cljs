@@ -47,7 +47,6 @@
    :cancelling? false
    :cancelled? false
    :bids (hash-map)
-   :show-new-bid? false
    :show-details? false})
 
 
@@ -77,6 +76,7 @@
 (s/def ::drawer-open? boolean?)
 
 (s/def ::bid (s/keys :req-un [::created-at
+                              ::goal-id
                               ::description
                               ::owner
                               ::placing?
@@ -94,7 +94,6 @@
                                ::cancelling?
                                ::cancelled?
                                ::bids
-                               ::show-new-bid?
                                ::show-details?]))
 
 (s/def ::new-goal #(s/conform ::goal %))
@@ -108,6 +107,7 @@
                              ::new-bid
                              ::current-address
                              ::show-new-goal?
+                             ::show-new-bid?
                              ::show-accounts?
                              ::drawer-open?]))
 ;;;
@@ -131,6 +131,7 @@
    :new-goal (default-goal)
    :new-bid (default-bid)
    :show-new-goal? false
+   :show-new-bid? false
    :show-accounts? false
    :drawer-open? false
    :web3 (mk-web3)
