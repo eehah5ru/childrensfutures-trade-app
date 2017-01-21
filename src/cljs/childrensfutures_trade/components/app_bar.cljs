@@ -17,13 +17,13 @@
     (fn []
       [row {:middle "xs"}
        ;; NEW GOAL BUTTON
-       [ui/raised-button
-        {:label "Your Goal"
-         :secondary true
-         :disabled @show-new-goal?
-         :on-touch-tap #(dispatch [:new-goal/toggle-view])
-         :style {:margin-right "20px"
-                 :margin-top "5px"}}]
+       ;; [ui/raised-button
+       ;;  {:label "Your Goal"
+       ;;   :secondary true
+       ;;   :disabled @show-new-goal?
+       ;;   :on-touch-tap #(dispatch [:new-goal/toggle-view])
+       ;;   :style {:margin-right "20px"
+       ;;           :margin-top "5px"}}]
        ;; CHANGE ACCOUNT
        [ui/icon-button
         {:tooltip "Change account"

@@ -20,6 +20,6 @@
         children (u/extract-children props-and-children)]
     [row row-props
      [col outer-layout-flex
-      [ui/paper {:style st/paper-base}
+      [ui/paper {:style st/outer-paper-base}
        (for [[index child] (medley/indexed children)]
          (with-meta child {:key index}))]]]))

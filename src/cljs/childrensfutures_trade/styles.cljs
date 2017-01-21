@@ -22,9 +22,10 @@
 ;;; PAPER
 ;;;
 ;;;
-(def paper-base {:padding 20
-                 :margin-top 10
-                 :margin-bottom 10})
+(def outer-paper-base {:padding 20
+                       :margin-top 64
+                       :margin-bottom 10})
+
 
 
 ;;;

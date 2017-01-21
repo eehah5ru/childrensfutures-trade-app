@@ -194,7 +194,7 @@
      [ui/text-field {:default-value (:description @new-bid)
                      :on-change #(dispatch [:place-bid/update (:goal-id new-bid) :description (u/evt-val %)])
                      :name "description"
-                     :max-length 120 ;FIXME
+                     :max-length 2000 ;FIXME
                      :floating-label-text "Bid's description"
                      :style {:width "100%"}}]]))
 
@@ -345,8 +345,6 @@
 (defn goals-view []
   (let [goals (subscribe [:db/sorted-goals])]
     [outer-paper
-     {:style {:padding 20
-              :margin-top 64}}
      [:h1 "Goals"]
      (for [goal @goals]
        ^{:key (:goal-id goal)} [goal-view goal])
