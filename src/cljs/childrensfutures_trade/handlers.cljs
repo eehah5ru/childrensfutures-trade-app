@@ -54,7 +54,7 @@
 ;;                       check-spec-interceptor-fx
 ;;                       trim-v])
 
-(defn interceptors-fx [{:keys [spec]}]
+(defn interceptors-fx [{:keys [spec]} & rest]
   (let [default-interceptors [trim-v]]
     (if spec
       (conj default-interceptors check-spec-interceptor-fx)
@@ -192,6 +192,7 @@
  :contract/on-goal-cancelled
  interceptors
  (fn [db [goal]]
+   (js/console.log :debug :on-goal-cancelled (:goal-id goal))
    (assoc-in db [:goals (:goal-id goal) :cancelled?] true)))
 
 
@@ -415,8 +416,7 @@
    (when (= gas-used goal-gas-limit)
      (console :error "All gas used"))
    (-> db
-       (assoc-in [:goals goal-id :cancelling?] false)
-       (assoc-in [:goals goal-id :cancelled?] true))))
+       (assoc-in [:goals goal-id :cancelling?] false))))
 
 
 ;;;

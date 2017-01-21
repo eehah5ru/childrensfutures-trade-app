@@ -13,7 +13,7 @@
 
 (def grid (r/adapt-react-class js/ReactFlexboxGrid.Grid))
 
-(def outer-layout-flex {:xs 12 :sm 12 :md 12 :lg 10 :lg-offset 1})
+(def outer-layout-flex {:xs 12 :sm 12 :md 12 :lg 6 :lg-offset 3})
 
 (defn outer-paper [& props-and-children]
   (let [row-props (u/extract-props props-and-children)

@@ -1,4 +1,4 @@
-(ns childrensfutures-trade.components.home-page
+(ns childrensfutures-trade.components.latest-events-page
   (:require
     [cljs-react-material-ui.icons :as icons]
     [cljs-react-material-ui.reagent :as ui]
@@ -7,12 +7,8 @@
     [childrensfutures-trade.utils :as u]
     [medley.core :as medley]
     [re-frame.core :refer [subscribe dispatch]]
-    [reagent.core :as r]
+    [reagent.core :as r]))
 
-    [childrensfutures-trade.components.goals :refer [goals-view]]))
-
-
-(defn home-page []
-  [goals-view]
-
-   )
+(defn latest-events-page []
+  [outer-paper
+   [:h1 "Latest Events"]])
