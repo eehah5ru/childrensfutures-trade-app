@@ -263,10 +263,8 @@
 (reg-event-db
  :new-goal/toggle-view
  interceptors
- (fn [db [goal-id]]
-   (-> db
-       (update :show-new-goal? not)
-       (update-in [:new-bid :goal-id] goal-id))))
+ (fn [db]
+   (update db :show-new-goal? not)))
 
 ;;;
 ;;; TOGGLE NEW BID DIALOG
@@ -274,8 +272,10 @@
 (reg-event-db
  :new-bid/toggle-view
  interceptors
- (fn [db]
-   (update db :show-new-bid? not)))
+ (fn [db [goal-id]]
+   (-> db
+       (update :show-new-bid? not)
+       (update-in [:new-bid :goal-id] goal-id))))
 
 ;;;
 ;;;
