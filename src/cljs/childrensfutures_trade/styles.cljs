@@ -39,3 +39,17 @@
 
 (def goal-card-cancelled (merge goal-card
                                 {:background-color color-disabled}))
+
+;;;
+;;; GOAL OWNER AVATAR BADGE
+;;;
+(def goal-owner-avatar-badge {:top "20px"
+                              :right "40px"
+                              :background-color (color :green-200)})
+
+;;;
+;;; BID OWNER AVATAR BADGE
+;;;
+(def bid-owner-avatar-badge (merge goal-owner-avatar-badge
+                                   {:top "-8px"
+                                    :right "-5px"}))

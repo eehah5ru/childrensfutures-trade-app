@@ -30,7 +30,7 @@
 
 
 (defn switch-account-dialog []
-  (let [show-accounts? (subscribe [:db/show-accounts?])
+  (let [show-accounts? (subscribe [:ui/show-accounts?])
         cancel-button [ui/flat-button
                        {:secondary true
                         :disabled false

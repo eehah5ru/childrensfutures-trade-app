@@ -50,7 +50,7 @@
 ;;; main panel
 ;;;
 (defn main-panel []
-  (let [show-new-goal? (subscribe [:db/show-new-goal?])
+  (let [show-new-goal? (subscribe [:ui/show-new-goal?])
         sending-new-goal? (subscribe [:db/sending-new-goal?])
 
         drawer-open? (subscribe [:ui/drawer-open?])

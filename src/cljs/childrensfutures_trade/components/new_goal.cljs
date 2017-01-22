@@ -25,7 +25,7 @@
 
 
 (defn new-goal-dialog []
-  (let [show-new-goal? (subscribe [:db/show-new-goal?])
+  (let [show-new-goal? (subscribe [:ui/show-new-goal?])
         new-goal (subscribe [:db/new-goal])
         create-button [ui/raised-button
                        {:secondary true

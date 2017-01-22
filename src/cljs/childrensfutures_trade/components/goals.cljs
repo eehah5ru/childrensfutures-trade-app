@@ -22,19 +22,39 @@
 ;;; goal avatar
 ;;;
 (defn- goal-avatar [goal]
-  [ui/avatar {:style {:margin-top 5
-                      :margin-right 20}
-              :src (clavatar/gravatar (:owner goal))}])
+  (let [goals-count (subscribe [:db.goals/count (:owner goal)])]
+    [ui/badge
+     {:badge-content @goals-count
+      :badge-style st/goal-owner-avatar-badge}
+     [ui/avatar {:style {:margin-top 5
+                         :margin-right 20}
+                 :src (clavatar/gravatar (:owner goal))}]]))
 
 ;;;
 ;;; bid avatar
 ;;;
 (defn- bid-avatar [bid]
-  [ui/avatar {:style {:position "absolute"
-                      :margin-left "-60px"
-                      :top "50%"
-                      :transform "translateY(-50%)"}
-              :src (clavatar/gravatar (:owner bid))}])
+  (let [goals-count (subscribe [:db.goals/count (:owner bid)])]
+    [:div
+     {:style {:position "absolute"
+              :left "15px"
+              :transform "translateY(-50%)"
+              :top "50%"}}
+     [ui/badge
+      {:badge-content @goals-count
+       :badge-style st/bid-owner-avatar-badge
+       :style {:display "block"
+               :padding 0
+               :position "relative"
+               :height 40
+               :width 40}}
+      [ui/avatar {:style {;;:margin-left "15px"
+                          ;; :position "absolute"
+                          ;; :margin-left "-60px"
+                          ;; :top "50%"
+                          ;;:transform "translateY(-50%)"
+                          }
+                  :src (clavatar/gravatar (:owner bid))}]]]))
 
 
 ;;;

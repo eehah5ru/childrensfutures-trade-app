@@ -34,13 +34,14 @@
   (fn [db]
     (= :active (get-in db [:contract :state]))))
 
+
 ;;;
 ;;;
 ;;; UI RELATED
 ;;;
 ;;;
 (reg-sub
- :db/show-new-goal?
+ :ui/show-new-goal?
  (fn [db]
    (:show-new-goal? db)))
 
@@ -49,8 +50,9 @@
  (fn [db]
    (:show-new-bid? db)))
 
+;;; FIXME: deprecated
 (reg-sub
- :db/show-accounts?
+ :ui/show-accounts?
  (fn [db]
    (:show-accounts? db)))
 
@@ -99,6 +101,15 @@
  (fn [goals _]
    (sort-by :created-at #(compare %2 %1) (vals goals))))
 
+;;;
+;;; get num goals for account
+;;;
+(reg-sub
+ :db.goals/count
+ :<- [:db/goals]
+ (fn [goals [_ owner]]
+   (js/console.log owner)
+   (count (filter #(= (:owner %) owner) (vals goals)))))
 
 ;;;
 ;;; is it my goal?
