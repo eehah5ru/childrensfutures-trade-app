@@ -20,7 +20,8 @@
    [childrensfutures-trade.handlers.interceptors :refer [interceptors
                                                          interceptors-fx]]
    [childrensfutures-trade.handlers.blockchain]
-   [childrensfutures-trade.handlers.contract]))
+   [childrensfutures-trade.handlers.contract]
+   [childrensfutures-trade.handlers.ui]))
 
 
 (def goal-gas-limit 1000000)
@@ -54,62 +55,6 @@
 ;;;
 ;;;
 
-;;;
-;;;
-;;; UI RELATED
-;;;
-;;;
-
-;;;
-;;; toggle details visibility
-;;;
-
-;;;
-;;; TOGGLE NEW GOAL VIEW VISIBILITY
-;;;
-(reg-event-db
- :new-goal/toggle-view
- interceptors
- (fn [db]
-   (update db :show-new-goal? not)))
-
-;;;
-;;; TOGGLE NEW BID DIALOG
-;;;
-(reg-event-db
- :new-bid/toggle-view
- interceptors
- (fn [db [goal-id]]
-   (-> db
-       (update :show-new-bid? not)
-       (update-in [:new-bid :goal-id] goal-id))))
-
-;;;
-;;;
-;;;
-(reg-event-db
- :drawer/toggle-view
- interceptors
- (fn [db]
-   (update db :drawer-open? not)))
-
-;;;
-;;; toggle accounts view
-;;;
-(reg-event-db
- :accounts/toggle-view
- interceptors
- (fn [db]
-   (update db :show-accounts? not)))
-
-(reg-event-fx
- :set-current-page
- interceptors
- (fn [{:keys [db]} [match]]
-   {:db (assoc db :current-page match
-               :drawer-open? false)
-    ;; :ga/page-view [(apply u/path-for (:handler match) (flatten (into [] (:route-params match))))]
-    }))
 
 ;;;
 ;;;
@@ -246,7 +191,7 @@
  (interceptors-fx :spec true)
  (fn [{:keys [db]} [goal-id]]
    {:db db
-    :dispatch-n [[:new-bid/toggle-view]
+    :dispatch-n [[:ui.new-bid/toggle-view]
                [:place-bid/send goal-id]]}))
 
 ;;;

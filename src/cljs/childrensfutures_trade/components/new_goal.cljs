@@ -38,7 +38,7 @@
                        {:secondary true
                         :disabled false
                         :label "cancel"
-                        :on-touch-tap #(dispatch [:new-goal/toggle-view])}]]
+                        :on-touch-tap #(dispatch [:ui.new-goal/toggle-view])}]]
 
     [ui/dialog
      {:modal true
@@ -52,7 +52,7 @@
 ;;;
 (defn new-goal-button []
   [ui/floating-action-button
-   {:on-touch-tap #(dispatch [:new-goal/toggle-view])
+   {:on-touch-tap #(dispatch [:ui.new-goal/toggle-view])
     :children (icons/content-add)
     :z-depth 2
     :style {:position "fixed"

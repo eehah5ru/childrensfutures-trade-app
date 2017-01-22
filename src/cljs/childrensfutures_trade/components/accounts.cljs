@@ -23,7 +23,7 @@
         [address-select-field
          @my-addresses
          @current-address
-         [[:new-goal/update :owner] [:current-address/update] [:accounts/toggle-view]]]
+         [[:new-goal/update :owner] [:current-address/update] [:ui.accounts/toggle-view]]]
 
         [:br]
         [:h3 "Balance: " (u/eth @balance)]]])))
@@ -35,7 +35,7 @@
                        {:secondary true
                         :disabled false
                         :label "cancel"
-                        :on-touch-tap #(dispatch [:accounts/toggle-view])}]]
+                        :on-touch-tap #(dispatch [:ui.accounts/toggle-view])}]]
     (fn []
       [ui/dialog
        {:modal false

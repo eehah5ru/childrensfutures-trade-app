@@ -19,7 +19,7 @@
 (enable-console-print!)
 
 (def history
-  (pushy/pushy #(dispatch [:set-current-page %]) (partial bidi/match-route routes)))
+  (pushy/pushy #(dispatch [:ui.set-current-page %]) (partial bidi/match-route routes)))
 
 (defn mount-root []
   (reagent/render [views/main-panel]

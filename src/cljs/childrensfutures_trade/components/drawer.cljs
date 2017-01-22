@@ -32,7 +32,7 @@
     (fn []
       [ui/drawer {:open @drawer-open?
                   :docked false
-                  :on-request-change #(dispatch [:drawer/toggle-view])}
+                  :on-request-change #(dispatch [:ui.drawer/toggle-view])}
 
        [ui/app-bar {:title "myFutures"
                     :show-menu-icon-button false}]
