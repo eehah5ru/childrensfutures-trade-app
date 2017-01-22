@@ -45,7 +45,7 @@
  (fn [db [goal-id]]
    (-> db
        (update :show-new-bid? not)
-       (update-in [:new-bid :goal-id] goal-id))))
+       (assoc-in [:new-bid :goal-id] goal-id))))
 
 ;;;
 ;;;

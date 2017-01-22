@@ -191,8 +191,8 @@
  (interceptors-fx :spec true)
  (fn [{:keys [db]} [goal-id]]
    {:db db
-    :dispatch-n [[:ui.new-bid/toggle-view]
-               [:place-bid/send goal-id]]}))
+    :dispatch-n [[:ui.new-bid/toggle-view goal-id]
+                 [:place-bid/send goal-id]]}))
 
 ;;;
 ;;; make place bid trx in the ethereum

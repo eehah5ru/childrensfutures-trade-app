@@ -28,7 +28,7 @@
    (when (:provides-web3? db)
      {:web3-fx.blockchain/fns
       {:web3 (:web3 db)
-       :fns [[web3-eth/accounts :blockchain/my-addresses-loaded :log-error]]}})))
+       :fns [[web3-eth/accounts [:blockchain/my-addresses-loaded] :log-error]]}})))
 
 
 ;;;
@@ -61,6 +61,28 @@
  (fn [db [balance address]]
    (assoc-in db [:accounts address :balance] balance)))
 
+;;;
+;;;
+;;; select first address
+;;;
+;;;
+(reg-event-db
+ :blockchain.account/select-first
+ interceptors
+ (fn [db]
+   (assoc db :current-address (first (:my-addresses db)))))
+
+
+;;;
+;;;
+;;; update account info
+;;;
+;;;
+(reg-event-fx
+ :blockchain.account/refresh
+ (interceptors-fx :spec false)
+ (fn [{:keys [db]}]
+   {:dispatch [:blockchain/load-my-addresses]}))
 
 ;;;
 ;;;

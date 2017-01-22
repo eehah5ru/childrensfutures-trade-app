@@ -29,8 +29,7 @@
        [ui/icon-button
         {:tooltip "Update"
          :children (icons/notification-sync)
-         :on-touch-tap #(do (dispatch [:blockchain/load-my-addresses])
-                            (dispatch [:ui.accounts/toggle-view]))}]])))
+         :on-touch-tap #(do (dispatch [:blockchain.account/refresh]))}]])))
 
 ;;;
 ;;; App bar
