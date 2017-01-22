@@ -23,7 +23,7 @@
         [address-select-field
          @my-addresses
          @current-address
-         [[:new-goal/update :owner] [:current-address/update] [:ui.accounts/toggle-view]]]
+         [[:new-goal.attribute/update :owner] [:current-address/update] [:ui.accounts/toggle-view]]]
 
         [:br]
         [:h3 "Balance: " (u/eth @balance)]]])))

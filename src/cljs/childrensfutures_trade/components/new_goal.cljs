@@ -16,7 +16,7 @@
    [:h1 "New Goal"]
    [ui/text-field
     {:default-value (:description new-goal)
-     :on-change #(dispatch [:new-goal/update :description (u/evt-val %)])
+     :on-change #(dispatch [:new-goal.attribute/update :description (u/evt-val %)])
      :name "description"
      :max-length 2000                   ;FIXME
      :floating-label-text "Goal's description"
@@ -33,7 +33,7 @@
                                       (:sending? @new-goal))
                         :label "Place on Exchange"
                         :style {:margin-top 15}
-                        :on-touch-tap #(dispatch [:new-goal/send])}]
+                        :on-touch-tap #(dispatch [:new-goal.blockchain/send])}]
         cancel-button [ui/flat-button
                        {:secondary true
                         :disabled false

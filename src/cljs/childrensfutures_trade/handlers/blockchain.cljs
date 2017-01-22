@@ -47,7 +47,8 @@
                                   :addresses addresses
                                   :watch? true
                                   :blockchain-filter-opts "latest"
-                                  :dispatches [:blockchain/balance-loaded :log-error]}}))
+                                  :dispatches [:blockchain/balance-loaded :log-error]}
+    :dispatch [:new-goal.attribute/update :owner (first addresses)]}))
 
 
 ;;;

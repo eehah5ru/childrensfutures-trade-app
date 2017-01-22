@@ -17,14 +17,14 @@
    ;;
    ;; event handlers
    ;;
+   [childrensfutures-trade.handlers.utils :refer [goal-gas-limit]]
    [childrensfutures-trade.handlers.interceptors :refer [interceptors
                                                          interceptors-fx]]
    [childrensfutures-trade.handlers.blockchain]
    [childrensfutures-trade.handlers.contract]
+   [childrensfutures-trade.handlers.new-goal]
    [childrensfutures-trade.handlers.ui]))
 
-
-(def goal-gas-limit 1000000)
 
 
 ;;;
@@ -61,71 +61,6 @@
 ;;; GOAL ACTIONS
 ;;;
 ;;;
-
-;;;
-;;;
-;;; NEW GOAL
-;;;
-;;;
-
-
-;;;
-;;;
-;;; update goal values while editing goal
-;;;
-;;;
-(reg-event-db
- :new-goal/update
- interceptors
- (fn [db [key value]]
-   (assoc-in db [:new-goal key] value)))
-
-;;;
-;;; send new goal to ethereum contract
-;;;
-(reg-event-fx
- :new-goal/send
- (interceptors-fx :spec false)
- (fn [{:keys [db]} []]
-   (let [{:keys [description owner]} (:new-goal db)]
-     {:web3-fx.contract/state-fn
-      {:instance (:instance (:contract db))
-       :web3 (:web3 db)
-       :db-path [:contract :send-goal]
-       :fn [:new-goal description
-            {:from owner
-             :gas goal-gas-limit}
-            :new-goal/confirmed
-            :log-error
-            :new-goal/transaction-receipt-loaded]}})))
-
-
-;;;
-;;; change new-goal's state to sending
-;;; fired after the trx has been confirmed
-;;; see event handler above
-;;;
-(reg-event-db
- :new-goal/confirmed
- interceptors
- (fn [db [transaction-hash]]
-   (-> db
-       (assoc-in [:new-goal :sending?] true)
-       (update :show-new-goal? not))))
-
-;;;
-;;; confirms that goal was sent to ethereum contract
-;;;
-(reg-event-db
- :new-goal/transaction-receipt-loaded
- interceptors
- (fn [db [{:keys [gas-used] :as transaction-receipt}]]
-   (console :log transaction-receipt)
-   (when (= gas-used goal-gas-limit)
-     (console :error "All gas used"))
-   (-> db
-       (assoc :new-goal (db/default-goal))
-       (assoc-in [:new-goal :owner] (:current-address db)))))
 
 
 ;;;
