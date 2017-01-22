@@ -13,6 +13,6 @@
 
 
 (defn home-page []
-  [goals-view]
+  [goals-view "Goals" #(subscribe [:db/sorted-goals])]
 
    )

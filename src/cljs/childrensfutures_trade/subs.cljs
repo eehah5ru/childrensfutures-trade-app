@@ -123,6 +123,19 @@
    (= current-address
       (get-in goals [goal-id :owner]))))
 
+
+;;;
+;;;
+;;; sorted goals for current acccount
+;;;
+;;;
+(reg-sub
+ :db.goals.my/sorted
+ :<- [:db/current-address]
+ :<- [:db/sorted-goals]
+ (fn [[current-address goals] _]
+   (filter #(= (:owner %) current-address) goals)))
+
 ;;;
 ;;; new goal
 ;;;
@@ -217,8 +230,8 @@
 
  ;; input
  (fn [[_ goal-id] _]
-   (subscribe [:db/bids goal-id]))
+   (subscribe [:db/sorted-bids goal-id]))
 
  ;; reaction
  (fn [bids _]
-   false))
+   (some #(= (:selected? %) true) bids)))

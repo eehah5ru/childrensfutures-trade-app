@@ -112,7 +112,7 @@
                        (not @my-goal?)
                        @goal-has-selected-bid?)
          :label "select"
-         :on-touch-tap #(dispatch [:select-bid/send goal-id bid-id])}]
+         :on-touch-tap #(dispatch [:select-bid.blockchain/send goal-id bid-id])}]
 
        ;;
        ;; cancel bid
@@ -242,6 +242,28 @@
 
 
 ;;;
+;;; BID LIST ITEM
+;;;
+(defn- bid-list-item [goal-id bid]
+  (let [{:keys [owner description selected?]} bid
+        bid-id owner
+        my-bid? (subscribe [:db/my-bid? goal-id bid-id])
+        my-goal? (subscribe [:db/my-goal? goal-id])
+        goal-has-selected-bid? (subscribe [:db/goal-has-selected-bid? goal-id])]
+    [ui/list-item
+     {:left-avatar (r/as-element [bid-avatar bid])
+      ;;:right-icon (icons/action-info)
+      :primary-text (:description bid)
+      :right-toggle (r/as-element
+                     [ui/toggle
+                      {:default-toggled selected?
+                       :disabled (or (not @my-goal?)
+                                     @goal-has-selected-bid?
+                                     selected?)
+                       :on-toggle #(dispatch [:select-bid.blockchain/send goal-id bid-id])
+                       }])}]))
+
+;;;
 ;;; BIDS TAB
 ;;;
 (defn- bids-view [goal-id]
@@ -249,11 +271,7 @@
     [ui/list
      (for [bid @bids]
        ^{:key (:owner bid)}
-       [ui/list-item
-        {:left-avatar (r/as-element [bid-avatar bid])
-         :right-icon (icons/action-info)
-         :primary-text (:description bid)}])
-      ]))
+       [bid-list-item goal-id bid])]))
 
 ;;;
 ;;;
@@ -362,10 +380,10 @@
 ;;;
 ;;; goals list view
 ;;;
-(defn goals-view []
-  (let [goals (subscribe [:db/sorted-goals])]
+(defn goals-view [title goals-selector]
+  (let [goals (goals-selector)]
     [outer-paper
-     [:h1 "Goals"]
+     [:h1 title]
      (for [goal @goals]
        ^{:key (:goal-id goal)} [goal-view goal])
      ]))

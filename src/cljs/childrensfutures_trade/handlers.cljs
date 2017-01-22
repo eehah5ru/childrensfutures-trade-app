@@ -23,6 +23,7 @@
    [childrensfutures-trade.handlers.blockchain]
    [childrensfutures-trade.handlers.contract]
    [childrensfutures-trade.handlers.new-goal]
+   [childrensfutures-trade.handlers.select-bid]
    [childrensfutures-trade.handlers.ui]))
 
 
@@ -205,54 +206,6 @@
        (assoc :show-new-bid? false)
        (assoc :new-bid (db/default-bid)))))
 
-
-;;;
-;;;
-;;; SELECT BID
-;;;
-;;;
-
-;;;
-;;; make select bid trx in the ethereum
-;;;
-(reg-event-fx
- :select-bid/send
- (interceptors-fx :spec false)
- (fn [{:keys [db]} [goal-id bid-id]]
-   (let [address (:current-address db)]
-     {:web3-fx.contract/state-fn
-      {:instance (:instance (:contract db))
-       :web3 (:web3 db)
-       :db-path [:contract :select-bid (keyword goal-id) (keyword bid-id)]
-       :fn [:select-bid goal-id bid-id
-            {:from address
-             :gas goal-gas-limit}
-            [:select-bid/confirmed goal-id bid-id]
-            :log-error
-            [:select-bid/transaction-receipt-loaded goal-id bid-id]]}})))
-
-;;;
-;;; change state of selected bid
-;;; if trx was confirmed by user
-;;;
-(reg-event-db
- :select-bid/confirmed
- interceptors
- (fn [db [goal-id bid-id tx-hash]]
-   (assoc-in db [:goals goal-id :bids bid-id :selecting?] true)))
-
-;;;
-;;; confirms that bid was selected
-;;;
-(reg-event-db
- :select-bid/transaction-receipt-loaded
- interceptors
- (fn [db [goal-id bid-id & {:keys [gas-used] :as transaction-receipt}]]
-   (console :log transaction-receipt)
-   (when (= gas-used goal-gas-limit)
-     (console :error "All gas used"))
-   (-> db
-       (assoc-in [:goals goal-id :bids bid-id :selecting?] false))))
 
 
 ;;;
