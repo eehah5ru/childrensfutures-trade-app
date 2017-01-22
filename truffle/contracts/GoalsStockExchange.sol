@@ -63,11 +63,12 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
 
   event GoalAdded(bytes32 goalId,
                      address owner,
-                     string description);
+                  string description,
+                  string giveInReturn);
 
   event GoalCancelled(bytes32 goalId,
                       address owner,
-                      string description);
+                      string description); //FIXME: add rest of goal data?
 
   event BidPlaced(bytes32 goalId,
                   address goalOwner,
@@ -119,7 +120,7 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
   //
   // create new goal
   //
-  function newGoal(string description)
+  function newGoal(string description, string giveInReturn)
     public
     returns (bool)
   {
@@ -131,7 +132,11 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
       throw;
     }
 
-    bytes32 goalId = Goal.mkGoalId(numGoals, msg.sender, description);
+    if(!(Goal.isValidGiveInreturn(giveInReturn))) {
+      throw;
+    }
+
+    bytes32 goalId = Goal.mkGoalId(numGoals, msg.sender, description, giveInReturn);
 
     // this goal already exists
     if(goals[goalId].exists()) {
@@ -140,12 +145,13 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
 
     Goal.Goal g = goals[goalId];
     g.description = description;
+    g.giveInReturn = giveInReturn;
     g.owner = msg.sender;
     g.stage = Stages.Stage.Created;
 
     numGoals = numGoals + 1;
 
-    GoalAdded(goalId, msg.sender, description);
+    GoalAdded(goalId, msg.sender, description, giveInReturn);
 
     return true;
   }

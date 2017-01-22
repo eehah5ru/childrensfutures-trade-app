@@ -11,6 +11,7 @@ library Goal {
   struct Goal {
     address owner;
     string description;
+    string giveInReturn;
     Stages.Stage stage;
     address selectedBidId;
 
@@ -72,6 +73,18 @@ library Goal {
   }
 
   //
+  // check giveInReturn validity
+  //
+  function isValidGiveInreturn(string _giveInReturn)
+    returns(bool)
+  {
+    if(bytes(_giveInReturn).length != 0) {
+      return true;
+    }
+    return false;
+  }
+
+  //
   //
   // utils
   //
@@ -80,10 +93,10 @@ library Goal {
   //
   // make goal id
   //
-  function mkGoalId(uint salt, address owner, string description)
+  function mkGoalId(uint salt, address owner, string description, string giveInReturn)
     returns(bytes32)
   {
-    return sha3(salt, now, owner, description);
+    return sha3(salt, now, owner, description, giveInReturn);
   }
 
   //
