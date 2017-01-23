@@ -35,12 +35,14 @@
                                   (js/console.log :debug :interceptor-fx db)
                                   (check-and-throw :childrensfutures-trade.db/db db))))
 
+
 ;;;
 ;;; INTERCEPTORS DEFINITION
 ;;;
-(def interceptors [check-spec-interceptor
-                   #_(when ^boolean js/goog.DEBUG debug)
-                   trim-v])
+(defn interceptors [& rest]
+  [check-spec-interceptor
+   #_(when ^boolean js/goog.DEBUG debug)
+   trim-v])
 
 ;;; interceptors for fx events
 ;; (def interceptors-fx [

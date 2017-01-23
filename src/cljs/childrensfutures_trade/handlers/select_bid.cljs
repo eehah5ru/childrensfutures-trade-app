@@ -32,7 +32,7 @@
 ;;; make select bid trx in the ethereum
 ;;;
 (reg-event-fx
- :select-bid.blockchain/send
+ :blockchain.select-bid/send
  (interceptors-fx :spec false)
  (fn [{:keys [db]} [goal-id bid-id]]
    (let [address (:current-address db)]
@@ -43,17 +43,17 @@
        :fn [:select-bid goal-id bid-id
             {:from address
              :gas goal-gas-limit}
-            [:select-bid.blockchain/confirmed goal-id bid-id]
+            [:blockchain.select-bid/confirmed goal-id bid-id]
             :log-error
-            [:select-bid.blockchain/transaction-receipt-loaded goal-id bid-id]]}})))
+            [:blockchain.select-bid/transaction-receipt-loaded goal-id bid-id]]}})))
 
 ;;;
 ;;; change state of selected bid
 ;;; if trx was confirmed by user
 ;;;
 (reg-event-db
- :select-bid.blockchain/confirmed
- interceptors
+ :blockchain.select-bid/confirmed
+ (interceptors)
  (fn [db [goal-id bid-id tx-hash]]
    (assoc-in db [:goals goal-id :bids bid-id :selecting?] true)))
 
@@ -61,8 +61,8 @@
 ;;; confirms that bid was selected
 ;;;
 (reg-event-db
- :select-bid.blockchain/transaction-receipt-loaded
- interceptors
+ :blockchain.select-bid/transaction-receipt-loaded
+ (interceptors)
  (fn [db [goal-id bid-id & {:keys [gas-used] :as transaction-receipt}]]
    (console :log transaction-receipt)
    (when (= gas-used goal-gas-limit)

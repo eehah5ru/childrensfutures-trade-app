@@ -58,7 +58,7 @@
 ;;;
 (reg-event-db
  :blockchain/balance-loaded
- interceptors
+ (interceptors)
  (fn [db [balance address]]
    (assoc-in db [:accounts address :balance] balance)))
 
@@ -69,7 +69,7 @@
 ;;;
 (reg-event-db
  :blockchain.account/select-first
- interceptors
+ (interceptors)
  (fn [db]
    (assoc db :current-address (first (:my-addresses db)))))
 
@@ -92,6 +92,6 @@
 ;;;
 (reg-event-db
  :current-address/update
- interceptors
+ (interceptors)
  (fn [db [new-current-address]]
    (assoc db :current-address new-current-address)))

@@ -32,7 +32,7 @@
 ;;;
 (reg-event-db
  :ui.new-goal/toggle-view
- interceptors
+ (interceptors)
  (fn [db]
    (update db :show-new-goal? not)))
 
@@ -41,7 +41,7 @@
 ;;;
 (reg-event-db
  :ui.new-bid/toggle-view
- interceptors
+ (interceptors)
  (fn [db [goal-id]]
    (-> db
        (update :show-new-bid? not)
@@ -52,7 +52,7 @@
 ;;;
 (reg-event-db
  :ui.drawer/toggle-view
- interceptors
+ (interceptors)
  (fn [db]
    (update db :drawer-open? not)))
 
@@ -61,13 +61,13 @@
 ;;;
 (reg-event-db
  :ui.accounts/toggle-view
- interceptors
+ (interceptors)
  (fn [db]
    (update db :show-accounts? not)))
 
 (reg-event-fx
  :ui.set-current-page
- interceptors
+ (interceptors)
  (fn [{:keys [db]} [match]]
    {:db (assoc db :current-page match
                :drawer-open? false)

@@ -37,7 +37,7 @@
 ;;;
 (reg-event-db
  :new-goal.attribute/update
- interceptors
+ (interceptors)
  (fn [db [key value]]
    (assoc-in db [:new-goal key] value)))
 
@@ -46,7 +46,7 @@
 ;;; send new goal to ethereum contract
 ;;;
 (reg-event-fx
- :new-goal.blockchain/send
+ :blockchain.new-goal/send
  (interceptors-fx :spec false)
  (fn [{:keys [db]} []]
    (let [{:keys [description owner give-in-return]} (:new-goal db)]
@@ -57,9 +57,9 @@
        :fn [:new-goal description give-in-return
        {:from owner
         :gas goal-gas-limit}
-       :new-goal.blockchain/confirmed
+       :blockchain.new-goal/confirmed
        :log-error
-       :new-goal.blockchain/transaction-receipt-loaded]}})))
+       :blockchain.new-goal/transaction-receipt-loaded]}})))
 
 
 ;;;
@@ -68,19 +68,19 @@
 ;;; see event handler above
 ;;;
 (reg-event-db
- :new-goal.blockchain/confirmed
- interceptors
+ :blockchain.new-goal/confirmed
+ (interceptors)
  (fn [db [transaction-hash]]
    (-> db
-       (assoc-in [:new-goal :sending?] true)
+       (assoc-in [:new-goal :trx-on-air?] true)
        (update :show-new-goal? not))))
 
 ;;;
 ;;; confirms that goal was sent to ethereum contract
 ;;;
 (reg-event-db
- :new-goal.blockchain/transaction-receipt-loaded
- interceptors
+ :blockchain.new-goal/transaction-receipt-loaded
+ (interceptors)
  (fn [db [{:keys [gas-used] :as transaction-receipt}]]
    (console :log transaction-receipt)
    (when (= gas-used goal-gas-limit)

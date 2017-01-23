@@ -42,11 +42,11 @@
 ;;;
 (defn default-goal []
   {:created-at (js/Date.now)
+   :stage :unknown
    :description ""
    :give-in-return ""
    :owner nil
-   :sending? false
-   :cancelling? false
+   :trx-on-air? false                   ; indicates that ethereum trx is being processed
    :cancelled? false
    :bids (hash-map)
    :show-details? false})
@@ -58,6 +58,17 @@
 ;;; SPECS
 ;;;
 ;;;
+(s/def ::stage #{:unknown
+                 :created
+                 :bid-placed
+                 :bid-selected
+                 :investment-sent
+                 :investment-received
+                 :goal-achieved
+                 :bonus-asked
+                 :bonus-sent
+                 :goal-completed
+                 :cancelled})
 (s/def ::goal-id string?)
 (s/def ::description string?)
 (s/def ::give-in-return string?)
@@ -65,8 +76,7 @@
 (s/def ::indicator boolean?)
 (s/def ::owner (s/or :nil nil?
                      :string string?))
-(s/def ::sending? boolean?)
-(s/def ::cancelling boolean?)
+(s/def ::trx-on-air? boolean?)
 (s/def ::cancelled? boolean?)
 (s/def ::placing? boolean?)
 (s/def ::show-new-bid? boolean?)
@@ -94,8 +104,7 @@
                                ::description
                                ::give-in-return
                                ::owner
-                               ::sending?
-                               ::cancelling?
+                               ::trx-on-air?
                                ::cancelled?
                                ::bids
                                ::show-details?]))

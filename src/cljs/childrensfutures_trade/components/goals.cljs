@@ -119,7 +119,7 @@
                        :disabled (or (not @my-goal?)
                                      @goal-has-selected-bid?
                                      selected?)
-                       :on-toggle #(dispatch [:select-bid.blockchain/send goal-id bid-id])
+                       :on-toggle #(dispatch [:blockchain.select-bid/send goal-id bid-id])
                        }])}]))
 
 ;;;
@@ -142,7 +142,7 @@
 ;;; card actions
 ;;;
 (defn- goal-actions [goal]
-  (let [{:keys [goal-id show-details? cancelled? cancelling?]} goal
+  (let [{:keys [goal-id show-details? cancelled? trx-on-air?]} goal
         my-goal? (subscribe [:db/my-goal? goal-id])
         already-bidded? (subscribe [:db.goal/already-bidded? goal-id])]
     [
@@ -170,7 +170,7 @@
      [ui/flat-button
       {:secondary true
        :disabled (or cancelled?
-                     cancelling?
+                     trx-on-air?
                      (not @my-goal?))
        :label "Delete"
        :on-touch-tap #(dispatch [:cancel-goal/send goal-id])}]
@@ -187,7 +187,7 @@
                 description
                 give-in-return
                 cancelled?
-                cancelling?
+                trx-on-air?
                 show-details?]} goal
         show-new-bid? (subscribe [:ui/show-new-bid? goal-id])
         my-goal? (subscribe [:db/my-goal? goal-id])

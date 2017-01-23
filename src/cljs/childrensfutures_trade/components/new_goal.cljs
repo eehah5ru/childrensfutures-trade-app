@@ -43,10 +43,10 @@
         create-button [ui/raised-button
                        {:secondary true
                         :disabled (or (empty? (:description @new-goal))
-                                      (:sending? @new-goal))
+                                      (:trx-on-air? @new-goal))
                         :label "Place on Exchange"
                         :style {:margin-top 15}
-                        :on-touch-tap #(dispatch [:new-goal.blockchain/send])}]
+                        :on-touch-tap #(dispatch [:blockchain.new-goal/send])}]
         cancel-button [ui/flat-button
                        {:secondary true
                         :disabled false

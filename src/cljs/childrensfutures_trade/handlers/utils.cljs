@@ -1,13 +1,55 @@
 (ns childrensfutures-trade.handlers.utils
   (:require
    [cljs.spec :as s]
-   [childrensfutures-trade.db :as db]
+
    [goog.string :as gstring]
    [goog.string.format]
    [re-frame.core :refer [reg-event-db reg-event-fx path trim-v after debug reg-fx console dispatch]]
+
+   [cljs-web3.core :as web3]
+   [cljs-web3.eth :as web3-eth]
+   [cljs-web3.personal :as web3-personal]
+   [cljsjs.web3]
+
+   [childrensfutures-trade.db :as db]
    [childrensfutures-trade.utils :as u]
 
    ))
 
-
 (def goal-gas-limit 1000000)
+
+
+;;;
+;;; send transaction to blockchain
+;;;
+(defn blockchain-send-transaction [db f-name f-args & {:keys [db-path
+                                                              confirmed-event
+                                                              error-event
+                                                              receipt-loaded-event]}]
+  (let [address (:current-address db)
+        fn-options {:from address
+                    :gas goal-gas-limit}
+        error-event (or error-event :log-error)]
+    {:web3-fx.contract/state-fn
+      {:instance (:instance (:contract db))
+       :web3 (:web3 db)
+       :db-path (flatten [:contract
+                          f-name
+                          db-path])
+       :fn (concat (flatten [f-name f-args])
+                   [fn-options
+                    confirmed-event
+                    error-event
+                    receipt-loaded-event])}}))
+
+
+;;;
+;;; on trx receipt loaded
+;;; f - db modifier. args are: [db [event-args]]
+;;;
+(defn blockchain-trx-receipt-loaded [f]
+  (fn [db [{:keys [gas-used] :as transaction-receipt} & rest]]
+    (console :log transaction-receipt)
+    (when (= gas-used goal-gas-limit)
+      (console :error "All gas used"))
+    (f db rest)))

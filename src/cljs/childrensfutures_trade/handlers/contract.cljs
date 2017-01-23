@@ -21,6 +21,22 @@
                                                          interceptors-fx]]
    ))
 
+;;;
+;;;
+;;; contract events
+;;;
+;;;
+(def contract-events
+  {:GoalAdded :contract/on-goal-loaded
+   :GoalCancelled :contract/on-goal-cancelled
+   :BidPlaced :contract/on-bid-placed
+   :BidSelected :contract/on-bid-selected
+   :InvestmentSent :contract/on-investment-sent
+   :InvestmentReceived :contract/on-investment-received
+   :GoalAchieved :contract/on-goal-achieved
+   :BonusAsked :contract/on-bonus-asked
+   :BonusSent :contract/on-bonus-sent
+   :GoalCompleted :contract/on-goal-completed})
 
 ;;;
 ;;;
@@ -39,10 +55,9 @@
       {:instance contract-instance
        :db db
        :db-path [:contract :events]
-       :events [[:GoalAdded {} {:from-block 0} :contract/on-goal-loaded :log-error]
-                [:GoalCancelled {} {:from-block 0} :contract/on-goal-cancelled :log-error]
-                [:BidPlaced {} {:from-block 0} :contract/on-bid-placed :log-error]
-                [:BidSelected {} {:from-block 0} :contract/on-bid-selected :log-error]]}
+       :events (map (fn [[event handler]]
+                      [event {} {:from-block 0} handler :log-error])
+                    contract-events)}
 
 
       ;; :web3-fx.contract/constant-fns
@@ -64,12 +79,13 @@
 ;;;
 (reg-event-db
  :contract/on-goal-loaded
- interceptors
+ (interceptors)
  (fn [db [goal]]
    (assoc-in db
              [:goals (:goal-id goal)]
              (merge (db/default-goal)
-                    (select-keys goal [:owner :description :goal-id :give-in-return])))))
+                    (select-keys goal [:owner :description :goal-id :give-in-return])
+                    {:stage :created}))))
 
 
 
@@ -80,10 +96,12 @@
 ;;;
 (reg-event-db
  :contract/on-goal-cancelled
- interceptors
+ (interceptors)
  (fn [db [goal]]
    (js/console.log :debug :on-goal-cancelled (:goal-id goal))
-   (assoc-in db [:goals (:goal-id goal) :cancelled?] true)))
+   (-> db
+       (assoc-in [:goals (:goal-id goal) :cancelled?] true)
+       (assoc-in [:goals (:goal-id goal) :stage] :cancelled))))
 
 
 ;;;
@@ -93,17 +111,18 @@
 ;;;
 (reg-event-db
  :contract/on-bid-placed
- interceptors
+ (interceptors)
  (fn [db [bid]]
-   (js/console.log :info :bid-placed bid)
-   (assoc-in db
-             [:goals (:goal-id bid) :bids (:bid-owner bid)] ; FIXME: bid-owner -> bid-id
-             (merge (db/default-bid)
-                    (let [{:keys [bid-owner description goal-id]} bid]
-                      {:goal-id goal-id
-                       :bid-id bid-owner ;FIXME use bid-id instead
-                       :owner bid-owner
-                       :description description})))))
+   (js/console.log :debug :bid-placed bid)
+   (-> db
+       (assoc-in [:goals (:goal-id bid) :stage] :bid-placed)
+       (assoc-in [:goals (:goal-id bid) :bids (:bid-owner bid)] ; FIXME: bid-owner -> bid-id
+                 (merge (db/default-bid)
+                        (let [{:keys [bid-owner description goal-id]} bid]
+                          {:goal-id goal-id
+                           :bid-id bid-owner ;FIXME use bid-id instead
+                           :owner bid-owner
+                           :description description}))))))
 
 
 ;;;
@@ -113,9 +132,92 @@
 ;;;
 (reg-event-db
  :contract/on-bid-selected
- interceptors
+ (interceptors)
+
  (fn [db [{:keys [goal-id bid-id]}]]
    (js/console.log :info :bid-selected goal-id bid-id)
-   (assoc-in db
-             [:goals goal-id :bids bid-id :selected?]
-             true)))
+   (-> db
+       (assoc-in [:goals goal-id :stage] :bid-selected)
+       (assoc-in [:goals goal-id :bids bid-id :selected?]
+                 true))))
+
+;;;
+;;;
+;;; InvestmentSent
+;;;
+;;;
+(reg-event-db
+ :contract/on-investment-sent
+ (interceptors)
+ (fn [db [{:keys [goal-id bid-id]}]]
+   (js/console.log :info :investment-sent goal-id bid-id)
+   (-> db
+       (assoc-in [:goals goal-id :stage] :investment-sent))))
+
+
+;;;
+;;;
+;;; InvestmentReceived
+;;;
+;;;
+(reg-event-db
+ :contract/on-investment-received
+ (interceptors)
+ (fn [db [{:keys [goal-id bid-id]}]]
+   (js/console.log :info :investment-received goal-id bid-id)
+   (-> db
+       (assoc-in [:goals goal-id :stage] :investment-received))))
+
+;;;
+;;;
+;;; GoalAchieved
+;;;
+;;;
+(reg-event-db
+ :contract/on-goal-achieved
+ (interceptors)
+ (fn [db [{:keys [goal-id]}]]
+   (js/console.log :info :goal-achieved goal-id)
+   (-> db
+       (assoc-in [:goals goal-id :stage] :goal-achieved))))
+
+
+;;;
+;;;
+;;; BonusAsked
+;;;
+;;;
+(reg-event-db
+ :contract/on-bonus-asked
+ (interceptors)
+ (fn [db [{:keys [goal-id bid-id]}]]
+   (js/console.log :info :bonus-asked goal-id bid-id)
+   (-> db
+       (assoc-in [:goals goal-id :stage] :bonus-asked))))
+
+;;;
+;;;
+;;; BonusSent
+;;;
+;;;
+(reg-event-db
+ :contract/on-bonus-sent
+ (interceptors)
+ (fn [db [{:keys [goal-id bid-id]}]]
+   (js/console.log :info :bonus-sent goal-id bid-id)
+   (-> db
+       (assoc-in [:goals goal-id :stage] :bonus-sent))))
+
+
+;;;
+;;;
+;;; GoalCompleted
+;;;
+;;;
+(reg-event-db
+ :contract/on-goal-completed
+ (interceptors)
+ (fn [db [{:keys [goal-id]}]]
+   (js/console.log :info :goal-completed goal-id)
+   (-> db
+       (assoc-in [:goals goal-id :stage] :goal-completed))))

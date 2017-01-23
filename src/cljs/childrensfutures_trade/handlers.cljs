@@ -22,8 +22,18 @@
                                                          interceptors-fx]]
    [childrensfutures-trade.handlers.blockchain]
    [childrensfutures-trade.handlers.contract]
+
+   ;; blockchain contract events
+   [childrensfutures-trade.handlers.goal] ; general goal events
    [childrensfutures-trade.handlers.new-goal]
    [childrensfutures-trade.handlers.select-bid]
+   [childrensfutures-trade.handlers.send-investment]
+   [childrensfutures-trade.handlers.receive-investment]
+   [childrensfutures-trade.handlers.achieve-goal]
+   [childrensfutures-trade.handlers.ask-bonus]
+   [childrensfutures-trade.handlers.send-bonus]
+   [childrensfutures-trade.handlers.complete-goal]
+
    [childrensfutures-trade.handlers.ui]))
 
 
@@ -95,22 +105,22 @@
 ;;;
 (reg-event-db
  :cancel-goal/confirmed
- interceptors
+ (interceptors)
  (fn [db [goal-id tx-hash]]
-   (assoc-in db [:goals goal-id :cancelling?] true)))
+   (assoc-in db [:goals goal-id :trx-on-air?] true)))
 
 ;;;
 ;;; confirms that goal was cancelled
 ;;;
 (reg-event-db
  :cancel-goal/transaction-receipt-loaded
- interceptors
+ (interceptors)
  (fn [db [goal-id & {:keys [gas-used] :as transaction-receipt}]]
    (console :log transaction-receipt)
    (when (= gas-used goal-gas-limit)
      (console :error "All gas used"))
    (-> db
-       (assoc-in [:goals goal-id :cancelling?] false))))
+       (assoc-in [:goals goal-id :trx-on-air?] false))))
 
 
 ;;;
@@ -156,7 +166,7 @@
 ;;;
 (reg-event-db
  :place-bid/confirmed
- interceptors
+ (interceptors)
  (fn [db [goal-id tx-hash]]
    (assoc-in db [:new-bid :placing?] true)))
 
@@ -165,7 +175,7 @@
 ;;;
 (reg-event-db
  :place-bid/transaction-receipt-loaded
- interceptors
+ (interceptors)
  (fn [db [goal-id & {:keys [gas-used] :as transaction-receipt}]]
    (console :log transaction-receipt)
    (when (= gas-used goal-gas-limit)
@@ -178,7 +188,7 @@
 ;;;
 (reg-event-db
  :place-bid/show-new-bid
- interceptors
+ (interceptors)
  (fn [db [goal-id]]
    (-> db
        (assoc :show-new-bid? true)
@@ -190,7 +200,7 @@
 ;;;
 (reg-event-db
  :place-bid/update
- interceptors
+ (interceptors)
  (fn [db [goal-id key value]]
    (assoc-in db [:new-bid key] value)))
 
@@ -200,7 +210,7 @@
 ;;;
 (reg-event-db
  :place-bid/cancel
- interceptors
+ (interceptors)
  (fn [db [goal-id]]
    (-> db
        (assoc :show-new-bid? false)
@@ -228,7 +238,7 @@
 
 ;; (reg-event-db
 ;;   :contract/settings-loaded
-;;   interceptors
+;;   (interceptors)
 ;;   (fn [db [[max-name-length max-tweet-length]]]
 ;;     (assoc db :settings {:max-name-length (.toNumber max-name-length)
 ;;                          :max-tweet-length (.toNumber max-tweet-length)})))
@@ -236,7 +246,7 @@
 
 ;; (reg-event-fx
 ;;   :contract/fetch-compiled-code
-;;   interceptors
+;;   (interceptors)
 ;;   (fn [{:keys [db]} [on-success]]
 ;;     {:http-xhrio {:method :get
 ;;                   :uri (gstring/format "/contracts/build/%s.json"
@@ -248,7 +258,7 @@
 
 ;; (reg-event-fx
 ;;   :contract/deploy-compiled-code
-;;   interceptors
+;;   (interceptors)
 ;;   (fn [{:keys [db]} [contracts]]
 ;;     (let [{:keys [abi bin]} (get-in contracts [:contracts (keyword (:name (:contract db)))])]
 ;;       {:web3-fx.blockchain/fns
@@ -263,7 +273,7 @@
 
 ;; (reg-event-fx
 ;;   :blockchain/unlock-account
-;;   interceptors
+;;   (interceptors)
 ;;   (fn [{:keys [db]} [address password]]
 ;;     {:web3-fx.blockchain/fns
 ;;      {:web3 (:web3 db)
@@ -273,14 +283,14 @@
 
 ;; (reg-event-fx
 ;;   :blockchain/account-unlocked
-;;   interceptors
+;;   (interceptors)
 ;;   (fn [{:keys [db]}]
 ;;     (console :log "Account was unlocked.")
 ;;     {}))
 
 ;; (reg-event-fx
 ;;   :contract/deployed
-;;   interceptors
+;;   (interceptors)
 ;;   (fn [_ [contract-instance]]
 ;;     (when-let [address (aget contract-instance "address")]
 ;;       (console :log "Contract deployed at" address))))

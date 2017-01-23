@@ -148,7 +148,7 @@
  :db/sending-new-goal?
  :<- [:db/new-goal]
  (fn [new-goal _]
-   (:sending? new-goal)))
+   (:trx-on-air? new-goal)))
 
 
 ;;;
