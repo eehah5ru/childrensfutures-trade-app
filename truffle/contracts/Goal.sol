@@ -155,6 +155,24 @@ contract withGoals {
     _;
   }
 
+  modifier onlySelectedBid(bytes32 _goalId, address _bidId) {
+    if (goals[_goalId].bids[_bidId].selected != true) {
+      throw;
+    }
+    _;
+  }
+
+  modifier onlyOwnerOfSelectedBid(bytes32 _goalId, address _bidId) {
+    if (goals[_goalId].bids[_bidId].selected != true) {
+      throw;
+    }
+
+    if (goals[_goalId].bids[_bidId].owner != msg.sender) {
+      throw;
+    }
+    _;
+  }
+
 
   //
   //

@@ -9,7 +9,12 @@ library Stages {
     Created,
     BidPlaced,
     BidSelected,
-    GoalReached,
+    InvestmentSent,
+    InvestmentReceived,
+    GoalAchieved,
+    BonusAsked,
+    BonusSent,
+    GoalCompleted,
     Cancelled
   }
 
