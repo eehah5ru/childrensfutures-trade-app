@@ -13,6 +13,8 @@
 
 
 (defn home-page []
-  [goals-view "Goals" #(subscribe [:db/sorted-goals])]
+  [outer-paper
+   [:h1 "Goals"]
+   [goals-view #(subscribe [:db.goals/sorted])]]
 
    )

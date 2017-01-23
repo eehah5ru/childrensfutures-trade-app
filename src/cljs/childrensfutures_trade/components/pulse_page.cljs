@@ -27,8 +27,29 @@
 ;;   [:h3
 ;;    (str "Unknown event type " (:type e))])
 
+(defn- my-bids []
+  (let [bids (subscribe [:db.bids.my/sorted])]
+    [:div
+     (for [bid @bids]
+       (let [{:keys [owner description bid-id]} bid]
+         ^{:key bid-id}
+         [:h2 description]))]))
+
+(defn- my-investments [])
+
 (defn pulse-page []
-  [goals-view "My Goals" #(subscribe [:db.goals.my/sorted])])
+  [outer-paper
+   [ui/tabs
+    [ui/tab
+     {:label "My Goals"}
+     [goals-view #(subscribe [:db.goals.my/sorted])]]
+    [ui/tab
+     {:label "Investments"}
+     [:h1 "Investments"]]
+    [ui/tab
+     {:label "I owe"}
+     [:h1 "My Bids"]
+     [my-bids]]]])
 
 ;; (comment
 ;;   (defn pulse-page []

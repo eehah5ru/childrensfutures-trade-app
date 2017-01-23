@@ -66,8 +66,10 @@
  :contract/on-goal-loaded
  interceptors
  (fn [db [goal]]
-   (assoc-in db [:goals (:goal-id goal)] (merge (db/default-goal)
-                                                (select-keys goal [:owner :description :goal-id])))))
+   (assoc-in db
+             [:goals (:goal-id goal)]
+             (merge (db/default-goal)
+                    (select-keys goal [:owner :description :goal-id :give-in-return])))))
 
 
 
@@ -99,6 +101,7 @@
              (merge (db/default-bid)
                     (let [{:keys [bid-owner description goal-id]} bid]
                       {:goal-id goal-id
+                       :bid-id bid-owner ;FIXME use bid-id instead
                        :owner bid-owner
                        :description description})))))
 

@@ -18,6 +18,7 @@
    ;; event handlers
    ;;
    [childrensfutures-trade.handlers.utils :refer [goal-gas-limit]]
+
    [childrensfutures-trade.handlers.interceptors :refer [interceptors
                                                          interceptors-fx]]
    ))
@@ -48,12 +49,12 @@
  :new-goal.blockchain/send
  (interceptors-fx :spec false)
  (fn [{:keys [db]} []]
-   (let [{:keys [description owner]} (:new-goal db)]
+   (let [{:keys [description owner give-in-return]} (:new-goal db)]
      {:web3-fx.contract/state-fn
       {:instance (:instance (:contract db))
        :web3 (:web3 db)
        :db-path [:contract :send-goal]
-       :fn [:new-goal description
+       :fn [:new-goal description give-in-return
        {:from owner
         :gas goal-gas-limit}
        :new-goal.blockchain/confirmed

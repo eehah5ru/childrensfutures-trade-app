@@ -19,7 +19,20 @@
      :on-change #(dispatch [:new-goal.attribute/update :description (u/evt-val %)])
      :name "description"
      :max-length 2000                   ;FIXME
+     :multi-line true
+     :rows 3
+     :rows-max 5
      :floating-label-text "Goal's description"
+     :style {:width "100%"}}]
+   [ui/text-field
+    {:default-value (:give-in-return new-goal)
+     :on-change #(dispatch [:new-goal.attribute/update :give-in-return (u/evt-val %)])
+     :name "give-in-return"
+     :max-length 2000                   ;FIXME
+     :multi-line true
+     :rows 3
+     :rows-max 5
+     :floating-label-text "What I'll give in return"
      :style {:width "100%"}}]
    ])
 

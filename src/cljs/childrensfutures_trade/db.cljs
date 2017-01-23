@@ -31,6 +31,7 @@
 (defn default-bid []
   {:created-at (js/Date.now)
    :description ""
+   :goal-id nil
    :owner nil
    :placing? false
    :selected? false
@@ -42,6 +43,7 @@
 (defn default-goal []
   {:created-at (js/Date.now)
    :description ""
+   :give-in-return ""
    :owner nil
    :sending? false
    :cancelling? false
@@ -58,6 +60,7 @@
 ;;;
 (s/def ::goal-id string?)
 (s/def ::description string?)
+(s/def ::give-in-return string?)
 (s/def ::created-at int?)
 (s/def ::indicator boolean?)
 (s/def ::owner (s/or :nil nil?
@@ -89,6 +92,7 @@
 
 (s/def ::goal (s/keys :req-un [::created-at
                                ::description
+                               ::give-in-return
                                ::owner
                                ::sending?
                                ::cancelling?
@@ -140,4 +144,4 @@
               :abi nil
               :bin nil
               :instance nil
-              :address "0x6dc29e701c4bbc33f89baba91f37b0ade58b7987"}})
+              :address "0x06db8fa0a4e2a96408c6cb82858a3cc6c9ba7ef0"}})

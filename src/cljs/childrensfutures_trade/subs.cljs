@@ -96,7 +96,7 @@
 ;;; @returns sequence
 ;;;
 (reg-sub
- :db/sorted-goals
+ :db.goals/sorted
  :<- [:db/goals]
  (fn [goals _]
    (sort-by :created-at #(compare %2 %1) (vals goals))))
@@ -132,7 +132,7 @@
 (reg-sub
  :db.goals.my/sorted
  :<- [:db/current-address]
- :<- [:db/sorted-goals]
+ :<- [:db.goals/sorted]
  (fn [[current-address goals] _]
    (filter #(= (:owner %) current-address) goals)))
 
@@ -161,7 +161,7 @@
 ;;; new bid for goal
 ;;;
 (reg-sub
- :db/new-bid
+ :db.bids/new-bid
  (fn [db]
    (:new-bid db)))
 
@@ -169,7 +169,7 @@
 ;;; bids for goal
 ;;;
 (reg-sub
- :db/bids
+ :db.goal.bids/all
  (fn [db [_ goal-id]]
    (get-in db [:goals goal-id :bids])))
 
@@ -178,11 +178,11 @@
 ;;; bids for goal as sorted vector
 ;;;
 (reg-sub
- :db/sorted-bids
+ :db.goal.bids/sorted
 
  ;; input
  (fn [[_ goal-id] _]
-   (subscribe [:db/bids goal-id]))
+   (subscribe [:db.goal.bids/all goal-id]))
 
  ;; reaction
  (fn [bids _]
@@ -190,14 +190,30 @@
  )
 
 ;;;
+;;; all bids for an account
+;;;
+(reg-sub
+ :db.bids.my/sorted
+ :<- [:db/current-address]
+ :<- [:db.goals/sorted]
+
+ (fn [[current-address goals] _]
+   (let [all-bids (mapcat #(-> %
+                               :bids
+                               vals)
+                          goals)]
+     (filter #(= (:owner %) current-address)
+             all-bids))))
+
+;;;
 ;;; returns true if current goal already bidded by user
 ;;;
 (reg-sub
- :db/already-bidded?
+ :db.goal/already-bidded?
  ;; input
  (fn [[_ goal-id] _]
    [(subscribe [:db/current-address])
-    (subscribe [:db/bids goal-id])])
+    (subscribe [:db.goal.bids/all goal-id])])
 
  ;; reaction
  (fn [[current-address bids] _]
@@ -210,12 +226,12 @@
 ;;; @returns boolean
 ;;;
 (reg-sub
- :db/my-bid?
+ :db.bids/my-bid?
 
  ;; input
  (fn [[_ goal-id bid-id] _]
    [(subscribe [:db/current-address])
-    (subscribe [:db/bids goal-id])])
+    (subscribe [:db.goal.bids/all goal-id])])
 
  ;; reaction
  (fn [[current-address bids] [_ goal-id bid-id]]
@@ -226,11 +242,11 @@
 ;;; returns true if goal has already selected bid
 ;;;
 (reg-sub
- :db/goal-has-selected-bid?
+ :db.goal/has-selected-bid?
 
  ;; input
  (fn [[_ goal-id] _]
-   (subscribe [:db/sorted-bids goal-id]))
+   (subscribe [:db.goal.bids/sorted goal-id]))
 
  ;; reaction
  (fn [bids _]
