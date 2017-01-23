@@ -10,6 +10,7 @@ module.exports = {
     "images/": "images/"
   },
   rpc: {
+    // gas: 1141592,
     host: "localhost",
     port: 8545
   }
