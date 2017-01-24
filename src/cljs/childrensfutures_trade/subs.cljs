@@ -16,6 +16,7 @@
  :db/current-address
  :<- [:db/my-addresses]
  (fn [my-addresses _]
+   (js/console.log :debug :current-address (first my-addresses))
    (first my-addresses)))
 
 (reg-sub
@@ -85,6 +86,109 @@
 
 ;;;
 ;;;
+;;; ROLES IN APP
+;;;
+;;;
+
+;;;
+;;; am I a goal owner?
+;;;
+(reg-sub
+ :role/goal-owner?
+ :<- [:db/current-address]
+ :<- [:db/goals]
+
+ (fn [[current-address goals] [_ goal-id]]
+   (js/console.log :debug :goal (get goals goal-id))
+   (= current-address
+      (get-in goals [goal-id :owner]))))
+
+;;;
+;;; am I bid owner?
+;;;
+(reg-sub
+ :role/bid-owner?
+ :<- [:db/current-address]
+ :<- [:db/goals]
+
+ (fn [[current-address goals] [_ goal-id]]
+   (some #(= current-address
+             (:owner %))
+         (-> goals
+             (get-in [goal-id :bids])
+             vals))))
+
+;;;
+;;; am I an investor in the goal?
+;;;
+(reg-sub
+ :role/investor?
+ :<- [:db/current-address]
+ :<- [:db/goals]
+
+ (fn [[current-address goals [_ goal-id]]]
+   (some #(and (= current-address
+                  (:owner %))
+               (:selected? %))
+         (-> goals
+             (get-in [goal-id :bids])
+             vals))))
+
+;;;
+;;; am I a stranger?
+;;;
+(reg-sub
+ :role/stranger?
+ ;;
+ ;; input
+ ;;
+ (fn [[_ goal-id] _]
+   [(subscribe [:role/goal-owner? goal-id])
+    (subscribe [:role/bid-owner? goal-id])
+    (subscribe [:role/investor? goal-id])
+    (subscribe [:db.goal/stage goal-id])])
+
+ ;;
+ ;; reaction
+ ;;
+ (fn [[goal-owner? bid-owner? investor? stage] _]
+   (or (and (not goal-owner?)
+            (not bid-owner?)
+            (not investor?))
+       (= stage :cancelled))))
+
+
+;;;
+;;;
+;;; get my curent role
+;;;
+;;;
+(reg-sub
+ :role/role
+ ;;
+ ;;  input
+ ;;
+ (fn [[_ goal-id] _]
+   [(subscribe [:role/goal-owner? goal-id])
+    (subscribe [:role/bid-owner? goal-id])
+    (subscribe [:role/investor? goal-id])
+    (subscribe [:role/stranger? goal-id])])
+
+ ;;
+ ;; reaction
+ ;;
+ (fn [[goal-owner? bid-owner? investor? stranger?] _]
+   (js/console.log :debug :getting-role goal-owner?)
+   (cond
+     goal-owner? :goal-owner
+     bid-owner? :bid-owner
+     investor? :investor
+     stranger? :stranger
+     :else (do (js/console.log :warning "strange user role")
+               :stranger)))
+ )
+;;;
+;;;
 ;;; GOAL RELATED
 ;;;
 ;;;
@@ -116,8 +220,17 @@
  :db.goals/count
  :<- [:db/goals]
  (fn [goals [_ owner]]
-   (js/console.log owner)
    (count (filter #(= (:owner %) owner) (vals goals)))))
+
+;;;
+;;; goal's stage
+;;;
+(reg-sub
+ :db.goal/stage
+ :<- [:db/goals]
+
+ (fn [goals [_ goal-id]]
+   (get-in goals [goal-id :stage])))
 
 ;;;
 ;;; is it my goal?

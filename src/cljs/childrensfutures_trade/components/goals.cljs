@@ -1,15 +1,26 @@
 (ns childrensfutures-trade.components.goals
   (:require
-    [cljs-react-material-ui.icons :as icons]
-    [cljs-react-material-ui.reagent :as ui]
-    [cljs-react-material-ui.core :refer [color]]
-    [childrensfutures-trade.components.layout :refer [grid row col outer-paper]]
-    [childrensfutures-trade.styles :as st]
-    [childrensfutures-trade.utils :as u]
-    [medley.core :as medley]
-    [re-frame.core :refer [subscribe dispatch]]
-    [reagent.core :as r]
-    [clavatar-js.core :as clavatar]))
+   [cljs-react-material-ui.icons :as icons]
+   [cljs-react-material-ui.reagent :as ui]
+   [cljs-react-material-ui.core :refer [color]]
+   [medley.core :as medley]
+   [re-frame.core :refer [subscribe dispatch]]
+   [reagent.core :as r]
+   [clavatar-js.core :as clavatar]
+
+   [childrensfutures-trade.components.layout :refer [grid row col outer-paper]]
+   [childrensfutures-trade.styles :as st]
+   [childrensfutures-trade.utils :as u]
+   [childrensfutures-trade.goal-stages :as gs]
+
+   ;;
+   ;; goal views
+   ;;
+   [childrensfutures-trade.components.goal.created :as created-goal]
+   [childrensfutures-trade.components.goal.unknown :as unknown-goal]
+   [childrensfutures-trade.components.goal.cancelled :as cancelled-goal]
+   [childrensfutures-trade.components.goal.bid-placed :as bid-placed-goal]
+   ))
 
 
 ;;;
@@ -246,10 +257,60 @@
 
 
 ;;;
+;;;
+;;; staged goal views
+;;;
+;;;
+(defn staged-goal-view [goal]
+  (let [{:keys [goal-id stage description give-in-return]} goal
+        ;; get staged view properties
+        card-properties (cond
+          (gs/unknown? stage) unknown-goal/card-properties
+          (gs/created? stage) created-goal/card-properties
+          (gs/cancelled? stage) cancelled-goal/card-properties
+          (gs/bid-placed? stage) bid-placed-goal/card-properties
+          :else unknown-goal/card-properties)
+        {:keys [card-style
+                card-text
+                card-actions]} card-properties]
+    [ui/card
+     {:style (card-style goal)}
+
+     ;; header
+     [ui/card-header
+      {:title (r/as-element [:span
+                             [:em "Goal: "]
+                             (u/truncate description 120)])
+       :subtitle (r/as-element [:span
+                                [:em "Bonus: "]
+                                give-in-return])
+       :show-expandable-button true
+       :act-as-expander true
+       :avatar (r/as-element [goal-avatar goal])}]
+
+     ;; text
+     [ui/card-text
+      {:expandable true}
+      [card-text goal]]
+
+     ;; actions
+     [ui/card-actions
+      {:act-as-expander false
+       :expandable true
+       :children (map #(r/as-element %) (card-actions goal))}
+      ]]))
+
+;;;
+;;;
+;;; select goal-view
+;;;
+;;;
+
+;;;
 ;;; goals list view
 ;;;
 (defn goals-view [goals-selector]
   (let [goals (goals-selector)]
     [:div (for [goal @goals]
-       ^{:key (:goal-id goal)} [goal-view goal])]
+            ^{:key (:goal-id goal)} [staged-goal-view goal])]
     ))

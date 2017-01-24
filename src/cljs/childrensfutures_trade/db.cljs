@@ -1,7 +1,9 @@
 (ns childrensfutures-trade.db
   (:require [cljs-web3.core :as web3]
             [cljs.reader]
-            [cljs.spec :as s]))
+            [cljs.spec :as s]
+
+            [childrensfutures-trade.goal-stages :as gs]))
 
 
 ;;;
@@ -58,17 +60,8 @@
 ;;; SPECS
 ;;;
 ;;;
-(s/def ::stage #{:unknown
-                 :created
-                 :bid-placed
-                 :bid-selected
-                 :investment-sent
-                 :investment-received
-                 :goal-achieved
-                 :bonus-asked
-                 :bonus-sent
-                 :goal-completed
-                 :cancelled})
+(s/def ::stage gs/stages)
+
 (s/def ::goal-id string?)
 (s/def ::description string?)
 (s/def ::give-in-return string?)

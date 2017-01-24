@@ -27,16 +27,16 @@
 ;;;
 ;;;
 (def contract-events
-  {:GoalAdded :contract/on-goal-loaded
-   :GoalCancelled :contract/on-goal-cancelled
-   :BidPlaced :contract/on-bid-placed
-   :BidSelected :contract/on-bid-selected
-   :InvestmentSent :contract/on-investment-sent
-   :InvestmentReceived :contract/on-investment-received
-   :GoalAchieved :contract/on-goal-achieved
-   :BonusAsked :contract/on-bonus-asked
-   :BonusSent :contract/on-bonus-sent
-   :GoalCompleted :contract/on-goal-completed})
+  [[:GoalAdded :contract/on-goal-loaded]
+   [:GoalCancelled :contract/on-goal-cancelled]
+   [:BidPlaced :contract/on-bid-placed]
+   [:BidSelected :contract/on-bid-selected]
+   [:InvestmentSent :contract/on-investment-sent]
+   [:InvestmentReceived :contract/on-investment-received]
+   [:GoalAchieved :contract/on-goal-achieved]
+   [:BonusAsked :contract/on-bonus-asked]
+   [:BonusSent :contract/on-bonus-sent]
+   [:GoalCompleted :contract/on-goal-completed]])
 
 ;;;
 ;;;
