@@ -29,11 +29,19 @@
 ;;; CONTRACT
 ;;;
 ;;;
+;;; FIXME: unused
 (reg-sub
   :contract/active-state?
   (fn [db]
     (= :active (get-in db [:contract :state]))))
 
+;;;
+;;; is web3 available
+;;;
+(reg-sub
+ :contract/web3-available?
+ (fn [db]
+   (:provides-web3? db)))
 
 ;;;
 ;;;

@@ -44,6 +44,14 @@
 ;;; VIEWS
 ;;;
 ;;;
+(defn- error-modal []
+  (let [web3-available? (subscribe [:contract/web3-available?])]
+    [ui/dialog
+     {:modal true
+      :title "Oups! Error..."
+      :open (not (if @web3-available? true false))}
+
+     [:p "Welcome! Looks like your browser can't handle Ethereum yet. Please see How to Play"]]))
 
 
 ;;;
@@ -67,6 +75,11 @@
 
         (when @drawer-open?
           [drawer-view])
+
+        ;;
+        ;; error modal window
+        ;;
+        [error-modal]
 
         ;;
         ;; switch account dialog
