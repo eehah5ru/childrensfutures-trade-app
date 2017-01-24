@@ -75,6 +75,10 @@
  (fn [db]
    (:current-page db)))
 
+(reg-sub
+ :ui/chat-open?
+ (fn [db]
+   (:chat-open? db)))
 ;;;
 ;;; show new bid indicator
 ;;;
@@ -83,6 +87,14 @@
 ;;  (fn [db [_ goal-id]]
 ;;    (get-in db [:goals goal-id :show-new-bid?])))
 
+
+;;;
+;;; chat channel id
+;;;
+(reg-sub
+ :chat/channel-id
+ (fn [db]
+   (:chat-channel-id db)))
 
 ;;;
 ;;;

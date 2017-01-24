@@ -80,6 +80,8 @@
 (s/def ::selected? boolean?)
 (s/def ::selecting? boolean?)
 (s/def ::drawer-open? boolean?)
+(s/def ::chat-channel-id string?)
+(s/def ::chat-open? boolean?)
 
 (s/def ::bid (s/keys :req-un [::created-at
                               ::goal-id
@@ -115,7 +117,9 @@
                              ::show-new-goal?
                              ::show-new-bid?
                              ::show-accounts?
-                             ::drawer-open?]))
+                             ::drawer-open?
+                             ::chat-channel-id
+                             ::chat-open?]))
 ;;;
 ;;;
 ;;; END OF SPECS
@@ -140,6 +144,8 @@
    :show-new-bid? false
    :show-accounts? false
    :drawer-open? false
+   :chat-channel-id ""
+   :chat-open? false
    :web3 (mk-web3)
    :provides-web3? (or (aget js/window "web3") goog.DEBUG)
    :contract {:name "GoalsStockExchange"

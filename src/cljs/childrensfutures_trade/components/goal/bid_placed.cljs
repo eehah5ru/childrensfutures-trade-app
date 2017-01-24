@@ -27,7 +27,14 @@
        :on-touch-tap #(dispatch [:cancel-goal/send goal-id])}]]))
 
 (defn- bid-owner-actions [goal]
-  [])
+  (let [{:keys [goal-id]} goal]
+    [
+     ^{:key :open-chat}
+     [ui/raised-button
+      {:secondary true
+       :disabled false
+       :label "Discuss details"
+       :on-touch-tap #(dispatch [:ui.chat/open goal-id])}]]))
 
 (defn- stranger-actions [goal]
   (let [{:keys [goal-id]} goal]

@@ -26,6 +26,10 @@
 
     [childrensfutures-trade.components.goals :refer [place-bid-dialog]]
 
+    [childrensfutures-trade.components.chat :refer [chat-view]]
+
+
+
     ))
 
 ;; (def col (r/adapt-react-class js/ReactFlexboxGrid.Col))
@@ -62,6 +66,7 @@
         sending-new-goal? (subscribe [:db/sending-new-goal?])
 
         drawer-open? (subscribe [:ui/drawer-open?])
+        chat-open? (subscribe [:ui/chat-open?])
         current-page (subscribe [:ui/current-page])]
     (fn []
       ;; {:fluid true}
@@ -111,6 +116,11 @@
         ;; show add goal button
         ;;
         [new-goal-button]
+
+        ;;
+        ;; chat view
+        ;;
+        [chat-view]
 
         ;; [ui/snackbar {:message "Adding Goal"
         ;;               :open @sending-new-goal?}]

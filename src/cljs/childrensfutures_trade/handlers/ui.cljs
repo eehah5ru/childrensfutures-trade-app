@@ -4,6 +4,8 @@
 
    [childrensfutures-trade.db :as db]
 
+   [cljs-web3.core :as web3]
+
    [goog.string :as gstring]
    [goog.string.format]
    [madvas.re-frame.web3-fx]
@@ -73,3 +75,16 @@
                :drawer-open? false)
     ;; :ga/page-view [(apply u/path-for (:handler match) (flatten (into [] (:route-params match))))]
     }))
+
+;;;
+;;;
+;;; chat events
+;;;
+;;;
+(reg-event-db
+ :ui.chat/open
+ (interceptors)
+ (fn [db [channel-id]]
+   (-> db
+       (assoc :chat-open? true)
+       (assoc :chat-channel-id (str "a" (subs (web3/sha3 channel-id) 2 30))))))
