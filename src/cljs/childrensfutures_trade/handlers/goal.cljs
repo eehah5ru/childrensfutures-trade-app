@@ -32,6 +32,6 @@
  (interceptors)
 
  (hu/blockchain-trx-receipt-loaded
-  (fn [db [goal-id]]
+  (fn [db [goal-id _]]
     (-> db
         (assoc-in [:goals goal-id :trx-on-air?] false)))))

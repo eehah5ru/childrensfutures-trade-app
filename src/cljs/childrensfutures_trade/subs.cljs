@@ -1,5 +1,6 @@
 (ns childrensfutures-trade.subs
-  (:require [re-frame.core :refer [reg-sub subscribe]]))
+  (:require [re-frame.core :refer [reg-sub subscribe]]
+            [childrensfutures-trade.goal-stages :as gs]))
 
 
 ;;;
@@ -112,11 +113,13 @@
  :<- [:db/goals]
 
  (fn [[current-address goals] [_ goal-id]]
-   (some #(= current-address
-             (:owner %))
-         (-> goals
-             (get-in [goal-id :bids])
-             vals))))
+   (let [stage (get-in goals [goal-id :stage])]
+     (and (gs/bid-placed? stage)
+          (some #(= current-address
+                    (:owner %))
+                (-> goals
+                    (get-in [goal-id :bids])
+                    vals))))))
 
 ;;;
 ;;; am I an investor in the goal?
@@ -126,7 +129,7 @@
  :<- [:db/current-address]
  :<- [:db/goals]
 
- (fn [[current-address goals [_ goal-id]]]
+ (fn [[current-address goals] [_ goal-id]]
    (some #(and (= current-address
                   (:owner %))
                (:selected? %))
@@ -309,6 +312,19 @@
  (fn [bids _]
    (sort-by :created-at (vals bids)))
  )
+
+;;;
+;;; selected bid
+;;;
+(reg-sub
+ :db.goal.bids/selected
+ ;; input
+ (fn [[_ goal-id] _]
+   (subscribe [:db.goal.bids/sorted goal-id]))
+
+ ;; reaction
+ (fn [bids _]
+   (first (filter :selected? bids))))
 
 ;;;
 ;;; all bids for an account

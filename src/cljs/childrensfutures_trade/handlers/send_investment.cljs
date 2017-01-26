@@ -29,8 +29,8 @@
  (fn [{:keys [db]} [goal-id bid-id]]
    (hu/blockchain-send-transaction
     db
-    [goal-id bid-id]
     :send-investment
+    [goal-id bid-id]
     :db-path [goal-id bid-id]
     :confirmed-event [:blockchain.goal/transaction-confirmed goal-id]
     :error-event :log-error

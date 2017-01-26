@@ -35,7 +35,7 @@
        :web3 (:web3 db)
        :db-path (flatten [:contract
                           f-name
-                          db-path])
+                          (map keyword db-path)])
        :fn (concat (flatten [f-name f-args])
                    [fn-options
                     confirmed-event
@@ -47,9 +47,15 @@
 ;;; on trx receipt loaded
 ;;; f - db modifier. args are: [db [event-args]]
 ;;;
+;; (defn blockchain-trx-receipt-loaded [f]
+;;   (fn [db args]
+;;     (js/console.log :debug :blockchain-trx-receipt-loaded all)
+;;     db))
+
 (defn blockchain-trx-receipt-loaded [f]
-  (fn [db [{:keys [gas-used] :as transaction-receipt} & rest]]
-    (console :log transaction-receipt)
-    (when (= gas-used goal-gas-limit)
-      (console :error "All gas used"))
-    (f db rest)))
+  (fn [db args]
+    (let [[_ {:keys [gas-used] :as transaction-receipt}] args]
+        (console :log :trx-receipt-loaded transaction-receipt)
+     (when (= gas-used goal-gas-limit)
+       (console :error "All gas used")))
+    (f db args)))

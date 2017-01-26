@@ -11,13 +11,15 @@
     [reagent.core :as r]
     [clavatar-js.core :as clavatar]
 
-    [childrensfutures-trade.goal-stages :as gs]))
+    [childrensfutures-trade.goal-stages :as gs]
+    [childrensfutures-trade.components.goal.utils :as gu]))
 
 (defn unknown-goal-view [goal]
   (let [{:keys [description give-in-return]} goal]
     []))
 
 (def card-properties
-  {:card-style (constantly st/goal-card)
-   :card-text (constantly [:h1 "Unknown goal"])
-   :card-actions (constantly [])})
+  (gu/card-properties
+   {:card-style (constantly st/goal-card)
+    :card-text (constantly [:h1 "Unknown goal"])
+    :card-actions (constantly [])}))

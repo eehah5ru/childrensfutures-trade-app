@@ -26,15 +26,6 @@
 ;;;
 ;;;
 
-;; (defmacro dummy [a]
-;;   (keyword a))
-
-;; (defmacro mk-stage-predicate [stage]
-;;   (let [p-name (symbol (stage "?"))
-;;         stage-name (keyword stage)]
-;;     `(def ~p-name (partial stage? ~stage-name))))
-
-
 (defn stage? [expected-stage s]
   (= expected-stage s))
 
@@ -49,3 +40,7 @@
 (def bonus-sent? (partial stage? :bonus-sent))
 (def goal-completed? (partial stage? :goal-completed))
 (def cancelled? (partial stage? :cancelled))
+
+(defn after? [expected-stage s]
+  (< (.indexOf sorted-stages expected-stage)
+     (.indexOf sorted-stages s)))

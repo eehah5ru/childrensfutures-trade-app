@@ -26,12 +26,12 @@
  :blockchain.complete-goal/send
  (interceptors-fx :spec false)
 
- (fn [{:keys [db]} [goal-id]]
+ (fn [{:keys [db]} [goal-id bid-id]]
    (hu/blockchain-send-transaction
     db
-    [goal-id]
     :complete-goal
-    :db-path [goal-id]
+    [goal-id bid-id]
+    :db-path [goal-id bid-id]
     :confirmed-event [:blockchain.goal/transaction-confirmed goal-id]
     :error-event :log-error
     :receipt-loaded-event [:blockchain.goal/transaction-receipt-loaded goal-id])))
