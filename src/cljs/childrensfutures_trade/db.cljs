@@ -146,4 +146,17 @@
               :abi nil
               :bin nil
               :instance nil
-              :address "0x06db8fa0a4e2a96408c6cb82858a3cc6c9ba7ef0"}})
+              ;;
+              ;;
+              ;; devel net address (depends on testrpc)
+              ;;
+              ;;
+              ;; :address "0x06db8fa0a4e2a96408c6cb82858a3cc6c9ba7ef0"
+
+              ;;
+              ;;
+              ;; ropsten testnet contract address
+              ;;
+              ;;
+              :address "0x641937c1fbf30604809e9701647af90413bb1e3a"
+             }})
