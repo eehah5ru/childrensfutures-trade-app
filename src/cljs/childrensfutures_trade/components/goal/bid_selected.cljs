@@ -13,6 +13,7 @@
 
    [childrensfutures-trade.components.avatars :refer [bid-avatar]]
    [childrensfutures-trade.components.goal.utils :as gu]
+
    [childrensfutures-trade.components.goal.common :as gc]
 
    [childrensfutures-trade.components.chat :refer [chat-open-button]]))
@@ -49,11 +50,11 @@
 (defn- card-text [goal]
   (gu/with-role
     goal
-    {:goal-owner [gu/simple-card-title
+    {:goal-owner [gc/simple-card-title
                   "Wait while investments is being send to you. Or discuss details via chat"]
-     :investor [gu/simple-card-title
+     :investor [gc/simple-card-title
                 "Help her get her dream achieved! Send an investment or discuss details via chat!"]}
-    [gu/simple-card-title
+    [gc/simple-card-title
      "Let's wait for incredible moments! Or invest in your future now!"]))
 
 

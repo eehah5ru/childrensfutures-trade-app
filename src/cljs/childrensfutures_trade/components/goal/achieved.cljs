@@ -49,9 +49,9 @@
 (defn- card-text [goal]
   (gu/with-role
     goal
-    {:goal-owner [gu/simple-card-title
+    {:goal-owner [gc/simple-card-title
                   "You're cool creature! Now investor can ask her bonus back. Be polite with her! Chat now or later!"]
-     :investor [gu/simple-card-title
+     :investor [gc/simple-card-title
                 "Ask bonus or discuss details!"]}
     [gu/simple-card-title
      "Let's wait for incredible moments! Or invest in your future now!"]))

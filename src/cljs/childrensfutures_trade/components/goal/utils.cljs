@@ -24,10 +24,3 @@
   (let [goal-id (:goal-id goal)
         role (subscribe [:role/role goal-id])]
     (get selections @role default)))
-
-;;;
-;;; simple card title
-;;;
-(defn simple-card-title [title]
-  [ui/card-title
-   {:title title}])

@@ -49,11 +49,11 @@
 (defn- card-text [goal]
   (gu/with-role
     goal
-    {:goal-owner [gu/simple-card-title
+    {:goal-owner [gc/simple-card-title
                   "Wait while bonus is on the way!"]
-     :investor [gu/simple-card-title
+     :investor [gc/simple-card-title
                 "Got it? Say thanks!"]}
-    [gu/simple-card-title
+    [gc/simple-card-title
      "Let's wait for incredible moments! Or invest in your future now!"]))
 
 

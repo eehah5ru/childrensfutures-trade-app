@@ -22,6 +22,18 @@
 
 ;;;
 ;;;
+;;; human readable names of stages
+;;;
+;;;
+(def human-readable-stages
+  {:created "just added"
+   :bid-selected "all set"})
+
+(defn human-readable [stage]
+  (get human-readable-stages stage stage))
+
+;;;
+;;;
 ;;; predicates
 ;;;
 ;;;

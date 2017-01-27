@@ -60,7 +60,7 @@
         place-button [ui/raised-button
                       {:secondary true
                        :disabled (empty? (:description @new-bid))
-                       :label "Place"
+                       :label "Invest"
                        :on-touch-tap #(dispatch
                                        [:place-bid/place (:goal-id @new-bid)])}]
         cancel-button [ui/flat-button
@@ -221,12 +221,13 @@
 ;;     ))
 
 
+
 (defn- goal-statuses [goal extra-statuses]
   (let [{:keys [stage goal-id]} goal
         role (subscribe [:role/role goal-id])
         extra-statuses (extra-statuses goal)]
     (concat [{:key :stage
-              :content stage}
+              :content (gs/human-readable stage)}
              {:key :role
               :content @role}]
             extra-statuses)))
@@ -265,8 +266,7 @@
      ;; header
      [ui/card-header
       {:title (r/as-element [:span
-                             [:em "Goal: "]
-                             (u/truncate description 120)])
+                             description])
        :subtitle (r/as-element [:span
                                 [:em "Bonus: "]
                                 give-in-return

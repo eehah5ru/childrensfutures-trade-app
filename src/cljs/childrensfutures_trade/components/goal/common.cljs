@@ -24,6 +24,13 @@
   (let [selected-bid (subscribe [:db.goal.bids/selected (:goal-id goal)])]
     [:span "Investment: " (:description @selected-bid)]))
 
+;;;
+;;; simple card title
+;;;
+(defn simple-card-title [title]
+  [ui/card-title
+   {:title title}])
+
 
 ;;;
 ;;; empty actions

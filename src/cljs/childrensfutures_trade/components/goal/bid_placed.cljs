@@ -12,7 +12,8 @@
     [clavatar-js.core :as clavatar]
 
     [childrensfutures-trade.components.avatars :refer [bid-avatar]]
-    [childrensfutures-trade.components.goal.utils :as gu]))
+    [childrensfutures-trade.components.goal.utils :as gu]
+    [childrensfutures-trade.components.goal.common :as gc]))
 
 
 ;;;
@@ -94,20 +95,21 @@
   (let [{:keys [goal-id]} goal
         bids (subscribe [:db.goal.bids/sorted goal-id])]
     [ui/card-title
-    {:title "Select your investment!"}
-    [ui/list
-     (for [bid @bids]
-       ^{:key (:owner bid)}
-       [bid-list-item goal-id bid])]]))
+     {:title "Select your investment!"}
+     [ui/list
+      (for [bid @bids]
+        ^{:key (:owner bid)}
+        [bid-list-item goal-id bid])]]))
 
 ;;; bid owner
 (defn- bid-owner-card-text [goal]
-  [ui/card-title
-   {:title "Wait for goal owner's decision"}])
+  [gc/simple-card-title
+   "Wait for the goal owner's decision"])
 
 ;;; stranger
 (defn- stranger-card-text [goal]
-  [:p "Don't wait! invest now!"])
+  [gc/simple-card-title
+   "Don't wait! invest now!"])
 
 (defn card-text [goal]
   (gu/with-role
@@ -138,9 +140,13 @@
 ;;;
 (defn- goal-statuses-extra [goal]
   (let [goal-id (:goal-id goal)
-        bids (subscribe [:db.goal.bids/sorted goal-id])]
+        bids (subscribe [:db.goal.bids/sorted goal-id])
+        content (str (count @bids) " potential investor")
+        content (if (= (count @bids) 1)
+                  content
+                  (str content "s"))]
     [{:key :investors-count
-      :content (str (count @bids) " potential investors")}]))
+      :content content}]))
 ;;;
 ;;;
 ;;; PROPERTIES
