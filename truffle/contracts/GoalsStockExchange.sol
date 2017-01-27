@@ -4,39 +4,8 @@ import "./owned.sol";
 import "./staged.sol";
 import "./Stages.sol";
 import "./Goal.sol";
+import "./withDreamer.sol";
 
-//
-//
-// helpers
-//
-//
-
-
-//
-// with dreamer
-// modifiers connected to dreamer logic
-//
-contract withDreamer {
-  //
-  // only owner of goal can do smth
-  //
-  modifier onlyDreamer(Goal.Goal _goal) {
-    if (_goal.owner != msg.sender) {
-      throw;
-    }
-    _;
-  }
-
-  //
-  // any person except dremear can perform smth
-  //
-  modifier notDreamer(Goal.Goal _goal) {
-    if (_goal.owner == msg.sender) {
-      throw;
-    }
-    _;
-  }
-}
 
 
 /*
@@ -116,22 +85,22 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
   }
 
 
-  function getGoal(bytes32 _goalId)
-    notBeforeStage(Stages.Stage.Created, goals[_goalId])
-    onlyExisted(_goalId)
-    public
-    constant
-    returns(bytes32 goalId,
-            address owner,
-            string description)
-  {
+  // function getGoal(bytes32 _goalId)
+  //   notBeforeStage(Stages.Stage.Created, goals[_goalId])
+  //   onlyExisted(_goalId)
+  //   public
+  //   constant
+  //   returns(bytes32 goalId,
+  //           address owner,
+  //           string description)
+  // {
 
-    Goal.Goal r = goals[_goalId];
+  //   Goal.Goal r = goals[_goalId];
 
-    goalId = _goalId;
-    owner = r.owner;
-    description = r.description;
-  }
+  //   goalId = _goalId;
+  //   owner = r.owner;
+  //   description = r.description;
+  // }
 
 
   //

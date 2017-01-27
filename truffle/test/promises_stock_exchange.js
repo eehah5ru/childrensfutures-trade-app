@@ -54,9 +54,9 @@ contract('GoalsStockExchange', function(accounts) {
   //
   // returns raw solidity results of getGoal call
   //
-  var performGetGoal = function(goalId, options) {
-    return gse().getGoal.call(goalId, options);
-  };
+  // var performGetGoal = function(goalId, options) {
+  //   return gse().getGoal.call(goalId, options);
+  // };
 
 
   //
@@ -268,9 +268,9 @@ contract('GoalsStockExchange', function(accounts) {
       return expect(gse().owner.call()).to.eventually.equal(accounts[0]);
     });
 
-    it("hasGoals should return false", function() {
-      return expect(gse().hasGoals.call()).to.eventually.be.equal(false);
-    });
+    // it("hasGoals should return false", function() {
+    //   return expect(gse().hasGoals.call()).to.eventually.be.equal(false);
+    // });
 
     it("getNumGoals should return 0", function() {
       return expect(gse().getNumGoals.call()
@@ -278,17 +278,17 @@ contract('GoalsStockExchange', function(accounts) {
         .to.eventually.be.equal(0);
     });
 
-    describe("getGoal", function() {
-      it("getGoal(0) throws exception", function() {
-        return expect(gse().getGoal.call(0))
-          .to.be.rejected;
-      });
+    // describe("getGoal", function() {
+    //   it("getGoal(0) throws exception", function() {
+    //     return expect(gse().getGoal.call(0))
+    //       .to.be.rejected;
+    //   });
 
-      it("getGoal(8) throws expeption also", function() {
-        return expect(gse().getGoal.call(8))
-          .to.be.rejected;
-      });
-    });
+    //   it("getGoal(8) throws expeption also", function() {
+    //     return expect(gse().getGoal.call(8))
+    //       .to.be.rejected;
+    //   });
+    // });
   });
 
 
@@ -406,88 +406,88 @@ contract('GoalsStockExchange', function(accounts) {
     });
   });
 
-  describe("#getGoal", function() {
-    it("should be successful", function() {
-      var expectedGoalId = null;
+  // describe("#getGoal", function() {
+  //   it("should be successful", function() {
+  //     var expectedGoalId = null;
 
-      return expect(performAddGoal("aaa",
-                                   Date.now().toString(),
-                                   {from: accounts[2]})
-                    .then(function(goalAddedEventData) {
-                      expectedGoalId = goalAddedEventData.goalId;
+  //     return expect(performAddGoal("aaa",
+  //                                  Date.now().toString(),
+  //                                  {from: accounts[2]})
+  //                   .then(function(goalAddedEventData) {
+  //                     expectedGoalId = goalAddedEventData.goalId;
 
-                      return gse().getGoal.call(goalAddedEventData.goalId, {from: accounts[3]});
-                    })).to.be.fulfilled;
-    });
+  //                     return gse().getGoal.call(goalAddedEventData.goalId, {from: accounts[3]});
+  //                   })).to.be.fulfilled;
+  //   });
 
-    it("returns goalId", function() {
-      var expectedGoalId = null;
+  //   it("returns goalId", function() {
+  //     var expectedGoalId = null;
 
-      return performAddGoal("aaa",
-                            Date.now().toString(),
-                            {from: accounts[2]})
-        .then(function(goalAddedEventData) {
-          expectedGoalId = goalAddedEventData.goalId;
+  //     return performAddGoal("aaa",
+  //                           Date.now().toString(),
+  //                           {from: accounts[2]})
+  //       .then(function(goalAddedEventData) {
+  //         expectedGoalId = goalAddedEventData.goalId;
 
-          return gse().getGoal.call(goalAddedEventData.goalId, {from: accounts[3]});
-        })
-        .then(function(goal) {
-          expect(goal[0]).to.be.equal(expectedGoalId);
-        });
-    });
+  //         return gse().getGoal.call(goalAddedEventData.goalId, {from: accounts[3]});
+  //       })
+  //       .then(function(goal) {
+  //         expect(goal[0]).to.be.equal(expectedGoalId);
+  //       });
+  //   });
 
 
-    it("returns goalOwner", function() {
-      return performAddGoal("bbb",
-                            Date.now().toString(),
-                            {from: accounts[3]})
-        .then(function(gaData) {
-          return performGetGoal(gaData.goalId, {from: accounts[4]});
-        })
-        .then(function(goal) {
-          expect(goal[1]).to.be.equal(accounts[3]);
-        });
-    });
+  //   it("returns goalOwner", function() {
+  //     return performAddGoal("bbb",
+  //                           Date.now().toString(),
+  //                           {from: accounts[3]})
+  //       .then(function(gaData) {
+  //         return performGetGoal(gaData.goalId, {from: accounts[4]});
+  //       })
+  //       .then(function(goal) {
+  //         expect(goal[1]).to.be.equal(accounts[3]);
+  //       });
+  //   });
 
-    it("returns goal's description", function() {
-      return expect(
-        performAddGoal("cccc",
-                       Date.now().toString(),
-                       {from: accounts[4]})
-          .then(function(gaData) {
-            return performGetGoal(gaData.goalId, {from: accounts[1]});
-          })
-      ).to.be.fulfilled
-        .and.eventually.have.deep.property("[2]", "cccc");
-    });
+  //   it("returns goal's description", function() {
+  //     return expect(
+  //       performAddGoal("cccc",
+  //                      Date.now().toString(),
+  //                      {from: accounts[4]})
+  //         .then(function(gaData) {
+  //           return performGetGoal(gaData.goalId, {from: accounts[1]});
+  //         })
+  //     ).to.be.fulfilled
+  //       .and.eventually.have.deep.property("[2]", "cccc");
+  //   });
 
-    it("fails if goalId is too big", function() {
-      return expect(
-        performAddGoal("ddd", Date.now().toString())
-          .then(function(gaData) {
-            return performGetGoal(gaData.goalId.toNumber() + 2);
-          })
-      ).to.be.rejected;
-    });
+  //   it("fails if goalId is too big", function() {
+  //     return expect(
+  //       performAddGoal("ddd", Date.now().toString())
+  //         .then(function(gaData) {
+  //           return performGetGoal(gaData.goalId.toNumber() + 2);
+  //         })
+  //     ).to.be.rejected;
+  //   });
 
-    it("fails if goalId is equal 0", function() {
-      return expect(
-        performAddGoal("ddd", Date.now().toString())
-          .then(function(gaData) {
-            return performGetGoal(0);
-          })
-      ).to.be.rejected;
-    });
+  //   it("fails if goalId is equal 0", function() {
+  //     return expect(
+  //       performAddGoal("ddd", Date.now().toString())
+  //         .then(function(gaData) {
+  //           return performGetGoal(0);
+  //         })
+  //     ).to.be.rejected;
+  //   });
 
-    it("fails if goalId is less than 0", function() {
-      return expect(
-        performAddGoal("aaa", Date.now().toString())
-          .then(function(gaData) {
-            return performGetGoal(-1);
-          })
-      ).to.be.rejected;
-    });
-  });
+  //   it("fails if goalId is less than 0", function() {
+  //     return expect(
+  //       performAddGoal("aaa", Date.now().toString())
+  //         .then(function(gaData) {
+  //           return performGetGoal(-1);
+  //         })
+  //     ).to.be.rejected;
+  //   });
+  // });
 
   //
   //
