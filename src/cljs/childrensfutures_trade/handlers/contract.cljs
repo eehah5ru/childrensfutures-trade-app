@@ -22,6 +22,15 @@
    ))
 
 ;;;
+;;; from block options
+;;;
+;; (def from-block
+;;   "latest")
+
+(def from-block
+  {:from-block 0})
+
+;;;
 ;;;
 ;;; contract events
 ;;;
@@ -56,7 +65,7 @@
        :db db
        :db-path [:contract :events]
        :events (map (fn [[event handler]]
-                      [event {} {:from-block 0} handler :log-error])
+                      [event {} from-block handler :log-error])
                     contract-events)}
 
 
