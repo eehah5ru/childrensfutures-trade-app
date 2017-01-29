@@ -65,7 +65,7 @@
      {:modal false
       :body-style {:position "relative"
                    :padding-bottom "56.25%" ; /* 16:9 */
-                   :padding-top "25px"      ;
+                   :padding-top "0px"      ;
                    :height "0"}
       :actions []
       :on-request-close #(dispatch [:ui.new-goal/toggle-view])
