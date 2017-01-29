@@ -48,7 +48,8 @@
 (defn full-width-paper [& props-and-childern]
   (generic-paper full-width-layout-col-flex
                  (u/merge-props
-                  {:col-props {:style {:margin 0
+                  {:row-props {:style {:margin 0}}
+                   :col-props {:style {:margin 0
                                        :padding 0}}}
                   props-and-childern)))
 
