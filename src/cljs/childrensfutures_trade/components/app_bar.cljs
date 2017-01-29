@@ -32,11 +32,19 @@
          :on-touch-tap #(do (dispatch [:blockchain.account/refresh]))}]])))
 
 ;;;
+;;; app title
+;;;
+(defn- app-title []
+  (let [current-page-name (subscribe [:ui/current-page-name])]
+    [:span
+     (str "Goals Exchange Market / " @current-page-name)]))
+
+;;;
 ;;; App bar
 ;;;
 (defn app-bar-view []
   [ui/app-bar
-   {:title "Goals Exchange Market"
+   {:title (r/as-component [app-title])
     :on-left-icon-button-touch-tap #(dispatch [:ui.drawer/toggle-view])
     :icon-element-right (r/as-element [right-buttons])
     :style {:position "fixed"

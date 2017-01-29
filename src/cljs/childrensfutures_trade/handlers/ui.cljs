@@ -65,6 +65,9 @@
  (fn [db]
    (update db :show-accounts? not)))
 
+;;;
+;;; set current page
+;;;
 (reg-event-fx
  :ui.set-current-page
  (interceptors)
@@ -73,3 +76,22 @@
                :drawer-open? false)
     ;; :ga/page-view [(apply u/path-for (:handler match) (flatten (into [] (:route-params match))))]
     }))
+
+;;;
+;;; forse set window size
+;;;
+(reg-event-db
+ :ui.window/set-size
+ (interceptors)
+ (fn [db]
+   (assoc db :window-height (.-innerHeight js/window))))
+
+;;;
+;;; resized window
+;;;
+(reg-event-db
+ :ui.window/resize
+ (interceptors)
+ (fn [db]
+   ;; (js/console.log :debug :win-height (.-innerHeight js/window))
+   (assoc db :window-height (.-innerHeight js/window))))

@@ -1,6 +1,8 @@
 (ns childrensfutures-trade.subs
   (:require [re-frame.core :refer [reg-sub subscribe]]
-            [childrensfutures-trade.goal-stages :as gs]))
+            [childrensfutures-trade.goal-stages :as gs]
+
+            [childrensfutures-trade.pages :as pages]))
 
 
 ;;;
@@ -17,7 +19,7 @@
  :db/current-address
  :<- [:db/my-addresses]
  (fn [my-addresses _]
-   (js/console.log :debug :current-address (first my-addresses))
+   ;; (js/console.log :debug :current-address (first my-addresses))
    (first my-addresses)))
 
 (reg-sub
@@ -77,6 +79,22 @@
    (:current-page db)))
 
 ;;;
+;;;
+;;;
+(reg-sub
+ :ui/current-page-name
+ :<- [:ui/current-page]
+ (fn [current-page _]
+   (pages/human-readable (:handler current-page))))
+
+;;;
+;;; window height
+;;;
+(reg-sub
+ :ui/window-height
+ (fn [db]
+   (:window-height db)))
+;;;
 ;;; show new bid indicator
 ;;;
 ;; (reg-sub
@@ -100,7 +118,7 @@
  :<- [:db/goals]
 
  (fn [[current-address goals] [_ goal-id]]
-   (js/console.log :debug :goal (get goals goal-id))
+   ;; (js/console.log :debug :goal (get goals goal-id))
    (= current-address
       (get-in goals [goal-id :owner]))))
 
@@ -181,7 +199,7 @@
  ;; reaction
  ;;
  (fn [[goal-owner? bid-owner? investor? stranger?] _]
-   (js/console.log :debug :getting-role goal-owner?)
+   ;; (js/console.log :debug :getting-role goal-owner?)
    (cond
      goal-owner? :goal-owner
      bid-owner? :bid-owner

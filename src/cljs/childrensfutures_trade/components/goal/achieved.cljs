@@ -53,7 +53,7 @@
                   "You're cool creature! Now investor can ask her bonus back. Be polite with her! Chat now or later!"]
      :investor [gc/simple-card-title
                 "Ask bonus or discuss details!"]}
-    [gu/simple-card-title
+    [gc/simple-card-title
      "Let's wait for incredible moments! Or invest in your future now!"]))
 
 

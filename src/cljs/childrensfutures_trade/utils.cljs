@@ -3,6 +3,8 @@
             [cljs-time.core :refer [date-time to-default-time-zone]]
             [cljs-time.format :as time-format]
             [cljs-web3.core :as web3]
+            [reagent.core :as r]
+
 
             [bidi.bidi :as bidi]
             ))
@@ -31,6 +33,18 @@
 (defn format-date [date]
   (time-format/unparse-local (time-format/formatters :rfc822) (to-default-time-zone (to-date-time date))))
 
+;;;
+;;;
+;;; childern nodes utils
+;;;
+;;;
+
+;;;
+;;; deep merge properties
+;;;
+;; (defn- merge-props [& props]
+;;   (apply merge-with merge props ))
+
 (defn extract-props [v]
   (let [p (nth v 0 nil)]
     (if (map? p) p)))
@@ -40,3 +54,24 @@
         first-child (if (or (nil? p) (map? p)) 1 0)]
     (if (> (count v) first-child)
       (subvec v first-child))))
+
+
+;;;
+;;; deep merge properties
+;;;
+
+(defn merge-props [props props-and-children]
+  (let [p (extract-props props-and-children)
+        c (extract-children props-and-children)]
+    (letfn [(mergef [& maps]
+              (apply merge-with mergef maps))]
+      (-> p
+          (as-> xs (merge-with mergef xs props))
+          vector
+          (concat c)
+          vec))))
+
+#_(let [a {:a 1 :b {:c 1 :d {:f 1}}}
+      b {:e 2 :b {:g 3 :d {:h 5}}}]
+  (letfn []
+    (merge-with mergef a b)))

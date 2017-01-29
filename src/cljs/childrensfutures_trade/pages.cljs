@@ -18,21 +18,44 @@
     ))
 
 
+(def page-defs
+  [
+   ;; about
+   {:key :about
+    :route "about"
+    :menu-icon icons/action-info
+    :human-readable "About"
+    :page-view about-page
+    }
+   ;; pulse
+   {:key :pulse
+    :route "pulse"
+    :menu-icon icons/action-stars
+    :human-readable "Pulse"
+    :page-view pulse-page}
+   ;; how to play
+   {:key :how-to-play
+    :route "how-to-play"
+    :menu-icon icons/action-help
+    :human-readable "How To Play"
+    :page-view about-page}
+   ;; home
+   {:key :home
+    :route true
+    :menu-icon icons/action-home
+    :human-readable "Home"
+    :page-view home-page
+    }])
+
 ;;;
 ;;;
 ;;; bidi/pushy routes
 ;;;
 ;;;
 (def routes
-  ["/" {"about" :about
-        "latest" :latest
-        "my" :my
-        "pulse" :pulse
-        ;; "contact" :contact
-        ;; "sponsor" :sponsor
-        ;; "how-to-play" :how-to-play
-        ;; ["players/" :address] :player-profile
-        true :home}])
+  ["/" (reduce merge
+               {}
+               (map #(hash-map (:route %) (:key %)) page-defs))])
 
 ;;;
 ;;;
@@ -40,13 +63,9 @@
 ;;;
 ;;;
 (def pages
-  {:home home-page
-   :about about-page
-   :pulse pulse-page
-   ;; :latest latest-events-page
-   ;; :my my-events-page
-   ;; :how-to-play how-to-play-page
-   })
+  (reduce merge
+          {}
+          (map #(hash-map (:key %) (:page-view %)) page-defs)))
 
 ;;;
 ;;;
@@ -54,10 +73,19 @@
 ;;;
 ;;;
 (def menu-pages
-  [[:home "Home" icons/action-home]
-   [:pulse "Pulse" icons/action-stars]
-   [:how-to-play "How To Play" icons/action-help]
-   [:about "About" icons/action-info]])
+  (map #(list (:key %)
+              (:human-readable %)
+              (:menu-icon %))
+       page-defs))
+
+;;;
+;;; human readable for page
+;;;
+(defn human-readable [page-key]
+  (->> page-defs
+   (filter #(= (:key %) page-key))
+   first
+   :human-readable))
 
 ;;;
 ;;;

@@ -8,7 +8,11 @@
     [childrensfutures-trade.utils :as u]
     [childrensfutures-trade.subs :as s]
     [childrensfutures-trade.styles :as st]
-    [childrensfutures-trade.components.layout :refer [grid row col outer-paper]]
+    [childrensfutures-trade.components.layout :refer [grid
+                                                      row
+                                                      col
+                                                      outer-paper
+                                                      full-width-paper]]
 
     [childrensfutures-trade.pages :refer [pages]]
 
@@ -53,6 +57,32 @@
 
      [:p "Welcome! Looks like your browser can't handle Ethereum yet. Please see How to Play"]]))
 
+;;;
+;;;
+;;; FOOTER
+;;;
+;;;
+(defn- footer []
+  [full-width-paper
+   {:paper-props {:z-depth 0
+                  :style {:text-align "center"
+                          :padding-top "20px"
+                          :padding-bottom "20px"
+                          :background-color (color :grey-900)
+                          :color "white"
+                          }}}
+   [:div "Produced by "
+    [:a {:href "http://pikene.no"
+         :target "blank"}
+     "Pikene på Broen"]
+    " and "
+    [:a {:href "http://eeefff.org/"
+         :target "blank"}
+     "eeefff"]
+    " for "
+    [:a {:href "http://barentsspektakel.no"
+         :target "blank"}
+     "Barents Spektakel 2017"]]])
 
 ;;;
 ;;; main panel
@@ -111,6 +141,8 @@
         ;; show add goal button
         ;;
         [new-goal-button]
+
+        [footer]
 
         ;; [ui/snackbar {:message "Adding Goal"
         ;;               :open @sending-new-goal?}]

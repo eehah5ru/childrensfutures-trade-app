@@ -56,7 +56,8 @@
                   :response-format (ajax/json-response-format {:keywords? true})
                   :on-success [:contract/abi-loaded]
                   :on-failure [:log-error]}
-     :dispatch [:blockchain/load-my-addresses]})))
+     :dispatch-n [[:ui.window/set-size]
+                  [:blockchain/load-my-addresses]]})))
 
 
 

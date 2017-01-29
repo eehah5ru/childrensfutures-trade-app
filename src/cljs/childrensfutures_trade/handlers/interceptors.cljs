@@ -20,7 +20,7 @@
   "throw an exception if db doesn't match the spec"
   [a-spec db]
   (when-not (s/valid? a-spec db)
-    (throw (ex-info (str "spec check failed: " (s/explain-str a-spec db)) {}))))
+    (throw (ex-info (str "spec check failed: " (s/explain-data a-spec db)) {}))))
 
 ;;;
 ;;; interceptor for usual event handlers

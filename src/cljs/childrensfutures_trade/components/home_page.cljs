@@ -14,7 +14,6 @@
 
 (defn home-page []
   [outer-paper
-   [:h1 "Goals"]
    [goals-view #(subscribe [:db.goals/sorted])]]
 
    )

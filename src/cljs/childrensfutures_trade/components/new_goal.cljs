@@ -70,5 +70,5 @@
     :z-depth 2
     :style {:position "fixed"
             :right 20
-            :bottom 20
+            :bottom "34px"
             :z-index 99}}])

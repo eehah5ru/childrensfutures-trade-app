@@ -80,6 +80,8 @@
 (s/def ::selected? boolean?)
 (s/def ::selecting? boolean?)
 (s/def ::drawer-open? boolean?)
+(s/def ::window-height (s/or :nil nil?
+                             :integer integer?))
 
 (s/def ::bid (s/keys :req-un [::created-at
                               ::goal-id
@@ -115,7 +117,8 @@
                              ::show-new-goal?
                              ::show-new-bid?
                              ::show-accounts?
-                             ::drawer-open?]))
+                             ::drawer-open?
+                             ::window-height]))
 ;;;
 ;;;
 ;;; END OF SPECS
@@ -140,6 +143,7 @@
    :show-new-bid? false
    :show-accounts? false
    :drawer-open? false
+   :window-height nil
    :web3 (mk-web3)
    :provides-web3? (or (aget js/window "web3") goog.DEBUG)
    :contract {:name "GoalsStockExchange"
@@ -151,12 +155,12 @@
               ;; devel net address (depends on testrpc)
               ;;
               ;;
-              ;; :address "0x06db8fa0a4e2a96408c6cb82858a3cc6c9ba7ef0"
+              :address "0x06db8fa0a4e2a96408c6cb82858a3cc6c9ba7ef0"
 
               ;;
               ;;
               ;; ropsten testnet contract address
               ;;
               ;;
-              :address "0x641937c1fbf30604809e9701647af90413bb1e3a"
+              ;; :address "0x641937c1fbf30604809e9701647af90413bb1e3a"
              }})

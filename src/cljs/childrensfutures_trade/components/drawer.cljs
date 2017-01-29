@@ -10,7 +10,7 @@
     [childrensfutures-trade.styles :as st]
     [childrensfutures-trade.utils :as u]
 
-    [childrensfutures-trade.pages :as pages :refer [menu-pages]]
+    [childrensfutures-trade.pages :as pages :refer [menu-pages pages]]
 
     ))
 
@@ -36,5 +36,6 @@
 
        [ui/app-bar {:title "myFutures"
                     :show-menu-icon-button false}]
+       ;; (js/console.log :info pages)
        (for [menu-page menu-pages]
           (menu-link menu-page))])))

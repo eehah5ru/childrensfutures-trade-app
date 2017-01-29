@@ -28,4 +28,5 @@
 (defn ^:export init []
   (re-frame/dispatch-sync [:initialize])
   (pushy/start! history)
-  (mount-root))
+  (mount-root)
+  (.addEventListener js/window "resize" #(dispatch [:ui.window/resize])))
