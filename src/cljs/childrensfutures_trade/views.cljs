@@ -109,12 +109,12 @@
         ;;
         ;; error modal window
         ;;
-        [error-modal]
+        ;; [error-modal]
 
         ;;
         ;; switch account dialog
         ;;
-        [switch-account-dialog]
+        ;; [switch-account-dialog]
 
         ;;
         ;; new goal dialog
@@ -126,7 +126,7 @@
         ;; place bid dialog
         ;; visiblity is controlled inside
         ;;
-        [place-bid-dialog]
+        ;; [place-bid-dialog]
 
         ;;
         ;; show active-page

@@ -46,18 +46,8 @@
 (reg-event-fx
  :initialize
  (fn [_ _]
-   (merge
-    {:db db/default-db
-     ;; TODO: refactor and extract this code to contract/fetch-abi
-     :http-xhrio {:method :get
-                  :uri (gstring/format "./contracts/build/%s.abi"
-                                       (get-in db/default-db [:contract :name]))
-                  :timeout 6000
-                  :response-format (ajax/json-response-format {:keywords? true})
-                  :on-success [:contract/abi-loaded]
-                  :on-failure [:log-error]}
-     :dispatch-n [[:ui.window/set-size]
-                  [:blockchain/load-my-addresses]]})))
+   {:db db/default-db
+    :dispatch [:ui.window/set-size]}))
 
 
 

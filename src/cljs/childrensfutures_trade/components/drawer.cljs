@@ -30,7 +30,7 @@
 (defn drawer-view []
   (let [drawer-open? (subscribe [:ui/drawer-open?])]
     (fn []
-      [ui/drawer {:open @drawer-open?
+      #_[ui/drawer {:open @drawer-open?
                   :docked false
                   :on-request-change #(dispatch [:ui.drawer/toggle-view])}
 
