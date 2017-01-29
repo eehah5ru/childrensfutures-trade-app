@@ -23,16 +23,23 @@
 ;;;
 ;;; props are:
 ;;; - :row-props
+;;; - :col-props
 ;;; - :paper-props
 ;;;
 (defn- generic-paper [col-layout props-and-children]
   ;; (js/console.log props-and-children)
   (let [props (u/extract-props props-and-children)
-        {:keys [row-props paper-props]
-         :or [row-props {} paper-props {}]} props
+        {:keys [row-props
+                col-props
+                paper-props]
+         :or [row-props {}
+              col-props {}
+              paper-props {}]} props
         children (u/extract-children props-and-children)]
     [row row-props
-     [col col-layout
+     [col (r/merge-props
+           col-layout
+           col-props)
       [ui/paper paper-props
        (for [[index child] (medley/indexed children)]
          (with-meta child {:key index}))]]]))
@@ -40,7 +47,11 @@
 
 (defn full-width-paper [& props-and-childern]
   (generic-paper full-width-layout-col-flex
-                 props-and-childern))
+                 (u/merge-props
+                  {:col-props {:style {:margin 0
+                                       :padding 0}}}
+                  props-and-childern)))
+
 
 (defn outer-paper [& props-and-children]
   (let [win-height (subscribe [:ui/window-height])]

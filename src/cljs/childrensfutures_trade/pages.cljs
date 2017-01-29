@@ -20,12 +20,12 @@
 
 (def page-defs
   [
-   ;; about
-   {:key :about
-    :route "about"
-    :menu-icon icons/action-info
-    :human-readable "About"
-    :page-view about-page
+   ;; home
+   {:key :home
+    :route true
+    :menu-icon icons/action-home
+    :human-readable "Home"
+    :page-view home-page
     }
    ;; pulse
    {:key :pulse
@@ -39,13 +39,14 @@
     :menu-icon icons/action-help
     :human-readable "How To Play"
     :page-view about-page}
-   ;; home
-   {:key :home
-    :route true
-    :menu-icon icons/action-home
-    :human-readable "Home"
-    :page-view home-page
-    }])
+   ;; about
+   {:key :about
+    :route "about"
+    :menu-icon icons/action-info
+    :human-readable "About"
+    :page-view about-page
+    }
+   ])
 
 ;;;
 ;;;
