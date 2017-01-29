@@ -10,16 +10,3 @@
     [re-frame.core :refer [subscribe dispatch]]
     [reagent.core :as r]
     ))
-
-
-(def default-chat-open-button-title "Discuss details")
-
-(defn chat-open-button
-  ([]
-   (chat-open-button default-chat-open-button-title))
-
-  ([title]
-
-   [ui/raised-button
-   {:secondary true
-    :label title}]))

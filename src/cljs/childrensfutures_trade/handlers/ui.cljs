@@ -72,7 +72,8 @@
  :ui.set-current-page
  (interceptors)
  (fn [{:keys [db]} [match]]
-   {:db (assoc db :current-page match
+   {:db (assoc db
+               :current-page match
                :drawer-open? false)
     ;; :ga/page-view [(apply u/path-for (:handler match) (flatten (into [] (:route-params match))))]
     }))

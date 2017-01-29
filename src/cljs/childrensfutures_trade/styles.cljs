@@ -25,7 +25,7 @@
 (def paper-base {:padding-left "20px"
                  :padding-right "20px"
                  :padding-top "10px"
-                 :margin-bottom 10})
+                 :padding-bottom "20px"})
 
 (defn outer-paper-base [win-height]
   (merge paper-base
@@ -45,6 +45,12 @@
 
 (def goal-card-cancelled (merge goal-card
                                 {:background-color color-disabled}))
+
+;;;
+;;; card button
+;;;
+(def goal-card-button {:margin-left "20px"
+                       :margin-bottom "20px"})
 
 ;;;
 ;;; GOAL OWNER AVATAR BADGE

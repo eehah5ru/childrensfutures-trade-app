@@ -15,7 +15,7 @@
    [childrensfutures-trade.components.goal.utils :as gu]
    [childrensfutures-trade.components.goal.common :as gc]
 
-   [childrensfutures-trade.components.chat :refer [chat-open-button]]))
+   ))
 
 (defn- complete-goal-button [goal]
   (let [goal-id (:goal-id goal)
@@ -34,13 +34,13 @@
 ;;; owner
 (defn- owner-actions [goal]
   [
-   [chat-open-button]])
+   [gc/chat-open-button]])
 
 ;;; investor
 (defn- investor-actions [goal]
   [
    [complete-goal-button goal]
-   [chat-open-button]])
+   [gc/chat-open-button]])
 
 
 ;;;

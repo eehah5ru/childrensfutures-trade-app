@@ -54,9 +54,9 @@
 ;;;
 ;;;
 (def routes
-  ["/" (reduce merge
-               {}
-               (map #(hash-map (:route %) (:key %)) page-defs))])
+  ["/" (let [pages (filter #(not= (:route %) true) page-defs)
+             default (filter #(= (:route %) true) page-defs)]
+         (map #(vector (:route %) (:key %)) (concat pages default)))])
 
 ;;;
 ;;;
@@ -74,7 +74,7 @@
 ;;;
 ;;;
 (def menu-pages
-  (map #(list (:key %)
+  (map #(vector (:key %)
               (:human-readable %)
               (:menu-icon %))
        page-defs))

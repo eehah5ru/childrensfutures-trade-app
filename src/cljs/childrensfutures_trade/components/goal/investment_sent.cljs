@@ -15,13 +15,13 @@
    [childrensfutures-trade.components.goal.utils :as gu]
    [childrensfutures-trade.components.goal.common :as gc]
 
-   [childrensfutures-trade.components.chat :refer [chat-open-button]]))
+   ))
 
 (defn- investment-received-button [goal]
   (let [goal-id (:goal-id goal)
         selected-bid (subscribe [:db.goal.bids/selected goal-id])
         bid-id (:bid-id @selected-bid)]
-    [ui/raised-button
+    [gc/card-raised-button
      {:primary true
       :label "Got Investment!"
       :on-touch-tap #(dispatch
@@ -35,12 +35,12 @@
 (defn- owner-actions [goal]
   [
    [investment-received-button goal]
-   [chat-open-button]])
+   [gc/chat-open-button]])
 
 ;;; investor
 (defn- investor-actions [goal]
   [
-   [chat-open-button]])
+   [gc/chat-open-button]])
 
 
 ;;;

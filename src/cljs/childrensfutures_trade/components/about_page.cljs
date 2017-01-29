@@ -9,30 +9,12 @@
     [re-frame.core :refer [subscribe dispatch]]
     [reagent.core :as r]))
 
+
 (defn about-page []
   [outer-paper
    [:h1 "What kind of exchange market is it?"]
-   [:p "As an art group EEEFFF we are developing a web application
-myfutures.trade that allows you to make transactions by putting up the
-goals and dreams of the future for trading. This is a decentralized
-speculative financial market to trade futures – investments in events
-that have not yet occurred. The app is based on blockchain technology
-called Ethereum."]
-   [:p "During the residency we would like to make a
-series of workshops for teenagers and youth (aged 14-25), where they
-will be invited to create a closed community where everyone is
-thinking about the future right now.  Exposing the goals for trading,
-participants become part of a community. They can sell and exchange a
-short-term goals (for example, to gather oneself up for 10 times), and
-long-term (to enter the university) to invest in their future now. In
-return they offer the potential investor is something that may
-interest him (for example, the secret of mutual friends). Investors
-are being paid only when the goal is achieved.  Using a financial
-instrument as a medium, we would like to involve a person in the
-experience of the debt situation, which is taken right now as a given
-and is an instrument for the construction of our culture as a
-whole."]
-   [:p "The project opens up a space for discussion: who owns our
-future? How many debts are we able to cover? Do we need to invent new
-tools for dealing with the existing economy? What horizonts are
-decentralised technological platforms are opening for us?"]])
+   [:p "The web application myfutures.trade allows you to make transactions by trading future goals and dreams. This is a decentralized, speculative financial stock exchange that is based on a blockchain-technology called ethereum. It is created to play with futures – investing into the events that have not yet occurred."]
+   [:p "Participants become a part of an anonymous society by trading their own goals. They can sell and exchange both short-term (for instance, 10 pull ups) and long-term goals (such as to enrol in a university) for the investments into their future right now. In exchange, they suggest a potential investor something that might interest them (for example, a secret about their friends). Investors receive the compensation only when the goal is achieved."]
+   [:p "Use this financial instrument as the medium to experience new forms of the decentralized financial organisation. Its aim is to cripple the world market!"]
+   [:p "The app is inspired by researching the processes that take place inside of the DarkNet and the blockchain community."]
+   [:p "Enjoy!"]])

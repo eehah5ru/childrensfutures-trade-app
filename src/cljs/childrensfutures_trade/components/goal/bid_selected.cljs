@@ -16,7 +16,7 @@
 
    [childrensfutures-trade.components.goal.common :as gc]
 
-   [childrensfutures-trade.components.chat :refer [chat-open-button]]))
+   ))
 
 
 (defn- investment-sent-button [goal]
@@ -35,13 +35,13 @@
 
 ;;; owner
 (defn- owner-actions [goal]
-  [[chat-open-button]])
+  [[gc/chat-open-button]])
 
 ;;; investor
 (defn- investor-actions [goal]
   [
    [investment-sent-button goal]
-   [chat-open-button]])
+   [gc/chat-open-button]])
 
 
 ;;;

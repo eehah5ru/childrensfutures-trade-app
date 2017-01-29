@@ -14,8 +14,11 @@
    [childrensfutures-trade.components.avatars :refer [bid-avatar]]
    [childrensfutures-trade.components.goal.utils :as gu]
 
-   [childrensfutures-trade.components.chat :refer [chat-open-button]]))
+   ))
 
+
+
+(def default-chat-open-button-title "Discuss details")
 
 ;;;
 ;;; card extra subtitle
@@ -34,7 +37,32 @@
 ;;;
 ;;; card button
 ;;;
-;; (defn)
+(defn card-flat-button [props]
+  [ui/flat-button
+   (r/merge-props
+    {:secondary true
+     :style st/goal-card-button}
+    props)])
+
+(defn card-raised-button [props]
+  [ui/raised-button
+   (r/merge-props
+    {:secondary false
+     :style st/goal-card-button}
+    props)])
+
+;;;
+;;; chat button
+;;;
+(defn chat-open-button
+  ([]
+   (chat-open-button default-chat-open-button-title))
+
+  ([title]
+   [card-raised-button
+   {:secondary true
+    :label title}]))
+
 
 ;;;
 ;;; empty actions
