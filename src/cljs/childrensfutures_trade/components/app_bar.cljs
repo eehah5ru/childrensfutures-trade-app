@@ -24,9 +24,9 @@
        ;;   :on-touch-tap #(dispatch [:ui.new-goal/toggle-view])
        ;;   :style {:margin-right "20px"
        ;;           :margin-top "5px"}}]
-       [:h4 (u/eth @balance)]
+       ;; [:h4 (u/eth @balance)]
        ;; CHANGE ACCOUNT
-       [ui/icon-button
+       #_[ui/icon-button
         {:tooltip "Update"
          :children (icons/notification-sync)
          :on-touch-tap #(do (dispatch [:blockchain.account/refresh]))}]])))
