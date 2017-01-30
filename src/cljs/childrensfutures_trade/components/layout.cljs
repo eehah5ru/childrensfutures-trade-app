@@ -6,12 +6,12 @@
     [medley.core :as medley]
     [reagent.core :as r]
     [re-frame.core :refer [dispatch subscribe]]
-
+    [cljsjs.react-flexbox-grid]
     ))
 
 (def col (r/adapt-react-class js/ReactFlexboxGrid.Col))
 
-(def row (r/adapt-react-class (aget js/ReactFlexboxGrid "Row")))
+(def row (r/adapt-react-class js/ReactFlexboxGrid.Row))
 
 (def grid (r/adapt-react-class js/ReactFlexboxGrid.Grid))
 
@@ -50,7 +50,8 @@
                  (u/merge-props
                   {:row-props {:style {:margin 0}}
                    :col-props {:style {:margin 0
-                                       :padding 0}}}
+                                       :padding 0}}
+                   :paper-props {:rounded false}}
                   props-and-childern)))
 
 
