@@ -10,6 +10,7 @@
    [re-frame.core :refer [reg-event-db reg-event-fx path trim-v after debug reg-fx console dispatch]]
    [childrensfutures-trade.utils :as u]
 
+   [childrensfutures-trade.pages :as pages]
    ;;
    ;; event handlers
    ;;
@@ -70,13 +71,13 @@
 ;;;
 (reg-event-fx
  :ui.set-current-page
- (interceptors)
+ (interceptors-fx :spec true)
  (fn [{:keys [db]} [match]]
    {:db (assoc db
                :current-page match
                :drawer-open? false)
     ;; :ga/page-view [(apply u/path-for (:handler match) (flatten (into [] (:route-params match))))]
-    }))
+    :dispatch [:ui.page.title/update]}))
 
 ;;;
 ;;; forse set window size
@@ -96,3 +97,18 @@
  (fn [db]
    ;; (js/console.log :debug :win-height (.-innerHeight js/window))
    (assoc db :window-height (.-innerHeight js/window))))
+
+;;;
+;;; change page title
+;;;
+(reg-event-fx
+ :ui.page.title/update
+ (interceptors-fx :spec false)
+ (fn [{:keys [db]}]
+   (let [cur-page-name (-> db
+                      :current-page
+                      :handler
+                      pages/human-readable)
+         page-title (str "myfutures.trade / " cur-page-name)]
+     (aset js/document "title" page-title)
+     {})))

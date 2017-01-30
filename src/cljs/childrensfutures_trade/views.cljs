@@ -72,14 +72,14 @@
                           :color "white"
                           }}}
    [:div "Produced by "
-    [:a {:href "http://pikene.no"
-         :target "blank"}
-     "Pikene på Broen"]
-    " and "
     [:a {:href "http://eeefff.org/"
          :target "blank"}
      "eeefff"]
-    " for "
+    " and "
+    [:a {:href "http://pikene.no"
+         :target "blank"}
+     "Pikene på Broen"]
+    " For "
     [:a {:href "http://barentsspektakel.no"
          :target "blank"}
      "Barents Spektakel 2017"]]])
