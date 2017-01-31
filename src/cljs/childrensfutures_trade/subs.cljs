@@ -35,9 +35,9 @@
 ;;;
 ;;; FIXME: unused
 (reg-sub
-  :contract/active-state?
+  :gse-contract/active-state?
   (fn [db]
-    (= :active (get-in db [:contract :state]))))
+    (= :active (get-in db [:gse-contract :state]))))
 
 ;;;
 ;;; is web3 available

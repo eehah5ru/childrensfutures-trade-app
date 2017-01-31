@@ -21,7 +21,7 @@
    [childrensfutures-trade.handlers.interceptors :refer [interceptors
                                                          interceptors-fx]]
    [childrensfutures-trade.handlers.blockchain]
-   [childrensfutures-trade.handlers.contract]
+   [childrensfutures-trade.handlers.gse-contract]
 
    ;; blockchain contract events
    [childrensfutures-trade.handlers.goal] ; general goal events
@@ -51,10 +51,10 @@
      ;; TODO: refactor and extract this code to contract/fetch-abi
      :http-xhrio {:method :get
                   :uri (gstring/format "./contracts/build/%s.abi"
-                                       (get-in db/default-db [:contract :name]))
+                                       (get-in db/default-db [:gse-contract :name]))
                   :timeout 6000
                   :response-format (ajax/json-response-format {:keywords? true})
-                  :on-success [:contract/abi-loaded]
+                  :on-success [:gse-contract/abi-loaded]
                   :on-failure [:log-error]}
      :dispatch-n [[:ui.window/set-size]
                   [:blockchain/load-my-addresses]]})))
@@ -90,9 +90,9 @@
  (fn [{:keys [db]} [goal-id]]
    (let [address (:current-address db)]
      {:web3-fx.contract/state-fn
-      {:instance (:instance (:contract db))
+      {:instance (:instance (:gse-contract db))
        :web3 (:web3 db)
-       :db-path [:contract :cancel-goal (keyword goal-id)]
+       :db-path [:gse-contract :cancel-goal (keyword goal-id)]
        :fn [:cancel-goal goal-id
             {:from address
              :gas goal-gas-limit}
@@ -151,9 +151,9 @@
    (let [address (:current-address db)
          {:keys [description]} (:new-bid db) ]
      {:web3-fx.contract/state-fn
-      {:instance (:instance (:contract db))
+      {:instance (:instance (:gse-contract db))
        :web3 (:web3 db)
-       :db-path [:contract :place-bid (keyword goal-id)]
+       :db-path [:gse-contract :place-bid (keyword goal-id)]
        :fn [:place-bid goal-id description
             {:from address
              :gas goal-gas-limit}
@@ -230,68 +230,3 @@
  (fn [_ [err]]
    (js/console.log :error err)
    {}))
-
-;;;
-;;;
-;;; OLD STUFF
-;;;
-;;;
-
-;; (reg-event-db
-;;   :contract/settings-loaded
-;;   (interceptors)
-;;   (fn [db [[max-name-length max-tweet-length]]]
-;;     (assoc db :settings {:max-name-length (.toNumber max-name-length)
-;;                          :max-tweet-length (.toNumber max-tweet-length)})))
-
-
-;; (reg-event-fx
-;;   :contract/fetch-compiled-code
-;;   (interceptors)
-;;   (fn [{:keys [db]} [on-success]]
-;;     {:http-xhrio {:method :get
-;;                   :uri (gstring/format "/contracts/build/%s.json"
-;;                                        (get-in db [:contract :name]))
-;;                   :timeout 6000
-;;                   :response-format (ajax/json-response-format {:keywords? true})
-;;                   :on-success on-success
-;;                   :on-failure [:log-error]}}))
-
-;; (reg-event-fx
-;;   :contract/deploy-compiled-code
-;;   (interceptors)
-;;   (fn [{:keys [db]} [contracts]]
-;;     (let [{:keys [abi bin]} (get-in contracts [:contracts (keyword (:name (:contract db)))])]
-;;       {:web3-fx.blockchain/fns
-;;        {:web3 (:web3 db)
-;;         :fns [[web3-eth/contract-new
-;;                (js/JSON.parse abi)
-;;                {:gas 4500000
-;;                 :data bin
-;;                 :from (first (:my-addresses db))}
-;;                :contract/deployed
-;;                :log-error]]}})))
-
-;; (reg-event-fx
-;;   :blockchain/unlock-account
-;;   (interceptors)
-;;   (fn [{:keys [db]} [address password]]
-;;     {:web3-fx.blockchain/fns
-;;      {:web3 (:web3 db)
-;;       :fns [[web3-personal/unlock-account address password 999999
-;;              :blockchain/account-unlocked
-;;              :log-error]]}}))
-
-;; (reg-event-fx
-;;   :blockchain/account-unlocked
-;;   (interceptors)
-;;   (fn [{:keys [db]}]
-;;     (console :log "Account was unlocked.")
-;;     {}))
-
-;; (reg-event-fx
-;;   :contract/deployed
-;;   (interceptors)
-;;   (fn [_ [contract-instance]]
-;;     (when-let [address (aget contract-instance "address")]
-;;       (console :log "Contract deployed at" address))))

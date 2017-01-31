@@ -146,7 +146,7 @@
    :window-height nil
    :web3 (mk-web3)
    :provides-web3? (or (aget js/window "web3") goog.DEBUG)
-   :contract {:name "GoalsStockExchange"
+   :gse-contract {:name "GoalsStockExchange"
               :abi nil
               :bin nil
               :instance nil

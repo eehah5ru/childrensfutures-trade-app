@@ -37,9 +37,9 @@
  (fn [{:keys [db]} [goal-id bid-id]]
    (let [address (:current-address db)]
      {:web3-fx.contract/state-fn
-      {:instance (:instance (:contract db))
+      {:instance (:instance (:gse-contract db))
        :web3 (:web3 db)
-       :db-path [:contract :select-bid (keyword goal-id) (keyword bid-id)]
+       :db-path [:gse-contract :select-bid (keyword goal-id) (keyword bid-id)]
        :fn [:select-bid goal-id bid-id
             {:from address
              :gas goal-gas-limit}

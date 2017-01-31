@@ -51,9 +51,9 @@
  (fn [{:keys [db]} []]
    (let [{:keys [description owner give-in-return]} (:new-goal db)]
      {:web3-fx.contract/state-fn
-      {:instance (:instance (:contract db))
+      {:instance (:instance (:gse-contract db))
        :web3 (:web3 db)
-       :db-path [:contract :send-goal]
+       :db-path [:gse-contract :send-goal]
        :fn [:new-goal description give-in-return
        {:from owner
         :gas goal-gas-limit}
