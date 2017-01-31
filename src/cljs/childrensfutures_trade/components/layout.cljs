@@ -57,7 +57,7 @@
 
 (defn outer-paper [& props-and-children]
   (let [win-height (subscribe [:ui/window-height])]
-    (js/console.log :debug :win-height @win-height)
+    ;; (js/console.log :debug :win-height @win-height)
     (generic-paper outer-layout-col-flex
                    (u/merge-props
                     {:paper-props {:style (st/outer-paper-base @win-height)}}
