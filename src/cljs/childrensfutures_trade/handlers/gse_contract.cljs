@@ -47,6 +47,24 @@
    [:BonusSent :gse-contract/on-bonus-sent]
    [:GoalCompleted :gse-contract/on-goal-completed]])
 
+
+;;;
+;;;
+;;; fetch contract abi
+;;;
+;;;
+(reg-event-fx
+ :gse-contract/fetch-abi
+ (interceptors-fx :spec false)
+ (fn [{:keys [db]} _]
+   {:http-xhrio {:method :get
+                 :uri (gstring/format "./contracts/build/%s.abi"
+                                      (get-in db/default-db [:gse-contract :name]))
+                 :timeout 6000
+                 :response-format (ajax/json-response-format {:keywords? true})
+                 :on-success [:gse-contract/abi-loaded]
+                 :on-failure [:log-error]}}))
+
 ;;;
 ;;;
 ;;; register handlers for contract events
