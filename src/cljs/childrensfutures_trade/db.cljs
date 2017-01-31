@@ -155,7 +155,7 @@
               ;; devel net address (depends on testrpc)
               ;;
               ;;
-              :address "0x06db8fa0a4e2a96408c6cb82858a3cc6c9ba7ef0"
+              :address "0x2f4225883ac9d7e816ed99dc2f3149857a985859"
 
               ;;
               ;;
