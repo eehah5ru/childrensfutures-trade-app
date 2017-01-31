@@ -29,6 +29,7 @@
  (fn [{:keys [db]} [goal-id bid-id]]
    (hu/blockchain-send-transaction
     db
+    :gse-contract
     :complete-goal
     [goal-id bid-id]
     :db-path [goal-id bid-id]
