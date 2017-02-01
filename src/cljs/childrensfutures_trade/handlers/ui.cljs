@@ -67,6 +67,15 @@
    (update db :show-accounts? not)))
 
 ;;;
+;;; toggle chat view
+;;;
+(reg-event-db
+ :ui.chat/toggle-view
+ (interceptors)
+ (fn [db]
+   (update db :chat-open? not)))
+
+;;;
 ;;; set current page
 ;;;
 (reg-event-fx

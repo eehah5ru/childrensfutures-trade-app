@@ -53,7 +53,21 @@
    :bids (hash-map)
    :show-details? false})
 
+;;;
+;;; default chat channel id
+;;;
+(def default-chat-channel-id
+  (web3/sha3 "myfutures.trade"))
 
+;;;
+;;; default chat message
+;;;
+(defn default-chat-message []
+  {:channel-id default-chat-channel-id
+   :msg-id nil
+   :text ""
+   :owner nil
+   :trx-on-air? false})
 
 ;;;
 ;;;
@@ -63,6 +77,9 @@
 (s/def ::stage gs/stages)
 
 (s/def ::goal-id string?)
+(s/def ::channel-id string?)
+(s/def ::message-id int?)
+(s/def ::text string?)
 (s/def ::description string?)
 (s/def ::give-in-return string?)
 (s/def ::created-at int?)
@@ -80,8 +97,26 @@
 (s/def ::selected? boolean?)
 (s/def ::selecting? boolean?)
 (s/def ::drawer-open? boolean?)
+(s/def ::chat-open? boolean?)
+
 (s/def ::window-height (s/or :nil nil?
                              :integer integer?))
+
+;;;
+;;; contracts
+;;;
+(s/def ::address string?)
+(s/def ::name string?)
+(s/def ::ethereum-contract (s/keys :req-un [::address
+                                            ::name]))
+
+
+(s/def ::gse-contract (partial s/conform ::ethereum-contract))
+(s/def ::chat-contract (partial s/conform ::ethereum-contract))
+
+;;;
+;;; structures
+;;;
 
 (s/def ::bid (s/keys :req-un [::created-at
                               ::goal-id
@@ -91,9 +126,17 @@
                               ::selected?
                               ::selecting?]))
 
+(s/def ::chat-message (s/keys :req-un [::channel-id
+                                       ::message-id
+                                       ::owner
+                                       ::text
+                                       ::trx-on-air?]))
+
 (s/def ::bids (s/map-of ::owner ::bid))
 
 (s/def ::new-bid #(s/conform ::bid %))
+
+(s/def ::new-chat-message (partial s/conform ::chat-message))
 
 (s/def ::goal (s/keys :req-un [::created-at
                                ::description
@@ -113,12 +156,16 @@
 (s/def ::db (s/keys :req-un [::goals
                              ::new-goal
                              ::new-bid
+                             ::new-chat-message
                              ::current-address
                              ::show-new-goal?
                              ::show-new-bid?
                              ::show-accounts?
                              ::drawer-open?
-                             ::window-height]))
+                             ::chat-open?
+                             ::window-height
+                             ::gse-contract
+                             ::chat-contract]))
 ;;;
 ;;;
 ;;; END OF SPECS
@@ -139,28 +186,32 @@
    :accounts {}
    :new-goal (default-goal)
    :new-bid (default-bid)
+   :new-chat-message (default-chat-message)
    :show-new-goal? false
    :show-new-bid? false
    :show-accounts? false
    :drawer-open? false
+   :chat-open? false
    :window-height nil
    :web3 (mk-web3)
    :provides-web3? (or (aget js/window "web3") goog.DEBUG)
    :gse-contract {:name "GoalsStockExchange"
-              :abi nil
-              :bin nil
-              :instance nil
-              ;;
-              ;;
-              ;; devel net address (depends on testrpc)
-              ;;
-              ;;
-              :address "0x2f4225883ac9d7e816ed99dc2f3149857a985859"
+                  :abi nil
+                  :bin nil
+                  :instance nil
+                  ;;
+                  ;;
+                  ;; devel net address (depends on testrpc)
+                  ;;
+                  ;;
+                  :address "0x2f4225883ac9d7e816ed99dc2f3149857a985859"
 
-              ;;
-              ;;
-              ;; ropsten testnet contract address
-              ;;
-              ;;
-              ;; :address "0x641937c1fbf30604809e9701647af90413bb1e3a"
-             }})
+                  ;;
+                  ;;
+                  ;; ropsten testnet contract address
+                  ;;
+                  ;;
+                  ;; :address "0x641937c1fbf30604809e9701647af90413bb1e3a"
+                  }
+   :chat-contract {:name "Chat"
+                   :address "0x7759a1442466ea622e44238de2e628b2001b8741"}})

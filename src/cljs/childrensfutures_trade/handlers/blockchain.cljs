@@ -48,7 +48,8 @@
                                   :watch? true
                                   :blockchain-filter-opts "latest"
                                   :dispatches [:blockchain/balance-loaded :log-error]}
-    :dispatch [:new-goal.attribute/update :owner (first addresses)]}))
+    :dispatch-n [[:new-goal.attribute/update :owner (first addresses)]
+                 [:new-chat-message.attribute/update :owner (first addresses)]]}))
 
 
 ;;;

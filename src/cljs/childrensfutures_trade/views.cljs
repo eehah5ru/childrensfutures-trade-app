@@ -21,6 +21,8 @@
     ;;
     [childrensfutures-trade.components.drawer :refer [drawer-view]]
 
+    [childrensfutures-trade.components.chat :refer [chat-drawer-view]]
+
     [childrensfutures-trade.components.new-goal :refer [new-goal-button
                                                         new-goal-dialog]]
 
@@ -103,8 +105,9 @@
 
         [app-bar-view]
 
-        (when @drawer-open?
-          [drawer-view])
+        [drawer-view]
+
+        [chat-drawer-view]
 
         ;;
         ;; error modal window

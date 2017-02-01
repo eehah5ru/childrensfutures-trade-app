@@ -22,8 +22,10 @@
                                                          interceptors-fx]]
    [childrensfutures-trade.handlers.blockchain]
    [childrensfutures-trade.handlers.gse-contract]
+   ;; chat blockchain events
+   [childrensfutures-trade.handlers.chat-contract]
 
-   ;; blockchain contract events
+   ;; blockchain GSE contract events
    [childrensfutures-trade.handlers.goal] ; general goal events
    [childrensfutures-trade.handlers.new-goal]
    [childrensfutures-trade.handlers.select-bid]
@@ -33,6 +35,8 @@
    [childrensfutures-trade.handlers.ask-bonus]
    [childrensfutures-trade.handlers.send-bonus]
    [childrensfutures-trade.handlers.complete-goal]
+
+   [childrensfutures-trade.handlers.new-chat-message]
 
    [childrensfutures-trade.handlers.ui]))
 
@@ -48,7 +52,8 @@
  (fn [_ _]
    {:db db/default-db
     ;; TODO: refactor and extract this code to contract/fetch-abi
-    :dispatch-n [[:gse-contract/fetch-abi]
+    :dispatch-n [[:chat-contract/fetch-abi]
+                 [:gse-contract/fetch-abi]
                  [:ui.window/set-size]
                  [:blockchain/load-my-addresses]]}))
 

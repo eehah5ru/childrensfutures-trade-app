@@ -74,6 +74,11 @@
    (:drawer-open? db)))
 
 (reg-sub
+ :ui.chat/drawer-open?
+ (fn [db]
+   (:chat-open? db)))
+
+(reg-sub
  :ui/current-page
  (fn [db]
    (:current-page db)))
