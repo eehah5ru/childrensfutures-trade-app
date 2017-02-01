@@ -21,6 +21,14 @@
 ;;;
 
 ;;;
+;;; generic version of avatar
+;;;
+(defn avatar [avatar-id & {:keys [avatar-style]
+                           :or {avatar-style {}}}]
+  [ui/avatar {:style avatar-style
+              :src (clavatar/gravatar avatar-id)}])
+
+;;;
 ;;; goal avatar
 ;;;
 (defn goal-avatar [goal]
@@ -28,9 +36,9 @@
     [ui/badge
      {:badge-content @goals-count
       :badge-style st/goal-owner-avatar-badge}
-     [ui/avatar {:style {:margin-top 5
-                         :margin-right 20}
-                 :src (clavatar/gravatar (:owner goal))}]]))
+     [avatar (:owner goal)
+      {:avatar-style {:margin-top 5
+                      :margin-right 20}}]]))
 
 ;;;
 ;;; bid avatar
@@ -50,10 +58,4 @@
                :position "relative"
                :height 40
                :width 40}}
-      [ui/avatar {:style {;;:margin-left "15px"
-                          ;; :position "absolute"
-                          ;; :margin-left "-60px"
-                          ;; :top "50%"
-                          ;;:transform "translateY(-50%)"
-                          }
-                  :src (clavatar/gravatar (:owner bid))}]]]))
+      [avatar (:owner bid)]]]))
