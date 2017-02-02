@@ -102,12 +102,17 @@
 (reg-event-db
  :chat-contract/on-message-sent
  (interceptors)
- (fn [db [message]]
-   ;; FIXME: implement
-   (js/console.log :debug :received-message message)
-   db
-   #_(assoc-in db
-             [:goals (:goal-id goal)]
-             (merge (db/default-goal)
-                    (select-keys goal [:owner :description :goal-id :give-in-return])
-                    {:stage :created}))))
+ (fn [db [msg]]
+   (let [{:keys [channel-id
+                 msg-id
+                 sender
+                 message]} msg
+         loaded-message (merge (db/default-chat-message)
+                            {:channel-id channel-id
+                             :message-id (.toNumber msg-id)
+                             :owner sender
+                             :text message})
+         messages (get-in db [:messages channel-id] [])]
+     (js/console.log :debug :received-msg loaded-message)
+     (assoc-in db [:messages channel-id]
+               (conj messages loaded-message)))))

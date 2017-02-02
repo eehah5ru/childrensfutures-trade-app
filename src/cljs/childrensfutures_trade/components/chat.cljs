@@ -27,42 +27,50 @@
 ;;; messages list
 ;;;
 (defn- chat-messages []
-  [:div
-   {:style {:height "calc(100% - 100px)"
-            :max-height "100%"
-            :overflow "scroll"
-            :margin 0}}
-   [ui/list
-    (for [x (range 40)]
-      ^{:key (str x)}
-      [ui/list-item
-       {:inset-children true
-        :secondary-text (r/as-element "Quisque in odio eu lorem cursus semper. Sed ultrices tortor ut condimentum lobortis. In feugiat ante justo. Cras vehicula lacus ac sagittis rutrum. Proin eu sem eu enim finibus sodales. Pellentesque venenatis sodales egestas. Maecenas sodales porttitor diam in feugiat. Etiam id urna non tortor pretium malesuada. Maecenas non quam. ")
-        :secondary-text-lines 2
-        :left-avatar (r/as-element
-                      [avatars/avatar
-                       (str x)
-                       :avatar-style {:position "absolute"
-                                      :display "inline-block"
-                                      :top "50%"
-                                      :left "15px"
-                                      :transform "translateY(-50%)"}])}]
-      )]])
+  (let [messages (subscribe [:db.chat.current/messages])]
+    [:div
+     {:style {:height "calc(100% - 100px)"
+              :max-height "100%"
+              :overflow "scroll"
+              :margin 0}}
+     [ui/list
+      (for [msg @messages]
+        (let [{:keys [message-id
+                      owner
+                      text]} msg]
+          ^{:key message-id}
+          [ui/list-item
+           {:inset-children true
+            :secondary-text (r/as-element text)
+            :secondary-text-lines 2
+            :left-avatar (r/as-element
+                          [avatars/avatar
+                           owner
+                           :avatar-style {:position "absolute"
+                                          :display "inline-block"
+                                          :top "50%"
+                                          :left "15px"
+                                          :transform "translateY(-50%)"}])}])
+        )]]))
 
 ;;;
 ;;; new message text-field
 ;;;
 (defn- new-message-text-field []
-  [ui/text-field
-   {:full-width true
-    :multi-line true
-    :rows 2
-    :rows-max 2
-    :floating-label-text "your message"
-    :on-change #(dispatch [:new-chat-message.attribute/update :text (u/evt-val %)])
-    :style {:padding-left "20px"
-            :padding-right "20px"
-            :width "80%"}}])
+  (let [new-chat-message (subscribe [:db.chat/new-chat-message])
+        {:keys [trx-on-air? text]} @new-chat-message]
+    [ui/text-field
+     {:full-width true
+      :multi-line true
+      :value text
+      :disabled trx-on-air?
+      :rows 2
+      :rows-max 2
+      :floating-label-text "your message"
+      :on-change #(dispatch [:new-chat-message.attribute/update :text (u/evt-val %)])
+      :style {:padding-left "20px"
+              :padding-right "20px"
+              :width "80%"}}]))
 
 ;;;
 ;;; send message button

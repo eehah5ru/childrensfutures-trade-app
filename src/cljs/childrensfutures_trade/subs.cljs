@@ -411,3 +411,24 @@
  ;; reaction
  (fn [bids _]
    (some #(= (:selected? %) true) bids)))
+
+;;;
+;;;
+;;; CHAT
+;;;
+;;;
+(reg-sub
+ :db.chat/new-chat-message
+ (fn [db]
+   (:new-chat-message db)))
+
+(reg-sub
+ :db.chat/current-channel-id
+ (fn [db]
+   (:current-chat-channel-id db)))
+
+(reg-sub
+ :db.chat.current/messages
+
+ (fn [db ]
+   (get-in db [:messages (:current-chat-channel-id db)])))

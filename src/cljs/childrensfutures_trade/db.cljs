@@ -64,7 +64,7 @@
 ;;;
 (defn default-chat-message []
   {:channel-id default-chat-channel-id
-   :msg-id nil
+   :message-id nil
    :text ""
    :owner nil
    :trx-on-air? false})
@@ -94,6 +94,7 @@
 (s/def ::show-new-goal? boolean?)
 (s/def ::show-accounts? boolean?)
 (s/def ::current-address string?)
+(s/def ::current-chat-channel-id string?)
 (s/def ::selected? boolean?)
 (s/def ::selecting? boolean?)
 (s/def ::drawer-open? boolean?)
@@ -132,6 +133,9 @@
                                        ::text
                                        ::trx-on-air?]))
 
+(s/def ::messages (s/map-of ::channel-id (s/coll-of ::chat-message)))
+
+
 (s/def ::bids (s/map-of ::owner ::bid))
 
 (s/def ::new-bid #(s/conform ::bid %))
@@ -158,6 +162,7 @@
                              ::new-bid
                              ::new-chat-message
                              ::current-address
+                             ::current-chat-channel-id
                              ::show-new-goal?
                              ::show-new-bid?
                              ::show-accounts?
@@ -180,9 +185,11 @@
 ;;;
 (def default-db
   {:goals (hash-map)
+   :messages (hash-map)
    :settings {}                         ;FIXME: remove
    :my-addresses []
    :current-address ""
+   :current-chat-channel-id default-chat-channel-id
    :accounts {}
    :new-goal (default-goal)
    :new-bid (default-bid)

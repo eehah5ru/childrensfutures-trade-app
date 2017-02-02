@@ -60,7 +60,7 @@
       db
       :chat-contract
       :send-message
-      [channel-id owner text]
+      [channel-id text]
       :db-path [:send-message]
       :confirmed-event [:blockchain.new-chat-message/confirmed]
       :error-event :log-error
