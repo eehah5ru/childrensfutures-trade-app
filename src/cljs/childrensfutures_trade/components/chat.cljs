@@ -29,7 +29,8 @@
 (defn- chat-messages []
   (let [messages (subscribe [:db.chat.current/messages])]
     [:div
-     {:style {:height "calc(100% - 100px)"
+     {:id "chat-messages-container"
+      :style {:height "calc(100% - 100px)"
               :max-height "100%"
               :overflow "scroll"
               :margin 0}}

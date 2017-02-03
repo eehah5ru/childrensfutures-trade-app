@@ -4,7 +4,8 @@
             [cljs-time.format :as time-format]
             [cljs-web3.core :as web3]
             [reagent.core :as r]
-
+            [goog.dom :as gd]
+            [goog.fx.dom :as gfd]
 
             [bidi.bidi :as bidi]
             ))
@@ -75,3 +76,21 @@
       b {:e 2 :b {:g 3 :d {:h 5}}}]
   (letfn []
     (merge-with mergef a b)))
+
+;;;
+;;;
+;;; UI utils
+;;;
+;;;
+(defn- scroll! [el start end time]
+  (js/console.log :debug :scroll el)
+  (let [start (clj->js start)
+        end (clj->js end)
+        scroll-o (goog.fx.dom.Scroll. (clj->js el) start end time)]
+    (.play scroll-o)))
+
+(defn scroll-to-bottom [el-id time]
+  (let [el (goog.dom/getElement el-id)
+        start [0 (.-scrollTop el)]
+        end [0 (.-scrollHeight el)]]
+    (scroll! el start end time)))

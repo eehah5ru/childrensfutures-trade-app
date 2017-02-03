@@ -67,6 +67,12 @@
    (update db :show-accounts? not)))
 
 ;;;
+;;;
+;;; chat events
+;;;
+;;;
+
+;;;
 ;;; toggle chat view
 ;;;
 (reg-event-db
@@ -74,6 +80,15 @@
  (interceptors)
  (fn [db]
    (update db :chat-open? not)))
+
+;;;
+;;; scroll chat messages to bottom
+;;;
+(reg-event-fx
+ :ui.chat/scroll-to-bottom
+ (interceptors-fx :spec false)
+ (fn [{:keys [db]}]
+   (u/scroll-to-bottom "chat-messages-container" 200)))
 
 ;;;
 ;;; set current page

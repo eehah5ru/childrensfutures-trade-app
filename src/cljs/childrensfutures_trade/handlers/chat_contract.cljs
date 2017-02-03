@@ -99,20 +99,22 @@
 ;;; event for MessageSent contract event
 ;;;
 ;;;
-(reg-event-db
+(reg-event-fx
  :chat-contract/on-message-sent
- (interceptors)
- (fn [db [msg]]
-   (let [{:keys [channel-id
-                 msg-id
-                 sender
-                 message]} msg
-         loaded-message (merge (db/default-chat-message)
-                            {:channel-id channel-id
-                             :message-id (.toNumber msg-id)
-                             :owner sender
-                             :text message})
-         messages (get-in db [:messages channel-id] [])]
-     (js/console.log :debug :received-msg loaded-message)
-     (assoc-in db [:messages channel-id]
-               (conj messages loaded-message)))))
+ (interceptors-fx :spec true)
+ (fn [{:keys [db]} [msg]]
+   {:db (let [{:keys [channel-id
+                      msg-id
+                      sender
+                      message]} msg
+              loaded-message (merge (db/default-chat-message)
+                                    {:channel-id channel-id
+                                     :message-id (.toNumber msg-id)
+                                     :owner sender
+                                     :text message})
+              messages (get-in db [:messages channel-id] [])]
+          (js/console.log :debug :received-msg loaded-message)
+          (assoc-in db [:messages channel-id]
+                    (conj messages loaded-message)))
+    :dispatch-later [{:ms 200
+                      :dispatch [:ui.chat/scroll-to-bottom]}]}))
