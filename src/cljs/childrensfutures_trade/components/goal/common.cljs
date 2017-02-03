@@ -61,7 +61,8 @@
   ([title]
    [card-raised-button
    {:secondary true
-    :label title}]))
+    :label title
+    :on-touch-tap #(dispatch [:ui.chat/toggle-view])}]))
 
 
 ;;;
