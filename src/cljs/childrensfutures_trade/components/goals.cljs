@@ -316,6 +316,7 @@
      ;; text
      [ui/card-text
       {:expandable true}
+      [ui/divider]
       [card-text goal]]
 
      ;; actions
