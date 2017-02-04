@@ -70,6 +70,25 @@
    :trx-on-air? false})
 
 ;;;
+;;;
+;;; default pulse states
+;;;
+;;;
+(defn default-pulse-goal-added []
+  {:number 0
+   :goal-id ""
+   :type :goal-added})
+
+(defn default-pulse-investment-placed []
+  {:number 0
+   :type :investment-placed
+   :goal-id ""
+   :bid-id ""})
+
+(defn default-pulse []
+  [])
+
+;;;
 ;;; default aux structure for confirming bid selection
 ;;;
 (defn default-select-bid []
@@ -108,6 +127,9 @@
 (s/def ::drawer-open? boolean?)
 (s/def ::dialog-open? boolean?)
 (s/def ::chat-open? boolean?)
+(s/def ::type #{:goal-added
+                :investment-placed})
+(s/def ::number int?)
 
 (s/def ::window-height (s/or :nil nil?
                              :integer integer?))
@@ -137,7 +159,7 @@
                               ::selecting?]))
 
 ;;;
-;;; selct bidS
+;;; selct bids
 ;;;
 (s/def ::select-bid (s/keys :req-un [::goal-id
                                      ::bid-id
@@ -149,10 +171,6 @@
                                        ::text
                                        ::trx-on-air?]))
 
-(s/def ::messages (s/map-of ::channel-id (s/coll-of ::chat-message)))
-
-
-(s/def ::bids (s/map-of ::owner ::bid))
 
 (s/def ::new-bid #(s/conform ::bid %))
 
@@ -169,11 +187,39 @@
 
 (s/def ::new-goal #(s/conform ::goal %))
 
+;;;
+;;; pulse structures
+;;;
+(s/def ::goal-added-pulse-event
+  (s/keys :req-un [::number
+                   ::type
+                   ::goal-id]))
+(s/def ::investmentplaced-pulse-event
+  (s/keys :req-un [::number
+                   ::type
+                   ::goal-id
+                   ::bid-id]))
+
+(s/def ::pulse-event #(s/or :goal-added
+                            (partial s/conform ::goal-added-pulse-event)
+                            :investment-placed
+                            (partial s/conform ::investmentplaced-pulse-event)))
+;;;
+;;; collections
+;;;
+(s/def ::messages (s/map-of ::channel-id (s/coll-of ::chat-message)))
+
+(s/def ::pulse (s/coll-of ::pulse-event))
+
+(s/def ::bids (s/map-of ::owner ::bid))
+
 ;;; goals structure
 (s/def ::goals (s/map-of ::goal-id ::goal))
 
 ;;; DB structure
 (s/def ::db (s/keys :req-un [::goals
+                             ;; ::messages
+                             ;; ::pulse
                              ::new-goal
                              ::new-bid
                              ::new-chat-message
@@ -203,6 +249,7 @@
 (def default-db
   {:goals (hash-map)
    :messages (hash-map)
+   :pulse (default-pulse)
    :settings {}                         ;FIXME: remove
    :my-addresses []
    :current-address ""

@@ -38,6 +38,7 @@
 
    [childrensfutures-trade.handlers.new-chat-message]
    [childrensfutures-trade.handlers.messages]
+   [childrensfutures-trade.handlers.pulse]
 
 
    [childrensfutures-trade.handlers.ui]))

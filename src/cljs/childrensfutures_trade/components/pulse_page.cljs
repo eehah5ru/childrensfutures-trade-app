@@ -11,45 +11,40 @@
 
     [childrensfutures-trade.components.goals :refer [goals-view]]))
 
-;; (defn- goal-added-event-view [e]
-;;   [:h3
-;;    "Goal Added"])
+(defn- goal-added-event-view [e]
+  [:h3
+   "Goal Added"])
 
-;; (defn- bid-added-event-view [e]
-;;   [:h3
-;;    "Bid Added"])
+(defn- investment-placed-event-view [e]
+  [:h3
+   "Investment placed"])
 
 ;; (defn- bid-selected-event-view [e]
 ;;   [:h3
 ;;    "Bid Selected"])
 
-;; (defn- unknown-event-view [e]
-;;   [:h3
-;;    (str "Unknown event type " (:type e))])
+(defn- unknown-event-view [e]
+  [:h3
+   (str "Unknown event type " (:type e))])
 
-(defn- my-bids []
-  (let [bids (subscribe [:db.bids.my/sorted])]
-    [:div
-     (for [bid @bids]
-       (let [{:keys [owner description bid-id]} bid]
-         ^{:key bid-id}
-         [:h2 description]))]))
+;; (defn- my-bids []
+;;   (let [bids (subscribe [:db.bids.my/sorted])]
+;;     [:div
+;;      (for [bid @bids]
+;;        (let [{:keys [owner description bid-id]} bid]
+;;          ^{:key bid-id}
+;;          [:h2 description]))]))
 
-(defn- my-investments [])
+;; (defn- my-investments [])
 
 (defn pulse-page []
-  [outer-paper
-   [ui/tabs
-    [ui/tab
-     {:label "My Goals"}
-     [goals-view #(subscribe [:db.goals.my/sorted])]]
-    [ui/tab
-     {:label "Investments"}
-     [:h1 "Investments"]]
-    [ui/tab
-     {:label "I owe"}
-     [:h1 "My Bids"]
-     [my-bids]]]])
+  (let [events (subscribe [:db.pulse/all-events])]
+    [outer-paper
+     (for [event @events]
+       (condp = (:type event)
+         :goal-added [goal-added-event-view event]
+         :investment-placed [investment-placed-event-view event]
+         :else [unknown-event-view event]))]))
 
 ;; (comment
 ;;   (defn pulse-page []

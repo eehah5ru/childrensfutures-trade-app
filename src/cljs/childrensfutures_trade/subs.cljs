@@ -454,3 +454,14 @@
 
  (fn [[channel-id chats] _]
    (get chats channel-id [])))
+
+;;;
+;;;
+;;; PULSE
+;;;
+;;;
+(reg-sub
+ :db.pulse/all-events
+
+ (fn [db]
+   (sort-by :number (:pulse db))))

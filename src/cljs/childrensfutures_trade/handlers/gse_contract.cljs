@@ -36,7 +36,7 @@
 ;;;
 ;;;
 (def contract-events
-  [[:GoalAdded :gse-contract/on-goal-loaded]
+  [[:GoalAdded :gse-contract/on-goal-added]
    [:GoalCancelled :gse-contract/on-goal-cancelled]
    [:BidPlaced :gse-contract/on-bid-placed]
    [:BidSelected :gse-contract/on-bid-selected]
@@ -101,15 +101,18 @@
 ;;; event for GoalAdded contract event
 ;;;
 ;;;
-(reg-event-db
- :gse-contract/on-goal-loaded
- (interceptors)
- (fn [db [goal]]
-   (assoc-in db
-             [:goals (:goal-id goal)]
-             (merge (db/default-goal)
-                    (select-keys goal [:owner :description :goal-id :give-in-return])
-                    {:stage :created}))))
+(reg-event-fx
+ :gse-contract/on-goal-added
+ (interceptors-fx :spec true)
+ (fn [{:keys [db]} [goal {:keys [block-number]}]]
+   ;; (js/console.log :debug :rest rest)
+   {:db (assoc-in db
+                  [:goals (:goal-id goal)]
+                  (merge (db/default-goal)
+                         (select-keys goal [:owner :description :goal-id :give-in-return])
+                         {:stage :created}))
+    :dispatch [:pulse/push-goal-added block-number (:goal-id goal)]
+    }))
 
 
 
@@ -133,20 +136,22 @@
 ;;; BidPlaced contract event
 ;;;
 ;;;
-(reg-event-db
+(reg-event-fx
  :gse-contract/on-bid-placed
- (interceptors)
- (fn [db [bid]]
+ (interceptors-fx :spec true)
+ (fn [{:keys [db]} [bid {:keys [block-number]}]]
    (js/console.log :debug :bid-placed bid)
-   (-> db
-       (assoc-in [:goals (:goal-id bid) :stage] :bid-placed)
-       (assoc-in [:goals (:goal-id bid) :bids (:bid-owner bid)] ; FIXME: bid-owner -> bid-id
-                 (merge (db/default-bid)
-                        (let [{:keys [bid-owner description goal-id]} bid]
-                          {:goal-id goal-id
-                           :bid-id bid-owner ;FIXME use bid-id instead
-                           :owner bid-owner
-                           :description description}))))))
+   {:db (-> db
+        (assoc-in [:goals (:goal-id bid) :stage] :bid-placed)
+        (assoc-in [:goals (:goal-id bid) :bids (:bid-owner bid)] ; FIXME: bid-owner -> bid-id
+                  (merge (db/default-bid)
+                         (let [{:keys [bid-owner description goal-id]} bid]
+                           {:goal-id goal-id
+                            :bid-id bid-owner ;FIXME use bid-id instead
+                            :owner bid-owner
+                            :description description}))))
+    :dispatch [:pulse/push-investment-placed block-number (:goal-id bid) (:bid-owner bid)]}
+   ))
 
 
 ;;;
