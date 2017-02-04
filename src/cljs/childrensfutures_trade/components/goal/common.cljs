@@ -55,15 +55,23 @@
 ;;; chat button
 ;;;
 (defn chat-open-button
-  ([]
-   (chat-open-button default-chat-open-button-title))
+  ([ids]
+   (chat-open-button ids default-chat-open-button-title))
 
-  ([title]
+  ([ids title]
    [card-raised-button
    {:secondary true
     :label title
-    :on-touch-tap #(dispatch [:ui.chat/toggle-view])}]))
+    :on-touch-tap #(do
+                    (dispatch [:messages/set-channel-id ids])
+                    (dispatch [:ui.chat/toggle-view]))
+    }]))
 
+
+(defn owner-investor-chat-button [goal-id]
+  (let [bid (subscribe [:db.goal.bids/selected goal-id])
+        bid-id (:bid-id @bid)]
+    (chat-open-button [goal-id bid-id])))
 
 ;;;
 ;;; empty actions

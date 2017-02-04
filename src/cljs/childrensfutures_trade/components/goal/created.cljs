@@ -11,7 +11,8 @@
    [reagent.core :as r]
    [clavatar-js.core :as clavatar]
 
-   [childrensfutures-trade.components.goal.utils :as gu]))
+   [childrensfutures-trade.components.goal.utils :as gu]
+   [childrensfutures-trade.components.goal.common :as gc]))
 
 
 ;;;

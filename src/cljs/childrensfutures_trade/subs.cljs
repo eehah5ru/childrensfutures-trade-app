@@ -428,7 +428,14 @@
    (:current-chat-channel-id db)))
 
 (reg-sub
- :db.chat.current/messages
+ :db.chats/all
+ (fn [db]
+   (:messages db)))
 
- (fn [db ]
-   (get-in db [:messages (:current-chat-channel-id db)])))
+(reg-sub
+ :db.chat.current/messages
+ :<- [:db.chat/current-channel-id]
+ :<- [:db.chats/all]
+
+ (fn [[channel-id chats] _]
+   (get chats channel-id [])))

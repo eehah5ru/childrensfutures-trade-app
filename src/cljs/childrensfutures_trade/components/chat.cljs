@@ -27,14 +27,20 @@
 ;;; messages list
 ;;;
 (defn- chat-messages []
-  (let [messages (subscribe [:db.chat.current/messages])]
+  (let [messages (subscribe [:db.chat.current/messages])
+        channel-id (subscribe [:db.chat/current-channel-id])]
     [:div
      {:id "chat-messages-container"
-      :style {:height "calc(100% - 100px)"
+      :style {:height "calc(100% - 164px)"
               :max-height "100%"
               :overflow "scroll"
-              :margin 0}}
+              :margin-top "64px"
+              :margin-left 0
+              :margin-right 0
+              :margin-bottom 0}}
      [ui/list
+      [ui/subheader
+       [:span @channel-id]]
       (for [msg @messages]
         (let [{:keys [message-id
                       owner

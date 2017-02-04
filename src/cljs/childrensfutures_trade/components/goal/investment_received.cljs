@@ -33,12 +33,12 @@
 (defn- owner-actions [goal]
   [
    [goal-achieved-button goal]
-   [gc/chat-open-button]])
+   [gc/owner-investor-chat-button (:goal-id goal)]])
 
 ;;; investor
 (defn- investor-actions [goal]
   [
-   [gc/chat-open-button]])
+   [gc/owner-investor-chat-button (:goal-id goal)]])
 
 
 ;;;

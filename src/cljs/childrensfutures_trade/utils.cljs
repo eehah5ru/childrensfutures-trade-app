@@ -79,11 +79,22 @@
 
 ;;;
 ;;;
+;;; CHAT UTILS
+;;;
+;;;
+(defn chat-channel-id [& ids]
+  (->> ids
+       (flatten)
+       (apply str)
+       (web3/sha3)))
+
+;;;
+;;;
 ;;; UI utils
 ;;;
 ;;;
 (defn- scroll! [el start end time]
-  (js/console.log :debug :scroll el)
+  ;; (js/console.log :debug :scroll el)
   (let [start (clj->js start)
         end (clj->js end)
         scroll-o (goog.fx.dom.Scroll. (clj->js el) start end time)]
