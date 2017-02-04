@@ -25,7 +25,7 @@
   (let [{:keys [goal-id cancelled? trx-on-air?]} goal]
     [
      ^{:key :cancel-goal}
-     [ui/flat-button
+     [gc/card-flat-button
       {:secondary true
        :disabled (or cancelled?
                      trx-on-air?)

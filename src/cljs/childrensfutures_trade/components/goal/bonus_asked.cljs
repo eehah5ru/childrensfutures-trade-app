@@ -21,7 +21,7 @@
   (let [goal-id (:goal-id goal)
         selected-bid (subscribe [:db.goal.bids/selected goal-id])
         bid-id (:bid-id @selected-bid)]
-    [ui/raised-button
+    [gc/card-raised-button
      {:primary true
       :label "I've sent bonus"
       :on-touch-tap #(dispatch

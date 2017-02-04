@@ -21,7 +21,7 @@
   (let [goal-id (:goal-id goal)
         selected-bid (subscribe [:db.goal.bids/selected goal-id])
         bid-id (:bid-id @selected-bid)]
-    [gc/card-raised-button
+    [ui/raised-button
      {:primary true
       :label "Got Investment!"
       :on-touch-tap #(dispatch

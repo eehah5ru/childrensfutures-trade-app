@@ -22,7 +22,7 @@
   (let [{:keys [goal-id cancelled? trx-on-air?]} goal]
     [
      ^{:key :cancel-goal}
-     [ui/flat-button
+     [gc/card-flat-button
       {:secondary true
        :disabled (or cancelled?
                      trx-on-air?)
@@ -33,7 +33,7 @@
   (let [{:keys [goal-id]} goal]
     [
      ^{:key :invest-now}
-     [ui/raised-button
+     [gc/card-raised-button
       {:secondary true
        :disabled false
        :label "Invest Now"

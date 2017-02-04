@@ -19,7 +19,7 @@
 
 (defn- goal-achieved-button [goal]
   (let [goal-id (:goal-id goal)]
-    [ui/raised-button
+    [gc/card-raised-button
      {:primary true
       :label "Goal is Achieved!"
       :on-touch-tap #(dispatch
