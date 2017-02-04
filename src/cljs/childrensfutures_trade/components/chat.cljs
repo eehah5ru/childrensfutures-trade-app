@@ -40,7 +40,8 @@
               :margin-bottom 0}}
      [ui/list
       [ui/subheader
-       [:span @channel-id]]
+       [:span (u/truncate @channel-id 30)]]
+      [ui/divider]
       (for [msg @messages]
         (let [{:keys [message-id
                       owner
