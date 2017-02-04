@@ -9,6 +9,7 @@
     ;; pages
     ;;
     [childrensfutures-trade.components.home-page :refer [home-page]]
+    [childrensfutures-trade.components.my-goals-page :refer [my-goals-page]]
     [childrensfutures-trade.components.pulse-page :refer [pulse-page]]
     ;; [childrensfutures-trade.components.how-to-play-page :refer [how-to-play-page]]
     [childrensfutures-trade.components.about-page :refer [about-page]]
@@ -27,6 +28,11 @@
     :human-readable "Home"
     :page-view home-page
     }
+   {:key :my-goals
+    :route "my-goals"
+    :menu-icon icons/action-favorite
+    :human-readable "My Goals"
+    :page-view my-goals-page}
    ;; pulse
    {:key :pulse
     :route "pulse"
