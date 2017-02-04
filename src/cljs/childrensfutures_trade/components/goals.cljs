@@ -76,6 +76,30 @@
      [place-bid-view]]))
 
 
+(defn confirm-bid-selection-dialog []
+  (let [selected-bid (subscribe [:ui.select-bid/selected])
+        {:keys [goal-id bid-id]} @selected-bid
+        dialog-open? (subscribe [:ui.select-bid/dialog-open?])
+        ok-button [ui/raised-button
+                   {:secondary true
+                    :disabled false
+                    :label "Do it!"
+                    :style {:margin-top 20}
+                    :on-touch-tap #(dispatch [:ui.select-bid-dialog/ok goal-id bid-id])}]
+        cancel-button [ui/flat-button
+                       {:secondary true
+                        :disabled false
+                        :label "cancel"
+                        :on-touch-tap #(dispatch [:ui.select-bid-dialog/cancel])}]]
+    [ui/dialog
+     {:modal true
+      :actions [(r/as-element ok-button)
+                (r/as-element cancel-button)]
+      :open @dialog-open?}
+
+     [:h1 "Are you sure?"]]))
+
+
 ;;;
 ;;; BID LIST ITEM
 ;;;

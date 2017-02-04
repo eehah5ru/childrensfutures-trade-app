@@ -78,19 +78,34 @@
  (fn [db]
    (:chat-open? db)))
 
+;;;
+;;; page subs
+;;;
 (reg-sub
  :ui/current-page
  (fn [db]
    (:current-page db)))
 
-;;;
-;;;
-;;;
 (reg-sub
  :ui/current-page-name
  :<- [:ui/current-page]
  (fn [current-page _]
    (pages/human-readable (:handler current-page))))
+
+;;;
+;;; select bid dialog  subs
+;;;
+(reg-sub
+ :ui.select-bid/dialog-open?
+ (fn [db]
+   (get-in db [:select-bid :dialog-open?])))
+
+(reg-sub
+ :ui.select-bid/selected
+ (fn [db]
+   (-> db
+       :select-bid
+       (select-keys [:goal-id :bid-id]))))
 
 ;;;
 ;;; window height

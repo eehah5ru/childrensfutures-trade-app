@@ -70,6 +70,14 @@
    :trx-on-air? false})
 
 ;;;
+;;; default aux structure for confirming bid selection
+;;;
+(defn default-select-bid []
+  {:goal-id ""
+   :bid-id ""
+   :dialog-open? false})
+
+;;;
 ;;;
 ;;; SPECS
 ;;;
@@ -98,6 +106,7 @@
 (s/def ::selected? boolean?)
 (s/def ::selecting? boolean?)
 (s/def ::drawer-open? boolean?)
+(s/def ::dialog-open? boolean?)
 (s/def ::chat-open? boolean?)
 
 (s/def ::window-height (s/or :nil nil?
@@ -126,6 +135,13 @@
                               ::placing?
                               ::selected?
                               ::selecting?]))
+
+;;;
+;;; selct bidS
+;;;
+(s/def ::select-bid (s/keys :req-un [::goal-id
+                                     ::bid-id
+                                     ::dialog-open?]))
 
 (s/def ::chat-message (s/keys :req-un [::channel-id
                                        ::message-id
@@ -161,6 +177,7 @@
                              ::new-goal
                              ::new-bid
                              ::new-chat-message
+                             ::select-bid
                              ::current-address
                              ::current-chat-channel-id
                              ::show-new-goal?
@@ -194,6 +211,7 @@
    :new-goal (default-goal)
    :new-bid (default-bid)
    :new-chat-message (default-chat-message)
+   :select-bid (default-select-bid)
    :show-new-goal? false
    :show-new-bid? false
    :show-accounts? false

@@ -49,6 +49,47 @@
        (assoc-in [:new-bid :goal-id] goal-id))))
 
 ;;;
+;;; SELECT BID DIALOG EVENTS
+;;;
+(reg-event-db
+ :ui.select-bid-dialog/toggle-view
+ (interceptors)
+ (fn [db]
+   (update-in db [:select-bid :dialog-open?] not)))
+
+(reg-event-db
+ :ui.select-bid-dialog/set-selected
+ (interceptors)
+ (fn [db [goal-id bid-id]]
+   (-> db
+       (assoc-in [:select-bid :goal-id] goal-id)
+       (assoc-in [:select-bid :bid-id] bid-id))))
+
+(reg-event-db
+ :ui.select-bid-dialog/clear-selected
+ (interceptors)
+ (fn [db]
+   (-> db
+       (assoc-in [:select-bid :goal-id] "")
+       (assoc-in [:select-bid :bid-id] ""))))
+
+(reg-event-fx
+ :ui.select-bid-dialog/ok
+ (interceptors-fx :spec false)
+
+ (fn [{:keys [db]} [goal-id bid-id]]
+   {:dispatch-n [[:blockchain.select-bid/send goal-id bid-id]
+                 [:ui.select-bid-dialog/toggle-view]
+                 [:ui.select-bid-dialog/clear-selected]]}))
+
+(reg-event-fx
+ :ui.select-bid-dialog/cancel
+ (interceptors-fx :spec false)
+
+ (fn [{:keys [db]}]
+   {:dispatch-n [[:ui.select-bid-dialog/toggle-view]
+                 [:ui.select-bid-dialog/clear-selected]]}))
+;;;
 ;;;
 ;;;
 (reg-event-db

@@ -85,9 +85,11 @@
       :primary-text (:description bid)
       :right-toggle (r/as-element
                      [ui/toggle
-                      {:default-toggled false
+                      {:toggled selected?
                        :disabled false
-                       :on-toggle #(dispatch [:blockchain.select-bid/send goal-id bid-id])
+                       :on-toggle #(do
+                                     (dispatch [:ui.select-bid-dialog/set-selected goal-id bid-id])
+                                     (dispatch [:ui.select-bid-dialog/toggle-view]))
                        }])}]))
 
 ;;; card text
