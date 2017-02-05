@@ -31,7 +31,8 @@
     [childrensfutures-trade.components.accounts :refer [switch-account-dialog]]
 
     [childrensfutures-trade.components.goals :refer [place-bid-dialog
-                                                     confirm-bid-selection-dialog]]
+                                                     confirm-bid-selection-dialog
+                                                     view-goal-dialog]]
 
     ))
 
@@ -127,6 +128,8 @@
         [new-goal-dialog]
 
         [confirm-bid-selection-dialog]
+
+        [view-goal-dialog]
         ;;
         ;; place bid dialog
         ;; visiblity is controlled inside

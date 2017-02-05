@@ -89,11 +89,18 @@
   [])
 
 ;;;
-;;; default aux structure for confirming bid selection
+;;; default aux structure for conforming bid selection
 ;;;
 (defn default-select-bid []
   {:goal-id ""
    :bid-id ""
+   :dialog-open? false})
+
+;;;
+;;; default aux structure for viewing a goal
+;;;
+(defn default-view-goal []
+  {:goal-id ""
    :dialog-open? false})
 
 ;;;
@@ -165,6 +172,15 @@
                                      ::bid-id
                                      ::dialog-open?]))
 
+;;;
+;;; view goal dialog
+;;;
+(s/def ::view-goal (s/keys :req-un [::goal-id
+                                    ::dialog-open?]))
+
+;;;
+;;; chat message
+;;;
 (s/def ::chat-message (s/keys :req-un [::channel-id
                                        ::message-id
                                        ::owner
@@ -259,6 +275,7 @@
    :new-bid (default-bid)
    :new-chat-message (default-chat-message)
    :select-bid (default-select-bid)
+   :view-goal (default-view-goal)
    :show-new-goal? false
    :show-new-bid? false
    :show-accounts? false

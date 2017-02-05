@@ -9,15 +9,90 @@
     [re-frame.core :refer [subscribe dispatch]]
     [reagent.core :as r]
 
+
+    [childrensfutures-trade.goal-stages :as gs]
+    [childrensfutures-trade.components.goal-statuses :as statuses]
+
     [childrensfutures-trade.components.goals :refer [goals-view]]))
 
+
+;;;
+;;;
+;;; action icons
+;;;
+;;;
+(defn created-icon-button [goal-id]
+  (let [role (subscribe [:role/role goal-id])]
+    (condp = @role
+      :stranger  [ui/icon-button
+                           {:disabled false
+                            :tooltip "Invest now!"
+                            :touch true
+                            :on-touch-tap #(dispatch [:place-bid/show-new-bid goal-id])}
+                  (icons/action-trending-up)]
+      nil)))
+
+(defn bid-placed-icon-button [goal-id]
+  (let [role (subscribe [:role/role goal-id])]
+    (condp = @role
+      :stranger [ui/icon-button
+                           {:disabled false
+                            :tooltip "Invest also!"
+                            :touch true
+                            :on-touch-tap #(dispatch [:place-bid/show-new-bid goal-id])}
+                 (icons/social-plus-one)]
+      nil)))
+
+(defn- staged-icon-button [goal-id]
+  (let [stage (subscribe [:db.goal/stage goal-id])]
+    (condp gs/stage? @stage
+      :created (created-icon-button goal-id)
+      :bid-placed (bid-placed-icon-button goal-id)
+      nil)))
+
+;;;
+;;;
+;;; event views
+;;;
+;;;
 (defn- goal-added-event-view [e]
-  [:h3
-   "Goal Added"])
+  (let [goal-id (:goal-id e)
+        goal (subscribe [:db.goals/get goal-id])
+        {:keys [description give-in-return]} @goal
+        my-goal? (subscribe [:db.goal/my? goal-id])
+        stage (subscribe [:db.goal/stage goal-id])
+        disabled? (or (not (gs/stage? :created @stage))
+                      @my-goal?)]
+    ^{:key (str :goal-added- goal-id)}
+    [ui/list-item
+     {:primary-text (str "Goal Added: " description)
+      :secondary-text (r/as-element
+                       [:span (str "Bonus: " give-in-return)
+                        [:br]
+                        (statuses/render (statuses/staged-goal-statuses @goal))])
+      :right-icon-button (r/as-element
+                          (staged-icon-button goal-id))
+      :on-touch-tap #(dispatch [:ui.view-goal-dialog/open goal-id])}
+     ]))
 
 (defn- investment-placed-event-view [e]
-  [:h3
-   "Investment placed"])
+  (let [goal-id (:goal-id e)
+        goal (subscribe [:db.goals/get goal-id])
+        {:keys [description give-in-return]} @goal
+        stranger? (subscribe [:role/stranger? goal-id])
+        stage (subscribe [:db.goal/stage goal-id])
+        disabled? (or (not @stranger?)
+                      (not (gs/stage? :bid-placed @stage)))]
+    ^{:key (str :investment-placed- goal-id)}
+    [ui/list-item
+     {:primary-text (str "Investment placed!: " description)
+      :secondary-text (r/as-element
+                       [:span (str "Bonus: " give-in-return)
+                        [:br]
+                        (statuses/render (statuses/staged-goal-statuses @goal))])
+      :right-icon-button (r/as-element
+                          (staged-icon-button goal-id))
+      :on-touch-tap #(dispatch [:ui.view-goal-dialog/open goal-id])}]))
 
 ;; (defn- bid-selected-event-view [e]
 ;;   [:h3
@@ -27,36 +102,15 @@
   [:h3
    (str "Unknown event type " (:type e))])
 
-;; (defn- my-bids []
-;;   (let [bids (subscribe [:db.bids.my/sorted])]
-;;     [:div
-;;      (for [bid @bids]
-;;        (let [{:keys [owner description bid-id]} bid]
-;;          ^{:key bid-id}
-;;          [:h2 description]))]))
-
-;; (defn- my-investments [])
 
 (defn pulse-page []
   (let [events (subscribe [:db.pulse/all-events])]
     [outer-paper
-     (for [event @events]
-       (condp = (:type event)
-         :goal-added [goal-added-event-view event]
-         :investment-placed [investment-placed-event-view event]
-         :else [unknown-event-view event]))]))
-
-;; (comment
-;;   (defn pulse-page []
-;;    (let [current-address (subscribe [:db/current-address])
-;;          latest-events (subscribe [:db/latest-events])]
-;;      [outer-paper
-;;       [:h1 "Pulse"]
-
-;;       (for [e @latest-events]
-;;         (let [{:keys [key type]} e]
-;;           (condp = type
-;;             :goal-added ^{:key key} [goal-added-event-view e]
-;;             :bid-added [bid-added-event-view e]
-;;             :bid-selected [bid-selected-event-view e]
-;;             :else [unknown-event-view e])))])))
+     [ui/list
+      (for [event @events]
+        (let [{:keys [type goal-id]} event]
+          (with-meta (condp = (:type event)
+                       :goal-added [goal-added-event-view event]
+                       :investment-placed [investment-placed-event-view event]
+                       :else [unknown-event-view event])
+            {:key (str type "-" goal-id)})))]]))

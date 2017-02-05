@@ -39,7 +39,7 @@
   (let [{:keys [goal-id]} goal]
     [
      ^{:key :invest-now}
-     [ui/raised-button
+     [gc/card-raised-button
       {:secondary true
        :disabled false
        :label "Invest Now"

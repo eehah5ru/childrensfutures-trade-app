@@ -89,6 +89,42 @@
  (fn [{:keys [db]}]
    {:dispatch-n [[:ui.select-bid-dialog/toggle-view]
                  [:ui.select-bid-dialog/clear-selected]]}))
+
+;;;
+;;;
+;;; VIEW GOAL DIALOG
+;;;
+;;;
+(reg-event-db
+ :ui.view-goal-dialog/toggle-view
+ (interceptors)
+ (fn [db]
+   (update-in db [:view-goal :dialog-open?] not)))
+
+(reg-event-db
+ :ui.view-goal-dialog/set-goal
+ (fn [db [_ goal-id]]
+   (assoc-in db [:view-goal :goal-id] goal-id)))
+
+(reg-event-db
+ :ui.view-goal-dialog/clear-goal
+ (fn [db]
+   (assoc-in db [:view-goal :goal-id] "")))
+
+(reg-event-fx
+ :ui.view-goal-dialog/open
+ (interceptors-fx :spec false)
+ (fn [{:keys [db]} [goal-id]]
+   ;; (js/console.log :debug :open-view-goal goal-id)
+   {:dispatch-n [[:ui.view-goal-dialog/set-goal goal-id]
+                 [:ui.view-goal-dialog/toggle-view]]}))
+
+(reg-event-fx
+ :ui.view-goal-dialog/close
+ (interceptors-fx :spec false)
+ (fn [{:keys [db]}]
+   {:dispatch-n [[:ui.view-goal-dialog/toggle-view]
+                 [:ui.view-goal-dialog/clear-goal]]}))
 ;;;
 ;;;
 ;;;

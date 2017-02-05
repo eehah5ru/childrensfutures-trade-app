@@ -108,6 +108,19 @@
        (select-keys [:goal-id :bid-id]))))
 
 ;;;
+;;; view goal dialog subs
+;;;
+(reg-sub
+ :ui.view-goal/dialog-open?
+ (fn [db]
+   (get-in db [:view-goal :dialog-open?])))
+
+(reg-sub
+ :ui.view-goal/goal-id
+ (fn [db]
+   (get-in db [:view-goal :goal-id])))
+
+;;;
 ;;; window height
 ;;;
 (reg-sub
@@ -226,8 +239,7 @@
      investor? :investor
      stranger? :stranger
      :else (do (js/console.log :warning "strange user role")
-               :stranger)))
- )
+               :stranger))))
 ;;;
 ;;;
 ;;; GOAL RELATED
@@ -264,6 +276,16 @@
    (count (filter #(= (:owner %) owner) (vals goals)))))
 
 ;;;
+;;; get specific goal
+;;;
+(reg-sub
+ :db.goals/get
+ :<- [:db/goals]
+
+ (fn [goals [_ goal-id]]
+   (get goals goal-id)))
+
+;;;
 ;;; goal's stage
 ;;;
 (reg-sub
@@ -278,7 +300,7 @@
 ;;; @returns boolean
 ;;;
 (reg-sub
- :db/my-goal?
+ :db.goal/my?
  :<- [:db/current-address]
  :<- [:db/goals]
  (fn [[current-address goals] [_ goal-id]]
@@ -464,4 +486,4 @@
  :db.pulse/all-events
 
  (fn [db]
-   (sort-by :number (:pulse db))))
+   (sort-by :number #(compare %2 %1) (:pulse db))))
