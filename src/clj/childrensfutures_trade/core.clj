@@ -4,14 +4,29 @@
             [compojure.route :refer [resources]]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             [ring.middleware.gzip :refer [wrap-gzip]]
-            [ring.middleware.logger :refer [wrap-with-logger]]
+            ;; [ring.middleware.logger :refer [wrap-with-logger]]
+            [ring.logger.onelog :as logger.onelog]
+            [clj-logging-config.log4j :refer [set-logger!]]
+            [clojure.tools.logging :refer [info]]
             [environ.core :refer [env]]
             [org.httpkit.server :refer [run-server]])
   (:gen-class))
 
 (def ^:dynamic *server*)
 
+;;;
+;;; play with ring handlers
+;;;
+(defn what-is-my-ip [request]
+  (println "what-is-my-ip")
+  {:status 200
+   :headers {"Content-Type" "text/plain"}
+   :body (:remote-addr request)})
+
 (defroutes routes
+  (GET "/my-ip"
+       request
+       (what-is-my-ip request))
   (GET "/js/*" _
     {:status 404})
   (GET "/*" _
@@ -22,11 +37,11 @@
 (def http-handler
   (-> routes
       (wrap-defaults site-defaults)
-      wrap-with-logger
+      logger.onelog/wrap-with-logger
       wrap-gzip))
 
 (defn -main [& [port]]
-
+  (set-logger!)
   (let [port (Integer. (or port (env :port) 6655))]
     (alter-var-root (var *server*)
                     (constantly (run-server http-handler {:port port :join? false})))))

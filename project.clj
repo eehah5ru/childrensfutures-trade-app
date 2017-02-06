@@ -19,7 +19,9 @@
                  [print-foo-cljs "2.0.3"]
                  [re-frame "0.8.0"]
                  [reagent "0.6.0" :exclusions [cljsjs/react]]
-                 [ring.middleware.logger "0.5.0"]
+                 ;; [ring.middleware.logger "0.5.0"]
+                 [ring-logger-onelog "0.7.6"]
+                 [clj-logging-config "1.9.12"]
                  [ring/ring-core "1.6.0-beta5"]
                  [ring/ring-defaults "0.3.0-beta1"]
                  [ring/ring-devel "1.6.0-beta5"]
@@ -42,7 +44,8 @@
 
   :figwheel {:css-dirs ["resources/public/css"]
              :server-port 6777
-             :ring-handler user/http-handler}
+             :ring-handler user/http-handler
+             :server-logfile "log/figwheel.log"}
 
   :auto {"compile-solidity" {:file-pattern #"\.(sol)$"
                              :paths ["resources/public/contracts/src"]}}
@@ -76,7 +79,7 @@
                                      :asset-path "/js/compiled/out"
                                      :source-map-timestamp true
                                      :optimizations :none
-                                     :closure-defines {goog.DEBUG true}
+                                     :closure-defines {goog.DEBUG false}
                                      :preloads [print.foo.preloads.devtools]}}]}}
 
    :uberjar {:hooks [leiningen.cljsbuild]
