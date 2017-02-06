@@ -103,7 +103,7 @@
    (str "Unknown event type " (:type e))])
 
 
-(defn pulse-page []
+(defn ^:export pulse-page []
   (let [events (subscribe [:db.pulse/all-events])]
     [outer-paper
      [ui/list

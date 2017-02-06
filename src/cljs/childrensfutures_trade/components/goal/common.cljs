@@ -74,6 +74,14 @@
     (chat-open-button [goal-id bid-id])))
 
 ;;;
+;;;
+;;; share goal button
+;;;
+;;;
+(defn share-goal-button [goal-id]
+  )
+
+;;;
 ;;; empty actions
 ;;;
 (def empty-actions (constantly []))

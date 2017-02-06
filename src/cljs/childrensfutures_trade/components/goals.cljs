@@ -10,11 +10,14 @@
 
    [childrensfutures-trade.components.layout :refer [grid row col outer-paper]]
    [childrensfutures-trade.styles :as st]
-   [childrensfutures-trade.utils :as u]
    [childrensfutures-trade.goal-stages :as gs]
+   [childrensfutures-trade.pages :as pages]
+   [childrensfutures-trade.utils :as u]
 
    [childrensfutures-trade.components.avatars :refer [goal-avatar]]
    [childrensfutures-trade.components.goal-statuses :as statuses]
+
+   ;; [childrensfutures-trade.pages :as pages]
    ;;
    ;; goal views
    ;;
@@ -125,7 +128,9 @@
                                 :or {expanded? false
                                      show-expandable-button? true}}]
   (let [{:keys [goal-id stage description give-in-return]} goal
+        show-share-url? (subscribe [:ui.goal/show-share-url? goal-id])
         card-properties (staged-card-properties stage)
+        location (subscribe [:location/root])
         {:keys [card-style
                 card-text
                 card-actions
@@ -157,8 +162,30 @@
 
      ;; text
      [ui/card-text
-      {:expandable true}
+      {:expandable true
+       :style {:position "relative"}}
+      [:span
+       {:style {:display "none"}}
+       :id (str "goal-" goal-id)]
+      [ui/floating-action-button
+       {:z-depth 1
+        :mini true
+        :secondary true
+        :children (icons/social-share)
+        :class-name "clipboard-button"
+        :on-touch-tap #(dispatch [:ui.goal/toggle-share-url goal-id])
+        :style {:position "absolute"
+                :top -5
+                :right 30}}]
+
       [ui/divider]
+      (when @show-share-url?
+        [ui/text-field
+         {:value (str @location (subs (pages/path-for :view-goal :goal-id goal-id) 1))
+          :name "share-link"
+          :full-width true
+          :floating-label-fixed true
+          :floating-label-text "copy and share this url"}])
       [card-text goal]]
 
      ;; actions

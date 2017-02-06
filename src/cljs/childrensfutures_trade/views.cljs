@@ -34,6 +34,15 @@
                                                      confirm-bid-selection-dialog
                                                      view-goal-dialog]]
 
+    ;;
+    ;; pages
+    ;;
+    [childrensfutures-trade.components.home-page :refer [home-page]]
+    [childrensfutures-trade.components.my-goals-page :refer [my-goals-page]]
+    [childrensfutures-trade.components.pulse-page :refer [pulse-page]]
+    [childrensfutures-trade.components.about-page :refer [about-page]]
+    [childrensfutures-trade.components.view-goal-page :refer [view-goal-page]]
+
     ))
 
 ;; (def col (r/adapt-react-class js/ReactFlexboxGrid.Col))
