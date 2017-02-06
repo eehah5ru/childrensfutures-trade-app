@@ -11,11 +11,11 @@
 ;;; UTILS
 ;;;
 ;;;
+(defn provides-web3? []
+  (not (nil? (aget js/window "web3"))))
+
 (defn mk-web3 []
-  (or (aget js/window "web3")
-             (if goog.DEBUG
-               (web3/create-web3 "http://localhost:8545/")
-               (web3/create-web3 "https://morden.infura.io/metamask"))))
+  (aget js/window "web3"))
 
 ;; (defn mk-web3 []
 ;;   (or (aget js/window "web3")
@@ -58,7 +58,9 @@
 ;;; default chat channel id
 ;;;
 (def default-chat-channel-id
-  (web3/sha3 "myfutures.trade"))
+  (if (provides-web3?)
+    (web3/sha3 "myfutures.trade")
+    "myfutures.trade"))
 
 ;;;
 ;;; default chat message

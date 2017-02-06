@@ -54,12 +54,23 @@
  :initialize
  (fn [_ _]
    (js/console.log :initialize)
-   {:db db/default-db
-    ;; TODO: refactor and extract this code to contract/fetch-abi
-    :dispatch-n [[:chat-contract/fetch-abi]
-                 [:gse-contract/fetch-abi]
-                 [:ui.window/set-size]
-                 [:blockchain/load-my-addresses]]}))
+   (let [db db/default-db
+         full-app? (:provides-web3? db)
+         read-only-app? (not full-app?)]
+     {:db db
+      ;; TODO: refactor and extract this code to contract/fetch-abi
+      :dispatch-n (cond-> []
+                    full-app?
+                    (conj [:chat-contract/fetch-abi])
+
+                    full-app?
+                    (conj [:gse-contract/fetch-abi])
+
+                    true
+                    (conj [:ui.window/set-size])
+
+                    full-app?
+                    (conj [:blockchain/load-my-addresses]))})))
 
 
 

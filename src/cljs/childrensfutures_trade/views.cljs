@@ -28,7 +28,7 @@
 
     [childrensfutures-trade.components.app-bar :refer [app-bar-view]]
 
-    [childrensfutures-trade.components.accounts :refer [switch-account-dialog]]
+    ;; [childrensfutures-trade.components.accounts :refer [switch-account-dialog]]
 
     [childrensfutures-trade.components.goals :refer [place-bid-dialog
                                                      confirm-bid-selection-dialog
@@ -128,7 +128,7 @@
         ;;
         ;; switch account dialog
         ;;
-        [switch-account-dialog]
+        ;; [switch-account-dialog]
 
         ;;
         ;; new goal dialog
