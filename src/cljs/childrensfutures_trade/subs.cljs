@@ -6,6 +6,24 @@
             [childrensfutures-trade.pages :as pages]))
 
 
+
+;;;
+;;;
+;;; APP VERSIONS
+;;;
+;;;
+(reg-sub
+ :app/full?
+
+ (fn [db]
+   (:provides-web3? db)))
+
+(reg-sub
+ :app/read-only?
+
+ (fn [db]
+   (not (:provides-web3? db))))
+
 ;;;
 ;;;
 ;;; ADDRESSES AND BALANCES

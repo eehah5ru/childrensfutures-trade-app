@@ -67,6 +67,9 @@
                     full-app?
                     (conj [:gse-contract/fetch-abi])
 
+                    read-only-app?
+                    (conj [:sync-db/fetch])
+
                     true
                     (conj [:ui.window/set-size])
 

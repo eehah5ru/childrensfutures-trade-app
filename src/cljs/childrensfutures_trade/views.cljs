@@ -101,11 +101,9 @@
 ;;; main panel
 ;;;
 (defn main-panel []
-  (let [show-new-goal? (subscribe [:ui/show-new-goal?])
-        sending-new-goal? (subscribe [:db/sending-new-goal?])
-
-        drawer-open? (subscribe [:ui/drawer-open?])
-        current-page (subscribe [:ui/current-page])]
+  (let [current-page (subscribe [:ui/current-page])
+        full-app? (subscribe [:app/full?])
+        read-only-app? (subscribe [:app/read-only?])]
     (fn []
       ;; {:fluid true}
       [ui/mui-theme-provider
@@ -118,12 +116,13 @@
 
         [drawer-view]
 
-        [chat-drawer-view]
+        (when full-app?
+          [chat-drawer-view])
 
         ;;
         ;; error modal window
         ;;
-        [error-modal]
+        ;; [error-modal]
 
         ;;
         ;; switch account dialog
@@ -134,16 +133,20 @@
         ;; new goal dialog
         ;; visibility is controlled inside the dialog
         ;;
-        [new-goal-dialog]
+        (when full-app?
+          [new-goal-dialog])
 
-        [confirm-bid-selection-dialog]
+        (when full-app?
+            [confirm-bid-selection-dialog])
 
         [view-goal-dialog]
+
         ;;
         ;; place bid dialog
         ;; visiblity is controlled inside
         ;;
-        [place-bid-dialog]
+        (when full-app?
+          [place-bid-dialog])
 
         ;;
         ;; show active-page
@@ -163,4 +166,5 @@
 
         ;; [ui/snackbar {:message "Adding Goal"
         ;;               :open @sending-new-goal?}]
-        ]])))
+        ]
+       ])))

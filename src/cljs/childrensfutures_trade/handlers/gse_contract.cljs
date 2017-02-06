@@ -109,7 +109,7 @@
    (js/console.log :debug :on-goal-added (:goal-id goal))
    {:dispatch-n [[:db.goal/add goal block-number]
                  [:pulse/push-goal-added block-number (:goal-id goal)]
-                 [:sync-db/inc-db-version block-number]]
+                 [:sync-db/on-db-updated block-number]]
     }))
 
 
@@ -125,7 +125,7 @@
  (fn [{:keys [db]} [goal {:keys [block-number]}]]
    (js/console.log :debug :on-goal-cancelled (:goal-id goal))
    {:dispatch-n [[:db.goal/cancel goal]
-                 [:sync-db/inc-db-version block-number]]}))
+                 [:sync-db/on-db-updated block-number]]}))
 
 
 ;;;
@@ -140,7 +140,7 @@
    (js/console.log :debug :bid-placed bid)
    {:dispatch-n [[:db.goal/place-bid bid]
                  [:pulse/push-investment-placed block-number (:goal-id bid) (:bid-owner bid)]
-                 [:sync-db/inc-db-version block-number]]}))
+                 [:sync-db/on-db-updated block-number]]}))
 
 
 ;;;
@@ -156,7 +156,7 @@
    (js/console.log :info :bid-selected goal-id bid-id)
 
    {:dispatch-n [[:db.goal/select-bid goal-id bid-id]
-                 [:sync-db/inc-db-version block-number]]}))
+                 [:sync-db/on-db-updated block-number]]}))
 
 ;;;
 ;;;
@@ -171,7 +171,7 @@
    (js/console.log :info :investment-sent goal-id bid-id)
 
    {:dispatch-n [[:db.goal/send-investment goal-id bid-id]
-                 [:sync-db/inc-db-version block-number]]}))
+                 [:sync-db/on-db-updated block-number]]}))
 
 
 ;;;
@@ -187,7 +187,7 @@
    (js/console.log :info :investment-received goal-id bid-id)
 
    {:dispatch-n [[:db.goal/receive-investment goal-id bid-id]
-                 [:sync-db/inc-db-version block-number]]}))
+                 [:sync-db/on-db-updated block-number]]}))
 
 ;;;
 ;;;
@@ -202,7 +202,7 @@
    (js/console.log :info :goal-achieved goal-id)
 
    {:dispatch-n [[:db.goal/achieve goal-id]
-                 [:sync-db/inc-db-version block-number]]}))
+                 [:sync-db/on-db-updated block-number]]}))
 
 
 ;;;
@@ -217,7 +217,7 @@
    (js/console.log :info :bonus-asked goal-id bid-id)
 
    {:dispatch-n [[:db.goal/ask-bonus goal-id bid-id]
-                 [:sync-db/inc-db-version block-number]]}))
+                 [:sync-db/on-db-updated block-number]]}))
 
 ;;;
 ;;;
@@ -232,7 +232,7 @@
    (js/console.log :info :bonus-sent goal-id bid-id)
 
    {:dispatch-n [[:db.goal/send-bonus goal-id bid-id]
-                 [:sync-db/inc-db-version block-number]]}))
+                 [:sync-db/on-db-updated block-number]]}))
 
 
 ;;;
@@ -248,4 +248,4 @@
    (js/console.log :info :goal-completed goal-id)
 
    {:dispatch-n [[:db.goal/complete goal-id]
-                 [:sync-db/inc-db-version block-number]]}))
+                 [:sync-db/on-db-updated block-number]]}))
