@@ -11,3 +11,4 @@ out
 /resources/public/contracts/build
 /resources/public/css
 /.lein-repl-history
+/log/figwheel.log
