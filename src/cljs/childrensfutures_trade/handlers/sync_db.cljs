@@ -113,7 +113,7 @@
     :db db}))
 
 ;;;
-;;; when db fetched
+;;; fetched
 ;;;
 (reg-event-fx
  :sync-db/fetched
@@ -128,7 +128,9 @@
          need-update? (> new-version current-version)]
      {:db (cond-> db
             need-update?
-            (merge fetched-db))})))
+            (merge fetched-db))
+      :dispatch-later [{:ms 5000
+                      :dispatch [:sync-db/fetch]}]})))
 
 
 (reg-event-fx
