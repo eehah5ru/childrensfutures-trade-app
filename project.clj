@@ -28,7 +28,9 @@
                  [net.colourcoding/cljs-clavatar "0.2.1"]
                  [clavatar-js "0.1.0-SNAPSHOT"]
                  [cljsjs/clipboard "1.5.13-1"]
-                 [com.cemerick/url "0.1.1"]]
+                 [com.cemerick/url "0.1.1"]
+                 [com.cognitect/transit-cljs "0.8.239"]
+                 [com.cognitect/transit-clj "0.8.297"]]
 
   :plugins [[lein-auto "0.1.2"]
             [lein-cljsbuild "1.1.4"]
