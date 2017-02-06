@@ -505,3 +505,14 @@
  :location/root
  (fn [_]
    (str (url/url (-> js/window .-location .-href) "/"))))
+
+
+;;;
+;;;
+;;; SYNC DB
+;;;
+;;;
+(reg-sub
+ :sync-db/db-version
+ (fn [db]
+   (:db-version db)))

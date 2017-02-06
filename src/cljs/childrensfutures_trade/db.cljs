@@ -43,7 +43,7 @@
 ;;; default goal
 ;;;
 (defn default-goal []
-  {:created-at (js/Date.now)
+  {:created-at 0
    :stage :unknown
    :description ""
    :give-in-return ""
@@ -112,7 +112,7 @@
 ;;;
 ;;;
 (s/def ::stage gs/stages)
-
+(s/def ::db-version int?)
 (s/def ::goal-id string?)
 (s/def ::channel-id string?)
 (s/def ::message-id int?)
@@ -237,7 +237,8 @@
 (s/def ::goals (s/map-of ::goal-id ::goal))
 
 ;;; DB structure
-(s/def ::db (s/keys :req-un [::goals
+(s/def ::db (s/keys :req-un [::db-version
+                             ::goals
                              ;; ::messages
                              ;; ::pulse
                              ::new-goal
@@ -267,7 +268,8 @@
 ;;;
 ;;;
 (def default-db
-  {:goals (hash-map)
+  {:db-version 0
+   :goals (hash-map)
    :messages (hash-map)
    :pulse (default-pulse)
    :settings {}                         ;FIXME: remove
@@ -308,3 +310,40 @@
                   }
    :chat-contract {:name "Chat"
                    :address "0x7759a1442466ea622e44238de2e628b2001b8741"}})
+
+;;;
+;;;
+;;; data access utils
+;;;
+;;;
+
+;;; get goal or default
+(defn get-goal [db goal-id]
+  (get-in db [:goals goal-id] (default-goal)))
+
+;;; get bid or default
+(defn get-bid [db goal-id bid-id]
+  (-> db
+      (get-goal goal-id)
+      (get-in [:bids bid-id] (default-bid))))
+
+;;; returns updated db
+(defn update-goal [db goal-id f]
+  (-> db
+      (get-goal goal-id)
+      (f)
+      (as-> g (assoc-in db [:goals goal-id] g))))
+
+;;; returns updated db
+(defn change-stage [db goal-id new-stage]
+  (let [goal (get-goal db goal-id)]
+    (cond-> db
+      (gs/after? (:stage goal) new-stage)
+      (update-goal goal-id #(assoc % :stage new-stage)))))
+
+;;; returns updated db
+(defn update-bid [db goal-id bid-id f]
+  (-> db
+      (get-bid goal-id bid-id)
+      (f)
+      (as-> b (assoc-in db [:goals goal-id :bids bid-id] b))))

@@ -56,3 +56,7 @@
 (defn after? [expected-stage s]
   (< (.indexOf sorted-stages expected-stage)
      (.indexOf sorted-stages s)))
+
+(defn before? [expected-stage s]
+  (> (.indexOf sorted-stages expected-stage)
+     (.indexOf sorted-stages s)))

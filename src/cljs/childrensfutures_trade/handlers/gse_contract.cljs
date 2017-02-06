@@ -19,6 +19,7 @@
    ;;
    [childrensfutures-trade.handlers.interceptors :refer [interceptors
                                                          interceptors-fx]]
+
    ))
 
 ;;;
@@ -103,15 +104,12 @@
 ;;;
 (reg-event-fx
  :gse-contract/on-goal-added
- (interceptors-fx :spec true)
+ (interceptors-fx :spec false)
  (fn [{:keys [db]} [goal {:keys [block-number]}]]
-   ;; (js/console.log :debug :rest rest)
-   {:db (assoc-in db
-                  [:goals (:goal-id goal)]
-                  (merge (db/default-goal)
-                         (select-keys goal [:owner :description :goal-id :give-in-return])
-                         {:stage :created}))
-    :dispatch [:pulse/push-goal-added block-number (:goal-id goal)]
+   (js/console.log :debug :on-goal-added (:goal-id goal))
+   {:dispatch-n [[:db.goal/add goal block-number]
+                 [:pulse/push-goal-added block-number (:goal-id goal)]
+                 [:sync-db/inc-db-version block-number]]
     }))
 
 
@@ -121,14 +119,13 @@
 ;;; GoalCancelled contract event
 ;;;
 ;;;
-(reg-event-db
+(reg-event-fx
  :gse-contract/on-goal-cancelled
- (interceptors)
- (fn [db [goal]]
+ (interceptors-fx :spec false)
+ (fn [{:keys [db]} [goal {:keys [block-number]}]]
    (js/console.log :debug :on-goal-cancelled (:goal-id goal))
-   (-> db
-       (assoc-in [:goals (:goal-id goal) :cancelled?] true)
-       (assoc-in [:goals (:goal-id goal) :stage] :cancelled))))
+   {:dispatch-n [[:db.goal/cancel goal]
+                 [:sync-db/inc-db-version block-number]]}))
 
 
 ;;;
@@ -138,20 +135,12 @@
 ;;;
 (reg-event-fx
  :gse-contract/on-bid-placed
- (interceptors-fx :spec true)
+ (interceptors-fx :spec false)
  (fn [{:keys [db]} [bid {:keys [block-number]}]]
    (js/console.log :debug :bid-placed bid)
-   {:db (-> db
-        (assoc-in [:goals (:goal-id bid) :stage] :bid-placed)
-        (assoc-in [:goals (:goal-id bid) :bids (:bid-owner bid)] ; FIXME: bid-owner -> bid-id
-                  (merge (db/default-bid)
-                         (let [{:keys [bid-owner description goal-id]} bid]
-                           {:goal-id goal-id
-                            :bid-id bid-owner ;FIXME use bid-id instead
-                            :owner bid-owner
-                            :description description}))))
-    :dispatch [:pulse/push-investment-placed block-number (:goal-id bid) (:bid-owner bid)]}
-   ))
+   {:dispatch-n [[:db.goal/place-bid bid]
+                 [:pulse/push-investment-placed block-number (:goal-id bid) (:bid-owner bid)]
+                 [:sync-db/inc-db-version block-number]]}))
 
 
 ;;;
@@ -159,29 +148,30 @@
 ;;; BidSelected
 ;;;
 ;;;
-(reg-event-db
+(reg-event-fx
  :gse-contract/on-bid-selected
- (interceptors)
+ (interceptors-fx :spec false)
 
- (fn [db [{:keys [goal-id bid-id]}]]
+ (fn [_ [{:keys [goal-id bid-id]} {:keys [block-number]}]]
    (js/console.log :info :bid-selected goal-id bid-id)
-   (-> db
-       (assoc-in [:goals goal-id :stage] :bid-selected)
-       (assoc-in [:goals goal-id :bids bid-id :selected?]
-                 true))))
+
+   {:dispatch-n [[:db.goal/select-bid goal-id bid-id]
+                 [:sync-db/inc-db-version block-number]]}))
 
 ;;;
 ;;;
 ;;; InvestmentSent
 ;;;
 ;;;
-(reg-event-db
+(reg-event-fx
  :gse-contract/on-investment-sent
- (interceptors)
- (fn [db [{:keys [goal-id bid-id]}]]
+ (interceptors-fx :spec false)
+
+ (fn [db [{:keys [goal-id bid-id]} {:keys [block-number]}]]
    (js/console.log :info :investment-sent goal-id bid-id)
-   (-> db
-       (assoc-in [:goals goal-id :stage] :investment-sent))))
+
+   {:dispatch-n [[:db.goal/send-investment goal-id bid-id]
+                 [:sync-db/inc-db-version block-number]]}))
 
 
 ;;;
@@ -189,26 +179,30 @@
 ;;; InvestmentReceived
 ;;;
 ;;;
-(reg-event-db
+(reg-event-fx
  :gse-contract/on-investment-received
- (interceptors)
- (fn [db [{:keys [goal-id bid-id]}]]
+ (interceptors-fx :spec false)
+ 
+ (fn [db [{:keys [goal-id bid-id]} {:keys [block-number]}]]
    (js/console.log :info :investment-received goal-id bid-id)
-   (-> db
-       (assoc-in [:goals goal-id :stage] :investment-received))))
+
+   {:dispatch-n [[:db.goal/receive-investment goal-id bid-id]
+                 [:sync-db/inc-db-version block-number]]}))
 
 ;;;
 ;;;
 ;;; GoalAchieved
 ;;;
 ;;;
-(reg-event-db
+(reg-event-fx
  :gse-contract/on-goal-achieved
- (interceptors)
- (fn [db [{:keys [goal-id]}]]
+ (interceptors-fx :spec false)
+ 
+ (fn [db [{:keys [goal-id]} {:keys [block-number]}]]
    (js/console.log :info :goal-achieved goal-id)
-   (-> db
-       (assoc-in [:goals goal-id :stage] :goal-achieved))))
+
+   {:dispatch-n [[:db.goal/achieve goal-id]
+                 [:sync-db/inc-db-version block-number]]}))
 
 
 ;;;
@@ -216,26 +210,29 @@
 ;;; BonusAsked
 ;;;
 ;;;
-(reg-event-db
+(reg-event-fx
  :gse-contract/on-bonus-asked
- (interceptors)
- (fn [db [{:keys [goal-id bid-id]}]]
+ (interceptors-fx :spec false)
+ (fn [db [{:keys [goal-id bid-id]} {:keys [block-number]}]]
    (js/console.log :info :bonus-asked goal-id bid-id)
-   (-> db
-       (assoc-in [:goals goal-id :stage] :bonus-asked))))
+
+   {:dispatch-n [[:db.goal/ask-bonus goal-id bid-id]
+                 [:sync-db/inc-db-version block-number]]}))
 
 ;;;
 ;;;
 ;;; BonusSent
 ;;;
 ;;;
-(reg-event-db
+(reg-event-fx
  :gse-contract/on-bonus-sent
- (interceptors)
- (fn [db [{:keys [goal-id bid-id]}]]
+ (interceptors-fx :spec false)
+
+ (fn [db [{:keys [goal-id bid-id]} {:keys [block-number]}]]
    (js/console.log :info :bonus-sent goal-id bid-id)
-   (-> db
-       (assoc-in [:goals goal-id :stage] :bonus-sent))))
+
+   {:dispatch-n [[:db.goal/send-bonus goal-id bid-id]
+                 [:sync-db/inc-db-version block-number]]}))
 
 
 ;;;
@@ -243,10 +240,12 @@
 ;;; GoalCompleted
 ;;;
 ;;;
-(reg-event-db
+(reg-event-fx
  :gse-contract/on-goal-completed
- (interceptors)
- (fn [db [{:keys [goal-id]}]]
+ (interceptors-fx :spec false)
+
+ (fn [db [{:keys [goal-id]} {:keys [block-number]}]]
    (js/console.log :info :goal-completed goal-id)
-   (-> db
-       (assoc-in [:goals goal-id :stage] :goal-completed))))
+
+   {:dispatch-n [[:db.goal/complete goal-id]
+                 [:sync-db/inc-db-version block-number]]}))
