@@ -24,7 +24,9 @@
                  [ring/ring-defaults "0.3.0-beta1"]
                  [ring/ring-devel "1.6.0-beta5"]
                  [net.colourcoding/cljs-clavatar "0.2.1"]
-                 [clavatar-js "0.1.0-SNAPSHOT"]]
+                 [clavatar-js "0.1.0-SNAPSHOT"]
+                 [cljsjs/clipboard "1.5.13-1"]
+                 [com.cemerick/url "0.1.1"]]
 
   :plugins [[lein-auto "0.1.2"]
             [lein-cljsbuild "1.1.4"]
@@ -71,7 +73,7 @@
                           :compiler {:main childrensfutures-trade.core
                                      :output-to "resources/public/js/compiled/app.js"
                                      :output-dir "resources/public/js/compiled/out"
-                                     :asset-path "./js/compiled/out"
+                                     :asset-path "/js/compiled/out"
                                      :source-map-timestamp true
                                      :optimizations :none
                                      :closure-defines {goog.DEBUG true}
