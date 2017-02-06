@@ -82,7 +82,7 @@
    :uberjar {:hooks [leiningen.cljsbuild]
              :omit-source true
              :aot :all
-             :main emojillionaire.core
+             :main childrensfutures-trade.core
              :cljsbuild {:builds {:app {:id "uberjar"
                                         :source-paths ["src/cljs"]
                                         :compiler {:main childrensfutures-trade.core

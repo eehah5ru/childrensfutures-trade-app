@@ -26,6 +26,7 @@
       wrap-gzip))
 
 (defn -main [& [port]]
+
   (let [port (Integer. (or port (env :port) 6655))]
     (alter-var-root (var *server*)
                     (constantly (run-server http-handler {:port port :join? false})))))
