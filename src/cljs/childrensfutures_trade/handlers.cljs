@@ -53,6 +53,7 @@
 (reg-event-fx
  :initialize
  (fn [_ _]
+   (js/console.log :initialize)
    {:db db/default-db
     ;; TODO: refactor and extract this code to contract/fetch-abi
     :dispatch-n [[:chat-contract/fetch-abi]

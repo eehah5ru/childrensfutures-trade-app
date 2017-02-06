@@ -6,8 +6,9 @@
             [reagent.core :as r]
             [goog.dom :as gd]
             [goog.fx.dom :as gfd]
-
+            [clojure.string :as str]
             [bidi.bidi :as bidi]
+
             ))
 
 (defn truncate
@@ -105,3 +106,26 @@
         start [0 (.-scrollTop el)]
         end [0 (.-scrollHeight el)]]
     (scroll! el start end time)))
+
+;;;
+;;;
+;;; PATH utils
+;;;
+;;;
+;; (def path-for (partial bidi/path-for pages/routes))
+
+
+;;;
+;;;
+;;; dynamically invoce function
+;;;
+;;;
+(defn ->js [var-name]
+      (-> var-name
+          (str/replace #"/" ".")
+          (str/replace #"-" "_")))
+
+
+(defn invoke [function-name & args]
+      (let [fun (js/eval (->js function-name))]
+           (apply fun args)))

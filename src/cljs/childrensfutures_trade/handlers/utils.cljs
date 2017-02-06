@@ -12,7 +12,6 @@
    [cljsjs.web3]
 
    [childrensfutures-trade.db :as db]
-   [childrensfutures-trade.utils :as u]
 
    ))
 

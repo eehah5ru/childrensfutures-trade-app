@@ -29,6 +29,27 @@
 ;;;
 
 ;;;
+;;; show/hide shae goal url
+;;;
+(reg-event-db
+ :ui.goal/toggle-share-url
+ (interceptors)
+ (fn [db [goal-id]]
+   (update-in db [:goals goal-id :show-share-url?] not)))
+
+(reg-event-db
+ :ui.goal/show-share-url
+ (interceptors)
+ (fn [db [goal-id]]
+   (assoc-in db [:goals goal-id :show-share-url?] true)))
+
+(reg-event-db
+ :ui.goal/hide-share-url
+ (interceptors)
+ (fn [db [goal-id]]
+   (assoc-in db [:goals goal-id :show-share-url?] false)))
+
+;;;
 ;;; TOGGLE NEW GOAL VIEW VISIBILITY
 ;;;
 (reg-event-db
@@ -125,8 +146,21 @@
  (fn [{:keys [db]}]
    {:dispatch-n [[:ui.view-goal-dialog/toggle-view]
                  [:ui.view-goal-dialog/clear-goal]]}))
+
 ;;;
+;;; VIEW GOAL PAGE
 ;;;
+(reg-event-fx
+ :ui.view-goal-page/init
+ (interceptors-fx :spec false)
+ (fn [{:keys [db]}]
+   (js/console.log :ui.view-goal-page)
+   (let [goal-id (get-in db [:current-page :route-params :goal-id])]
+     {:dispatch-later [{:ms 500
+                        :dispatch [:ui.view-goal-dialog/open goal-id]}]})))
+
+;;;
+;;; drawer
 ;;;
 (reg-event-db
  :ui.drawer/toggle-view
@@ -182,7 +216,7 @@
     :dispatch [:ui.page.title/update]}))
 
 ;;;
-;;; forse set window size
+;;; force set window size
 ;;;
 (reg-event-db
  :ui.window/set-size

@@ -48,6 +48,7 @@
    :description ""
    :give-in-return ""
    :owner nil
+   :show-share-url? false
    :trx-on-air? false                   ; indicates that ethereum trx is being processed
    :cancelled? false
    :bids (hash-map)
@@ -126,6 +127,7 @@
 (s/def ::show-new-bid? boolean?)
 (s/def ::show-details? boolean?)
 (s/def ::show-new-goal? boolean?)
+(s/def ::show-share-url? boolean?)
 (s/def ::show-accounts? boolean?)
 (s/def ::current-address string?)
 (s/def ::current-chat-channel-id string?)

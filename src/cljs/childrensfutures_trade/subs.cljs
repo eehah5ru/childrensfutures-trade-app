@@ -1,5 +1,6 @@
 (ns childrensfutures-trade.subs
   (:require [re-frame.core :refer [reg-sub subscribe]]
+            [cemerick.url :as url]
             [childrensfutures-trade.goal-stages :as gs]
 
             [childrensfutures-trade.pages :as pages]))
@@ -46,95 +47,6 @@
  :contract/web3-available?
  (fn [db]
    (:provides-web3? db)))
-
-;;;
-;;;
-;;; UI RELATED
-;;;
-;;;
-(reg-sub
- :ui/show-new-goal?
- (fn [db]
-   (:show-new-goal? db)))
-
-(reg-sub
- :ui/show-new-bid?
- (fn [db]
-   (:show-new-bid? db)))
-
-;;; FIXME: deprecated
-(reg-sub
- :ui/show-accounts?
- (fn [db]
-   (:show-accounts? db)))
-
-(reg-sub
- :ui/drawer-open?
- (fn [db]
-   (:drawer-open? db)))
-
-(reg-sub
- :ui.chat/drawer-open?
- (fn [db]
-   (:chat-open? db)))
-
-;;;
-;;; page subs
-;;;
-(reg-sub
- :ui/current-page
- (fn [db]
-   (:current-page db)))
-
-(reg-sub
- :ui/current-page-name
- :<- [:ui/current-page]
- (fn [current-page _]
-   (pages/human-readable (:handler current-page))))
-
-;;;
-;;; select bid dialog  subs
-;;;
-(reg-sub
- :ui.select-bid/dialog-open?
- (fn [db]
-   (get-in db [:select-bid :dialog-open?])))
-
-(reg-sub
- :ui.select-bid/selected
- (fn [db]
-   (-> db
-       :select-bid
-       (select-keys [:goal-id :bid-id]))))
-
-;;;
-;;; view goal dialog subs
-;;;
-(reg-sub
- :ui.view-goal/dialog-open?
- (fn [db]
-   (get-in db [:view-goal :dialog-open?])))
-
-(reg-sub
- :ui.view-goal/goal-id
- (fn [db]
-   (get-in db [:view-goal :goal-id])))
-
-;;;
-;;; window height
-;;;
-(reg-sub
- :ui/window-height
- (fn [db]
-   (:window-height db)))
-;;;
-;;; show new bid indicator
-;;;
-;; (reg-sub
-;;  :db/show-new-bid?
-;;  (fn [db [_ goal-id]]
-;;    (get-in db [:goals goal-id :show-new-bid?])))
-
 
 ;;;
 ;;;
@@ -294,6 +206,7 @@
 
  (fn [goals [_ goal-id]]
    (get-in goals [goal-id :stage])))
+
 
 ;;;
 ;;; is it my goal?
@@ -487,3 +400,108 @@
 
  (fn [db]
    (sort-by :number #(compare %2 %1) (:pulse db))))
+
+
+;;;
+;;;
+;;; UI RELATED
+;;;
+;;;
+(reg-sub
+ :ui/show-new-goal?
+ (fn [db]
+   (:show-new-goal? db)))
+
+(reg-sub
+ :ui/show-new-bid?
+ (fn [db]
+   (:show-new-bid? db)))
+
+(reg-sub
+ :ui.goal/show-share-url?
+ :<- [:db/goals]
+
+ (fn [goals [_ goal-id]]
+   (get-in goals [goal-id :show-share-url?])))
+
+
+;;; FIXME: deprecated
+(reg-sub
+ :ui/show-accounts?
+ (fn [db]
+   (:show-accounts? db)))
+
+(reg-sub
+ :ui/drawer-open?
+ (fn [db]
+   (:drawer-open? db)))
+
+(reg-sub
+ :ui.chat/drawer-open?
+ (fn [db]
+   (:chat-open? db)))
+
+;;;
+;;; page subs
+;;;
+(reg-sub
+ :ui/current-page
+ (fn [db]
+   (:current-page db)))
+
+(reg-sub
+ :ui/current-page-name
+ :<- [:ui/current-page]
+ (fn [current-page _]
+   (pages/human-readable (:handler current-page))))
+
+;;;
+;;; select bid dialog  subs
+;;;
+(reg-sub
+ :ui.select-bid/dialog-open?
+ (fn [db]
+   (get-in db [:select-bid :dialog-open?])))
+
+(reg-sub
+ :ui.select-bid/selected
+ (fn [db]
+   (-> db
+       :select-bid
+       (select-keys [:goal-id :bid-id]))))
+
+;;;
+;;; view goal dialog subs
+;;;
+(reg-sub
+ :ui.view-goal/dialog-open?
+ (fn [db]
+   (get-in db [:view-goal :dialog-open?])))
+
+(reg-sub
+ :ui.view-goal/goal-id
+ (fn [db]
+   (get-in db [:view-goal :goal-id])))
+
+;;;
+;;; window height
+;;;
+(reg-sub
+ :ui/window-height
+ (fn [db]
+   (:window-height db)))
+;;;
+;;; show new bid indicator
+;;;
+;; (reg-sub
+;;  :db/show-new-bid?
+;;  (fn [db [_ goal-id]]
+;;    (get-in db [:goals goal-id :show-new-bid?])))
+
+;;;
+;;; get proto-host-port
+;;;
+(reg-sub
+ :location/root
+ (fn [_]
+   (str (url/url (-> js/window .-location .-href) "/"))))

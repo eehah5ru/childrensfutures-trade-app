@@ -63,7 +63,7 @@
  (interceptors-fx :spec false)
  (fn [{:keys [db]} _]
    {:http-xhrio {:method :get
-                 :uri (gstring/format "./contracts/build/%s.abi"
+                 :uri (gstring/format "/contracts/build/%s.abi"
                                       (get-in db/default-db [:chat-contract :name]))
                  :timeout 6000
                  :response-format (ajax/json-response-format {:keywords? true})

@@ -12,7 +12,7 @@
     ))
 
 
-(defn about-page []
+(defn ^:export about-page []
   [outer-paper
    [:h1 "What kind of exchange market is it?"]
    [:p "The web application "

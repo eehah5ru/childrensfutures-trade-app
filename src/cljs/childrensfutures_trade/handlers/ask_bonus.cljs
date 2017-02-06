@@ -2,7 +2,6 @@
   (:require
    [childrensfutures-trade.db :as db]
    [re-frame.core :refer [reg-event-db reg-event-fx path trim-v after debug reg-fx console dispatch]]
-   [childrensfutures-trade.utils :as u]
 
    ;;
    ;; event handlers

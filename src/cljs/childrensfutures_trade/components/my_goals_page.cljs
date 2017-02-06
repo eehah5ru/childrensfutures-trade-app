@@ -12,7 +12,7 @@
     [childrensfutures-trade.components.goals :refer [goals-view]]))
 
 
-(defn my-goals-page []
+(defn ^:export my-goals-page []
   [outer-paper
    [goals-view #(subscribe [:db.goals.my/sorted])]]
 
