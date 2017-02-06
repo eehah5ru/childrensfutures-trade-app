@@ -22,33 +22,39 @@
 ;;;
 ;;;
 (defn created-icon-button [goal-id]
-  (let [role (subscribe [:role/role goal-id])]
+  (let [role (subscribe [:role/role goal-id])
+        icon-options {:disabled false
+                      :tooltip "Invest now!"
+                      :touch true
+                      :on-touch-tap #(dispatch [:place-bid/show-new-bid goal-id])}
+        icon (fn [& {:keys [disabled?]}]
+               [ui/icon-button
+                (merge icon-options
+                       {:disabled disabled?})
+                (icons/action-trending-up)])]
     (condp = @role
-      :stranger  [ui/icon-button
-                           {:disabled false
-                            :tooltip "Invest now!"
-                            :touch true
-                            :on-touch-tap #(dispatch [:place-bid/show-new-bid goal-id])}
-                  (icons/action-trending-up)]
-      nil)))
+      :stranger  (icon :disabled? false)
+      (icon :disabled? true))))
 
 (defn bid-placed-icon-button [goal-id]
-  (let [role (subscribe [:role/role goal-id])]
+  (let [role (subscribe [:role/role goal-id])
+        icon (fn [& {:keys [disabled?]}]
+               [ui/icon-button
+                {:disabled disabled?
+                 :tooltip "Invest also!"
+                 :touch true
+                 :on-touch-tap #(dispatch [:place-bid/show-new-bid goal-id])}
+                (icons/social-plus-one)])]
     (condp = @role
-      :stranger [ui/icon-button
-                           {:disabled false
-                            :tooltip "Invest also!"
-                            :touch true
-                            :on-touch-tap #(dispatch [:place-bid/show-new-bid goal-id])}
-                 (icons/social-plus-one)]
-      nil)))
+      :stranger (icon :disabled? false)
+      (icon :disabled? true))))
 
 (defn- staged-icon-button [goal-id]
   (let [stage (subscribe [:db.goal/stage goal-id])]
     (condp gs/stage? @stage
       :created (created-icon-button goal-id)
       :bid-placed (bid-placed-icon-button goal-id)
-      nil)))
+      (bid-placed-icon-button goal-id))))
 
 ;;;
 ;;;
@@ -65,11 +71,9 @@
                       @my-goal?)]
     ^{:key (str :goal-added- goal-id)}
     [ui/list-item
-     {:primary-text (str "Goal Added: " description)
+     {:primary-text description
       :secondary-text (r/as-element
-                       [:span (str "Bonus: " give-in-return)
-                        [:br]
-                        (statuses/render (statuses/staged-goal-statuses @goal))])
+                       [:span (str "Bonus: " give-in-return)])
       :right-icon-button (r/as-element
                           (staged-icon-button goal-id))
       :on-touch-tap #(dispatch [:ui.view-goal-dialog/open goal-id])}
@@ -85,11 +89,9 @@
                       (not (gs/stage? :bid-placed @stage)))]
     ^{:key (str :investment-placed- goal-id)}
     [ui/list-item
-     {:primary-text (str "Investment placed!: " description)
+     {:primary-text description
       :secondary-text (r/as-element
-                       [:span (str "Bonus: " give-in-return)
-                        [:br]
-                        (statuses/render (statuses/staged-goal-statuses @goal))])
+                       [:span (str "Bonus: " give-in-return)])
       :right-icon-button (r/as-element
                           (staged-icon-button goal-id))
       :on-touch-tap #(dispatch [:ui.view-goal-dialog/open goal-id])}]))
