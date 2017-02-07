@@ -58,6 +58,8 @@
    (let [db db/default-db
          full-app? (:provides-web3? db)
          read-only-app? (not full-app?)]
+     (js/console.log :full-app? full-app?)
+     (js/console.log :read-only-app? read-only-app?)
      {:db db
       ;; TODO: refactor and extract this code to contract/fetch-abi
       :dispatch-n (cond-> []

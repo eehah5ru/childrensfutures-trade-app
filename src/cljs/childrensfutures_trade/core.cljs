@@ -16,6 +16,7 @@
    ))
 
 
+
 (enable-console-print!)
 
 (def history
@@ -26,6 +27,7 @@
                   (.getElementById js/document "app")))
 
 (defn ^:export init []
+
   (re-frame/dispatch-sync [:initialize])
   (pushy/start! history)
   (mount-root)

@@ -3,7 +3,9 @@
             [cljs.reader]
             [cljs.spec :as s]
 
-            [childrensfutures-trade.goal-stages :as gs]))
+            [childrensfutures-trade.goal-stages :as gs]
+
+            [childrensfutures-trade.utils :as u]))
 
 
 ;;;
@@ -293,27 +295,32 @@
    :chat-open? false
    :window-height nil
    :web3 (mk-web3)
-   :provides-web3? (or (aget js/window "web3") goog.DEBUG)
-   :gse-contract {:name "GoalsStockExchange"
-                  :abi nil
-                  :bin nil
-                  :instance nil
-                  ;;
-                  ;;
-                  ;; devel net address (depends on testrpc)
-                  ;;
-                  ;;
-                  :address "0x2f4225883ac9d7e816ed99dc2f3149857a985859"
+   :provides-web3? (not (nil? (aget js/window "web3")))
+   ;;
+   ;; gse contract
+   ;;
+   :gse-contract (cond-> {:name "GoalsStockExchange"
+                          :abi nil
+                          :bin nil
+                          :instance nil
+                          ;; ropsten testnet contract address
+                          :address "0x641937c1fbf30604809e9701647af90413bb1e3a"
+                          }
+                   childrensfutures-trade.utils/DEV
+                   ;; devel GSE contract address
+                   ;; depends on testrpc
+                   (merge {:address "0x2f4225883ac9d7e816ed99dc2f3149857a985859"}))
+   ;;
+   ;; chat contract
+   ;;
+   :chat-contract (cond-> {:name "Chat"
+                           ;; ropsten testnet contract address
+                           :address "0x6e600f0939c3aec1aece8735c38f2e10ccc44cf3"}
+                    childrensfutures-trade.utils/DEV
+                    ;; devel Chat contract address
+                    ;; depends on testrpc
+                    (merge {:address "0x7759a1442466ea622e44238de2e628b2001b8741"}))})
 
-                  ;;
-                  ;;
-                  ;; ropsten testnet contract address
-                  ;;
-                  ;;
-                  ;; :address "0x641937c1fbf30604809e9701647af90413bb1e3a"
-                  }
-   :chat-contract {:name "Chat"
-                   :address "0x7759a1442466ea622e44238de2e628b2001b8741"}})
 
 ;;;
 ;;;
@@ -322,6 +329,7 @@
 ;;;
 
 ;;; get goal or default
+
 (defn get-goal [db goal-id]
   (get-in db [:goals goal-id] (default-goal)))
 
