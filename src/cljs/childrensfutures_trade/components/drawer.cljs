@@ -18,7 +18,8 @@
 
 (defn- menu-link [[route title icon]]
   [ui/list-item
-   {:left-icon (icon)
+   {:class-name (str "menu-link-" (subs (str route) 1))
+    :left-icon (icon)
     :href (pages/path-for route)
     :key route}
 

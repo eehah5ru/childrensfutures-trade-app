@@ -156,7 +156,7 @@
                            [:ui.view-goal-dialog/clear-goal]
                            [:ui.view-goal-dialog/on-view-goal-page false]]
                     on-view-goal-page?
-                    (conj [:ui.change-location :pulse]))})))
+                    (conj [:ui.go-to-menu :pulse]))})))
 
 ;;;
 ;;; VIEW GOAL PAGE
@@ -239,6 +239,17 @@
    (js/console.log :change-location)
    (aset js/window "location" (apply pages/path-for route-params))
    {}))
+
+;;;
+;;; go to menu link
+;;;
+(reg-event-fx
+ :ui.go-to-menu
+ (interceptors-fx :spec false)
+
+ (fn [_ [menu-page-key]]
+   (let [menu-link-selector (str ".menu-link-" (subs (str menu-page-key) 1))]
+    (.click (js/document.querySelector menu-link-selector)))))
 
 ;;;
 ;;; force set window size
