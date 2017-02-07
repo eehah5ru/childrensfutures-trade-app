@@ -79,16 +79,3 @@
   (let [bid (subscribe [:db.goal.bids/selected goal-id])
         bid-id (:bid-id @bid)]
     (chat-open-button [goal-id bid-id])))
-
-;;;
-;;;
-;;; share goal button
-;;;
-;;;
-(defn share-goal-button [goal-id]
-  )
-
-;;;
-;;; empty actions
-;;;
-(def empty-actions (constantly []))
