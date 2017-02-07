@@ -79,3 +79,38 @@
   (let [bid (subscribe [:db.goal.bids/selected goal-id])
         bid-id (:bid-id @bid)]
     (chat-open-button [goal-id bid-id])))
+
+;;;
+;;;
+;;; goal bids view
+;;;
+;;;
+
+;;; bid view
+;;;
+;;; BID LIST ITEM
+;;;
+(defn- bid-list-item [goal-id bid]
+  (let [{:keys [owner description selected?]} bid
+        bid-id owner]
+    [ui/list-item
+     {:left-avatar (r/as-element [bid-avatar bid])
+      ;;:right-icon (icons/action-info)
+      :primary-text (:description bid)
+      :right-toggle (r/as-element
+                     [ui/toggle
+                      {:toggled selected?
+                       :disabled false
+                       :on-toggle #(do
+                                     (dispatch [:ui.select-bid-dialog/set-selected goal-id bid-id])
+                                     (dispatch [:ui.select-bid-dialog/toggle-view]))
+                       }])}]))
+
+(defn goal-bids-view [goal]
+  (let [goal-id (:goal-id goal)
+        bids (subscribe [:db.goal.bids/sorted goal-id])]
+
+    [ui/list
+     (for [bid @bids]
+       ^{:key (:owner bid)}
+       [bid-list-item goal-id bid])]))

@@ -168,30 +168,43 @@
      ;; text
      [ui/card-text
       {:expandable true
-       :style {:position "relative"}}
-      [:span
-       {:style {:display "none"}}
-       :id (str "goal-" goal-id)]
-      [ui/floating-action-button
-       {:z-depth 1
-        :mini true
-        :secondary true
-        :children (icons/social-share)
-        :class-name "clipboard-button"
-        :on-touch-tap #(dispatch [:ui.goal/toggle-share-url goal-id])
-        :style {:position "absolute"
-                :top -5
-                :right 30}}]
+       :style {:position "relative"}
+       :children (cond-> []
+                   true
+                   (conj [:span
+                          {:style {:display "none"}}
+                          :id (str "goal-" goal-id)])
 
-      [ui/divider]
-      (when @show-share-url?
-        [ui/text-field
-         {:value (str @location (subs (pages/path-for :view-goal :goal-id goal-id) 1))
-          :name "share-link"
-          :full-width true
-          :floating-label-fixed true
-          :floating-label-text "copy and share this url"}])
-      [card-text goal]]
+                   true
+                   (conj [ui/floating-action-button
+                          {:z-depth 1
+                           :mini true
+                           :secondary true
+                           :children (icons/social-share)
+                           :class-name "clipboard-button"
+                           :on-touch-tap #(dispatch [:ui.goal/toggle-share-url goal-id])
+                           :style {:position "absolute"
+                                   :top -5
+                                   :right 30}}])
+
+                   true
+                   (conj [ui/divider])
+
+                   @show-share-url?
+                   (conj [ui/text-field
+                          {:value (str @location (subs (pages/path-for :view-goal :goal-id goal-id) 1))
+                           :name "share-link"
+                           :full-width true
+                           :floating-label-fixed true
+                           :floating-label-text "copy and share this url"}])
+
+                   true
+                   (conj [card-text goal])
+
+                   true
+                   (as-> cs (map #(r/as-element (with-meta %1 {:key %2}))
+                                 cs
+                                 (range))))}]
 
      ;; actions
      [ui/card-actions

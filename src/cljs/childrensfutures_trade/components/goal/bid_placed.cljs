@@ -72,36 +72,15 @@
 ;;; goal owner
 ;;;
 
-;;; bid view
-;;;
-;;; BID LIST ITEM
-;;;
-(defn- bid-list-item [goal-id bid]
-  (let [{:keys [owner description selected?]} bid
-        bid-id owner]
-    [ui/list-item
-     {:left-avatar (r/as-element [bid-avatar bid])
-      ;;:right-icon (icons/action-info)
-      :primary-text (:description bid)
-      :right-toggle (r/as-element
-                     [ui/toggle
-                      {:toggled selected?
-                       :disabled false
-                       :on-toggle #(do
-                                     (dispatch [:ui.select-bid-dialog/set-selected goal-id bid-id])
-                                     (dispatch [:ui.select-bid-dialog/toggle-view]))
-                       }])}]))
-
 ;;; card text
 (defn- owner-card-text [goal]
   (let [{:keys [goal-id]} goal
         bids (subscribe [:db.goal.bids/sorted goal-id])]
-    [ui/card-title
-     {:title "Select your investment!"}
-     [ui/list
-      (for [bid @bids]
-        ^{:key (:owner bid)}
-        [bid-list-item goal-id bid])]]))
+    [:div
+     [ui/card-title
+      {:title "Select your investment!"}]
+     [gc/goal-bids-view goal]]))
+
 
 ;;; bid owner
 (defn- bid-owner-card-text [goal]
