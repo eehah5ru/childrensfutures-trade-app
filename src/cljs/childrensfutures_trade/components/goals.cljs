@@ -118,6 +118,10 @@
     (gs/bonus-sent? stage) bonus-sent-goal/card-properties
     (gs/goal-completed? stage) completed-goal/card-properties
     :else unknown-goal/card-properties))
+
+(defn staged-goal-card-class-name [stage]
+  (str "goal-stage-" (subs (str stage) 1)))
+
 ;;;
 ;;;
 ;;; staged goal views
@@ -137,7 +141,8 @@
                 card-subtitle-extra
                 goal-statuses-extra]} card-properties]
     [ui/card
-     {:style (card-style goal)
+     {:class-name (str "goal-card" " " (staged-goal-card-class-name stage))
+      :style (card-style goal)
       ;; :expanded expanded?
       :initially-expanded expanded?}
 
@@ -215,7 +220,8 @@
         goal (subscribe [:db.goals/get @goal-id])
         dialog-open? (subscribe [:ui.view-goal/dialog-open?])]
     [ui/dialog
-     {:modal false
+     {:body-class-name "view-goal-dialog"
+      :modal false
       :open @dialog-open?
       :on-request-close #(dispatch [:ui.view-goal-dialog/close])}
      [staged-goal-view @goal :expanded? true :show-expandable-button? false]]))

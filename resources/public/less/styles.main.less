@@ -3,8 +3,11 @@
 //
 // colors
 //
+@deep-orange-800: #D84315;
+
 @green-200: #A5D6A7;
 @lime-200: #E6EE9C;
+@grey-500: #9E9E9E;
 
 //
 // pulse event bkg color
@@ -69,6 +72,11 @@ strong, b {
     font-weight: 500;
 }
 
+//
+//
+// pulse page
+//
+//
 .pulse-event {
   margin-bottom: 2px !important;
 }
@@ -80,6 +88,66 @@ strong, b {
   .pulse-event-bkg-color(@lime-200);
 }
 
+
+//
+//
+// goal card
+//
+//
+.goal-card {
+  // TBD
+}
+
 .goal-stage-created {
   .pulse-event-bkg-color(@green-200);
+}
+
+.goal-stage-bid-placed {
+  .pulse-event-bkg-color(@deep-orange-800);
+}
+
+.goal-stage-bid-selected {
+  .pulse-event-bkg-color(@deep-orange-800);
+}
+
+.goal-stage-investment-sent {
+  .pulse-event-bkg-color(@deep-orange-800);
+}
+
+.goal-stage-investment-received {
+  .pulse-event-bkg-color(@deep-orange-800);
+}
+
+.goal-stage-goal-achieved {
+  .pulse-event-bkg-color(@deep-orange-800);
+}
+
+.goal-stage-bonus-asked {
+  .pulse-event-bkg-color(@deep-orange-800);
+}
+
+.goal-stage-bonus-sent {
+  .pulse-event-bkg-color(@deep-orange-800);
+}
+
+.goal-stage-goal-completed {
+  .pulse-event-bkg-color(@deep-orange-800);
+}
+
+.goal-stage-cancelled {
+  .pulse-event-bkg-color(@grey-500);
+}
+
+//
+//
+// view goal dialog
+//
+//
+.view-goal-dialog {
+  padding: 0 !important;
+
+  .goal-card {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
 }
