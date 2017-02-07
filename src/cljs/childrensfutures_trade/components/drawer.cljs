@@ -28,7 +28,8 @@
 ;;; DRAWER
 ;;;
 (defn drawer-view []
-  (let [drawer-open? (subscribe [:ui/drawer-open?])]
+  (let [drawer-open? (subscribe [:ui/drawer-open?])
+                read-only-app? (subscribe [:app/read-only?])]
     (fn []
       [ui/drawer {:open @drawer-open?
                   :docked false
@@ -37,5 +38,5 @@
        [ui/app-bar {:title "myFutures"
                     :show-menu-icon-button false}]
        ;; (js/console.log :info pages)
-       (for [menu-page menu-pages]
+       (for [menu-page (menu-pages :read-only-app? read-only-app?)]
           (menu-link menu-page))])))

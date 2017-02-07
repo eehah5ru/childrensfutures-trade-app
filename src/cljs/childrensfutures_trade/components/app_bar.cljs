@@ -13,7 +13,8 @@
 
 
 (defn- right-buttons []
-  (let [balance (subscribe [:db/selected-address-balance])]
+  (let [balance (subscribe [:db/selected-address-balance])
+        full-app? (subscribe [:app/full?])]
     (fn []
       [row {:middle "xs"}
        ;; NEW GOAL BUTTON
@@ -24,12 +25,16 @@
        ;;   :on-touch-tap #(dispatch [:ui.new-goal/toggle-view])
        ;;   :style {:margin-right "20px"
        ;;           :margin-top "5px"}}]
-       [:h4 (u/eth @balance)]
+
+       (when @full-app?
+         [:h4 (u/eth @balance)])
+
        ;; CHANGE ACCOUNT
-       [ui/icon-button
-        {:tooltip "Update"
-         :children (icons/notification-sync)
-         :on-touch-tap #(do (dispatch [:blockchain.account/refresh]))}]])))
+       (when @full-app?
+         [ui/icon-button
+          {:tooltip "Update"
+           :children (icons/notification-sync)
+           :on-touch-tap #(do (dispatch [:blockchain.account/refresh]))}])])))
 
 ;;;
 ;;; app title

@@ -116,7 +116,7 @@
 
         [drawer-view]
 
-        (when full-app?
+        (when @full-app?
           [chat-drawer-view])
 
         ;;
@@ -133,10 +133,10 @@
         ;; new goal dialog
         ;; visibility is controlled inside the dialog
         ;;
-        (when full-app?
+        (when @full-app?
           [new-goal-dialog])
 
-        (when full-app?
+        (when @full-app?
             [confirm-bid-selection-dialog])
 
         [view-goal-dialog]
@@ -145,7 +145,7 @@
         ;; place bid dialog
         ;; visiblity is controlled inside
         ;;
-        (when full-app?
+        (when @full-app?
           [place-bid-dialog])
 
         ;;

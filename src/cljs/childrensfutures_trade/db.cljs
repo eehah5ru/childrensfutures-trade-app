@@ -104,7 +104,8 @@
 ;;;
 (defn default-view-goal []
   {:goal-id ""
-   :dialog-open? false})
+   :dialog-open? false
+   :on-view-goal-page? false})
 
 ;;;
 ;;;
@@ -137,6 +138,7 @@
 (s/def ::selecting? boolean?)
 (s/def ::drawer-open? boolean?)
 (s/def ::dialog-open? boolean?)
+(s/def ::on-view-goal-page? boolean?)
 (s/def ::chat-open? boolean?)
 (s/def ::type #{:goal-added
                 :investment-placed})
@@ -180,7 +182,8 @@
 ;;; view goal dialog
 ;;;
 (s/def ::view-goal (s/keys :req-un [::goal-id
-                                    ::dialog-open?]))
+                                    ::dialog-open?
+                                    ::on-view-goal-page?]))
 
 ;;;
 ;;; chat message
@@ -214,6 +217,7 @@
   (s/keys :req-un [::number
                    ::type
                    ::goal-id]))
+
 (s/def ::investmentplaced-pulse-event
   (s/keys :req-un [::number
                    ::type

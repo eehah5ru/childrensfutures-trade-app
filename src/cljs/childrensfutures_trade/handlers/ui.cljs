@@ -1,6 +1,7 @@
 (ns childrensfutures-trade.handlers.ui
   (:require
    [cljs.spec :as s]
+   [bidi.bidi :as bidi]
 
    [childrensfutures-trade.db :as db]
 
@@ -128,6 +129,12 @@
    (assoc-in db [:view-goal :goal-id] goal-id)))
 
 (reg-event-db
+ :ui.view-goal-dialog/on-view-goal-page
+
+ (fn [db [_ on-view-goal-page?]]
+   (assoc-in db [:view-goal :on-view-goal-page?] on-view-goal-page?)))
+
+(reg-event-db
  :ui.view-goal-dialog/clear-goal
  (fn [db]
    (assoc-in db [:view-goal :goal-id] "")))
@@ -144,8 +151,12 @@
  :ui.view-goal-dialog/close
  (interceptors-fx :spec false)
  (fn [{:keys [db]}]
-   {:dispatch-n [[:ui.view-goal-dialog/toggle-view]
-                 [:ui.view-goal-dialog/clear-goal]]}))
+   (let [on-view-goal-page? (get-in db [:view-goal :on-view-goal-page?])]
+     {:dispatch-n (cond-> [[:ui.view-goal-dialog/toggle-view]
+                           [:ui.view-goal-dialog/clear-goal]
+                           [:ui.view-goal-dialog/on-view-goal-page false]]
+                    on-view-goal-page?
+                    (conj [:ui.change-location :pulse]))})))
 
 ;;;
 ;;; VIEW GOAL PAGE
@@ -156,7 +167,9 @@
  (fn [{:keys [db]}]
    (js/console.log :ui.view-goal-page)
    (let [goal-id (get-in db [:current-page :route-params :goal-id])]
-     {:dispatch-later [{:ms 500
+     {:dispatch-later [{:ms 50
+                        :dispatch [:ui.view-goal-dialog/on-view-goal-page true]}
+                       {:ms 500
                         :dispatch [:ui.view-goal-dialog/open goal-id]}]})))
 
 ;;;
@@ -214,6 +227,18 @@
                :drawer-open? false)
     ;; :ga/page-view [(apply u/path-for (:handler match) (flatten (into [] (:route-params match))))]
     :dispatch [:ui.page.title/update]}))
+
+;;;
+;;; change location
+;;;
+(reg-event-fx
+ :ui.change-location
+ (interceptors-fx :spec false)
+
+ (fn [_ [& route-params]]
+   (js/console.log :change-location)
+   (aset js/window "location" (apply pages/path-for route-params))
+   {}))
 
 ;;;
 ;;; force set window size

@@ -31,6 +31,7 @@
     :page-view "childrensfutures-trade.components.home-page/home-page"
     }
    {:key :my-goals
+    :only-full-app? true
     :route "my-goals"
     :menu-icon icons/action-favorite
     :human-readable "My Goals"
@@ -87,8 +88,12 @@
 ;;; drawer menu items
 ;;;
 ;;;
-(def menu-pages
-  (let [ps (filter (complement :hidden-from-menu?) page-defs)]
+(defn menu-pages [& {:keys [read-only-app?]}]
+  (let [ps (cond->> page-defs
+             true
+             (filter (complement :hidden-from-menu?))
+             read-only-app?
+             (filter (complement :only-full-app?)))]
     (map #(vector (:key %)
                   (:human-readable %)
                   (:menu-icon %))
