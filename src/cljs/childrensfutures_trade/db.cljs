@@ -250,6 +250,8 @@
 ;;;
 (s/def ::messages (s/map-of ::channel-id (s/coll-of ::chat-message)))
 
+(s/def ::chat-threads (s/map-of ::owner (s/coll-of ::channel-id)))
+
 (s/def ::pulse (s/coll-of ::pulse-event))
 
 (s/def ::bids (s/map-of ::owner ::bid))
@@ -263,6 +265,7 @@
                              ;; ::messages
                              ;; ::pulse
                              ;; ::view-goal
+                             ::chat-threads
                              ::how-to-play
                              ::new-goal
                              ::new-bid
@@ -294,6 +297,7 @@
   {:db-version 0
    :goals (hash-map)
    :messages (hash-map)
+   :chat-threads (hash-map)
    :pulse (default-pulse)
    :settings {}                         ;FIXME: remove
    :my-addresses []

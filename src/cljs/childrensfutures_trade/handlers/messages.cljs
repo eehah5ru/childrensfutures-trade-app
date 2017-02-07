@@ -34,3 +34,22 @@
      (-> db
          (assoc :current-chat-channel-id channel-id)
          (assoc-in [:new-chat-message :channel-id] channel-id)))))
+
+(reg-event-db
+ :chat-thread/create
+ (interceptors)
+
+ (fn [db [user-id channel-id]]
+   (let [chat-threads (get-in db [:chat-threads user-id] [])
+         exists? (some #(= channel-id %) chat-threads)]
+     (cond-> db
+       (not exists?)
+       (assoc-in [:chat-threads user-id]
+                 (conj chat-threads channel-id))))))
+
+(reg-event-fx
+ :chat-threads/print-all
+ (interceptors-fx :spec false)
+
+ (fn [{:keys [db]}]
+   (js/console.log :chat-threads (:chat-threads db))))

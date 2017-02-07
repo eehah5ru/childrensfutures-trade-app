@@ -152,10 +152,12 @@
  :gse-contract/on-bid-selected
  (interceptors-fx :spec false)
 
- (fn [_ [{:keys [goal-id bid-id]} {:keys [block-number]}]]
+ (fn [_ [{:keys [goal-id bid-id goal-owner bid-owner]} {:keys [block-number]}]]
    (js/console.log :info :bid-selected goal-id bid-id)
 
    {:dispatch-n [[:db.goal/select-bid goal-id bid-id]
+                 [:chat-thread/create goal-owner (u/chat-channel-id goal-id bid-id)]
+                 [:chat-thread/create bid-owner (u/chat-channel-id goal-id bid-id)]
                  [:sync-db/on-db-updated block-number]]}))
 
 ;;;
@@ -182,7 +184,7 @@
 (reg-event-fx
  :gse-contract/on-investment-received
  (interceptors-fx :spec false)
- 
+
  (fn [db [{:keys [goal-id bid-id]} {:keys [block-number]}]]
    (js/console.log :info :investment-received goal-id bid-id)
 
@@ -197,7 +199,7 @@
 (reg-event-fx
  :gse-contract/on-goal-achieved
  (interceptors-fx :spec false)
- 
+
  (fn [db [{:keys [goal-id]} {:keys [block-number]}]]
    (js/console.log :info :goal-achieved goal-id)
 
