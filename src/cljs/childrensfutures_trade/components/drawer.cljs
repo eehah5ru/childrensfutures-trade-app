@@ -39,5 +39,5 @@
        [ui/app-bar {:title "myFutures"
                     :show-menu-icon-button false}]
        ;; (js/console.log :info pages)
-       (for [menu-page (menu-pages :read-only-app? read-only-app?)]
+       (for [menu-page (menu-pages :read-only-app? @read-only-app?)]
           (menu-link menu-page))])))
