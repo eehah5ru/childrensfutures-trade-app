@@ -502,6 +502,30 @@
    (get-in db [:view-goal :goal-id])))
 
 ;;;
+;;;
+;;; how to play page
+;;;
+;;;
+(reg-sub
+ :ui.how-to-play/step
+
+ (fn [db]
+   (get-in db [:how-to-play :step])))
+
+(reg-sub
+ :ui.how-to-play/last-step?
+
+ (fn [db [_ step]]
+   (let [steps-count (get-in db [:how-to-play :steps-count])]
+     (= (inc step) steps-count))))
+
+(reg-sub
+ :ui.how-to-play/firsts-step?
+
+ (fn [db [_ step]]
+   (= step 0)))
+
+;;;
 ;;; window height
 ;;;
 (reg-sub

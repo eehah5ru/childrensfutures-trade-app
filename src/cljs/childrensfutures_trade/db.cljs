@@ -110,6 +110,13 @@
    :on-view-goal-page? false})
 
 ;;;
+;;; default aux structure for how to play page
+;;;
+(defn default-how-to-play []
+  {:step 0
+   :steps-count 5})
+
+;;;
 ;;;
 ;;; SPECS
 ;;;
@@ -123,6 +130,8 @@
 (s/def ::description string?)
 (s/def ::give-in-return string?)
 (s/def ::created-at int?)
+(s/def ::step int?)
+(s/def ::steps-count int?)
 (s/def ::indicator boolean?)
 (s/def ::owner (s/or :nil nil?
                      :string string?))
@@ -188,6 +197,12 @@
                                     ::on-view-goal-page?]))
 
 ;;;
+;;; how to play
+;;;
+(s/def ::how-to-play (s/keys :req-un [::step
+                                      ::steps-count]))
+
+;;;
 ;;; chat message
 ;;;
 (s/def ::chat-message (s/keys :req-un [::channel-id
@@ -247,6 +262,8 @@
                              ::goals
                              ;; ::messages
                              ;; ::pulse
+                             ;; ::view-goal
+                             ::how-to-play
                              ::new-goal
                              ::new-bid
                              ::new-chat-message
@@ -288,6 +305,7 @@
    :new-chat-message (default-chat-message)
    :select-bid (default-select-bid)
    :view-goal (default-view-goal)
+   :how-to-play (default-how-to-play)
    :show-new-goal? false
    :show-new-bid? false
    :show-accounts? false

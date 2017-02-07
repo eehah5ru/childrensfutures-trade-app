@@ -173,6 +173,53 @@
                         :dispatch [:ui.view-goal-dialog/open goal-id]}]})))
 
 ;;;
+;;; HOW TO PLAY PAGE
+;;;
+(reg-event-db
+ :ui.how-to-play/init
+ (interceptors)
+
+ (fn [db]
+   (assoc-in db [:how-to-play :step] 0)))
+
+(reg-event-db
+ :ui.how-to-play/next-step
+ (interceptors)
+
+ (fn [db]
+   (let [steps-count (get-in db [:how-to-play :steps-count])
+         current-step (get-in db [:how-to-play :step])
+         next-step (inc current-step)
+         can-go? (< next-step steps-count)]
+     (cond-> db
+       can-go?
+       (assoc-in [:how-to-play :step] next-step)))))
+
+(reg-event-db
+ :ui.how-to-play/previous-step
+ (interceptors)
+
+ (fn [db]
+   (let [current-step (get-in db [:how-to-play :step])
+         previous-step (dec current-step)
+         can-go? (>= previous-step 0)]
+     (cond-> db
+       can-go?
+       (assoc-in [:how-to-play :step] previous-step)))))
+
+(reg-event-db
+ :ui.how-to-play/set-step
+ (interceptors)
+
+ (fn [db [step]]
+   (let [steps-count (get-in db [:how-to-play :steps-count])
+         can-set? (and (>= step 0)
+                       (< step steps-count))]
+     (cond-> db
+       can-set?
+       (assoc-in [:how-to-play :step] step)))))
+
+;;;
 ;;; drawer
 ;;;
 (reg-event-db

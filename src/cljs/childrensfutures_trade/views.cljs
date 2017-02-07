@@ -41,6 +41,7 @@
     [childrensfutures-trade.components.my-goals-page :refer [my-goals-page]]
     [childrensfutures-trade.components.pulse-page :refer [pulse-page]]
     [childrensfutures-trade.components.about-page :refer [about-page]]
+    [childrensfutures-trade.components.how-to-play-page :refer [how-to-play-page]]
     [childrensfutures-trade.components.view-goal-page :refer [view-goal-page]]
 
     ))
@@ -107,8 +108,9 @@
     (fn []
       ;; {:fluid true}
       [ui/mui-theme-provider
-       {:mui-theme (get-mui-theme {:palette {:primary-color (color :light-blue500)
-                                             :accent-color (color :amber700)}})}
+       {:mui-theme (get-mui-theme {:palette
+                                   {:primary-color (color :light-blue500)
+                                    :accent-color (color :amber700)}})}
        [:div
         {:style {:position "relative"}}
 
@@ -136,9 +138,6 @@
         (when @full-app?
           [new-goal-dialog])
 
-        (when @full-app?
-            [confirm-bid-selection-dialog])
-
         [view-goal-dialog]
 
         ;;
@@ -147,6 +146,9 @@
         ;;
         (when @full-app?
           [place-bid-dialog])
+
+        (when @full-app?
+          [confirm-bid-selection-dialog])
 
         ;;
         ;; show active-page

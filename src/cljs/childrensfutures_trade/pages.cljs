@@ -47,7 +47,7 @@
     :route "how-to-play"
     :menu-icon icons/action-help
     :human-readable "How To Play"
-    :page-view "childrensfutures-trade.components.about-page/about-page"}
+    :page-view "childrensfutures-trade.components.how-to-play-page/how-to-play-page"}
    ;; about
    {:key :about
     :route "about"

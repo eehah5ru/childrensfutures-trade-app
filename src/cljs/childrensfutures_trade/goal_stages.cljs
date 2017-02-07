@@ -3,7 +3,8 @@
 ;;;
 ;;; ordered stages
 ;;;
-(def sorted-stages [:unknown
+(def sorted-stages [
+                    :unknown
                     :created
                     :bid-placed
                     :bid-selected
@@ -13,7 +14,8 @@
                     :bonus-asked
                     :bonus-sent
                     :goal-completed
-                    :cancelled])
+                    :cancelled
+                    ])
 
 ;;;
 ;;; set of stages
