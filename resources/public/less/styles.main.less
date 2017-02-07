@@ -1,5 +1,29 @@
 @import (inline) "cljsjs/react-flexbox-grid/production/react-flexbox-grid.min.inc.css";
 
+//
+// colors
+//
+@green-200: #A5D6A7;
+@lime-200: #E6EE9C;
+
+//
+// pulse event bkg color
+//
+.pulse-event-bkg-color(@color) {
+  background-color: @color !important;
+
+  &:hover {
+    background-color: darken(@color, 10%) !important;
+  }
+}
+
+.goal-stage-color(@color) {
+  background-color: @color !important;
+
+  &:hover {
+    background-color: darken(@color, 10%) !important;
+  }
+}
 
 a {
     color: #ff4081;
@@ -43,4 +67,19 @@ body {
 
 strong, b {
     font-weight: 500;
+}
+
+.pulse-event {
+  margin-bottom: 2px !important;
+}
+.pulse-goal-added {
+  .pulse-event-bkg-color(@green-200);
+}
+
+.pulse-investment-placed {
+  .pulse-event-bkg-color(@lime-200);
+}
+
+.goal-stage-created {
+  .pulse-event-bkg-color(@green-200);
 }
