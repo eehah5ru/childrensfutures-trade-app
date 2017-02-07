@@ -23,6 +23,7 @@
 ;;;
 (defn created-icon-button [goal-id]
   (let [role (subscribe [:role/role goal-id])
+        read-only-app? (subscribe [:app/read-only?])
         icon-options {:disabled false
                       :tooltip "Invest now!"
                       :touch true
@@ -33,11 +34,12 @@
                        {:disabled disabled?})
                 (icons/action-trending-up)])]
     (condp = @role
-      :stranger  (icon :disabled? false)
+      :stranger  (icon :disabled? @read-only-app?)
       (icon :disabled? true))))
 
 (defn bid-placed-icon-button [goal-id]
   (let [role (subscribe [:role/role goal-id])
+        read-only-app? (subscribe [:app/read-only?])
         icon (fn [& {:keys [disabled?]}]
                [ui/icon-button
                 {:disabled disabled?
@@ -46,7 +48,7 @@
                  :on-touch-tap #(dispatch [:place-bid/show-new-bid goal-id])}
                 (icons/social-plus-one)])]
     (condp = @role
-      :stranger (icon :disabled? false)
+      :stranger (icon :disabled? @read-only-app?)
       (icon :disabled? true))))
 
 (defn- staged-icon-button [goal-id]

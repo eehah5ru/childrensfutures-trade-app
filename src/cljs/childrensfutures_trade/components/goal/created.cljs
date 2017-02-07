@@ -19,23 +19,27 @@
 ;;; goal actions
 ;;;
 (defn- owner-actions [goal]
-  (let [{:keys [goal-id cancelled? trx-on-air?]} goal]
+  (let [{:keys [goal-id cancelled? trx-on-air?]} goal
+        read-only-app? (subscribe [:app/read-only?])]
     [
      ^{:key :cancel-goal}
      [gc/card-flat-button
       {:secondary true
        :disabled (or cancelled?
-                     trx-on-air?)
+                     trx-on-air?
+                     @read-only-app?)
        :label "Delete"
        :on-touch-tap #(dispatch [:cancel-goal/send goal-id])}]]))
 
 (defn- stranger-actions [goal]
-  (let [{:keys [goal-id]} goal]
+  (let [{:keys [goal-id trx-on-air?]} goal
+        read-only-app? (subscribe [:app/read-only?])]
     [
      ^{:key :invest-now}
      [gc/card-raised-button
       {:secondary true
-       :disabled false
+       :disabled (or trx-on-air?
+                     @read-only-app?)
        :label "Invest Now"
        :on-touch-tap #(dispatch [:place-bid/show-new-bid goal-id])}]]))
 

@@ -38,18 +38,24 @@
 ;;; card button
 ;;;
 (defn card-flat-button [props]
-  [ui/flat-button
-   (r/merge-props
-    {:secondary true
-     :style st/goal-card-button}
-    props)])
+  (let [read-only-app? (subscribe [:app/read-only?])]
+    (fn [props]
+      [ui/flat-button
+       (r/merge-props
+        {:secondary true
+         :disabled @read-only-app?
+         :style st/goal-card-button}
+        props)])))
 
 (defn card-raised-button [props]
-  [ui/raised-button
-   (r/merge-props
-    {:secondary false
-     :style st/goal-card-button}
-    props)])
+  (let [read-only-app? (subscribe [:app/read-only?])]
+    (fn [props]
+      [ui/raised-button
+       (r/merge-props
+        {:secondary false
+         :disabled @read-only-app?
+         :style st/goal-card-button}
+        props)])))
 
 ;;;
 ;;; chat button
@@ -59,13 +65,14 @@
    (chat-open-button ids default-chat-open-button-title))
 
   ([ids title]
-   [card-raised-button
-   {:secondary true
-    :label title
-    :on-touch-tap #(do
-                    (dispatch [:messages/set-channel-id ids])
-                    (dispatch [:ui.chat/toggle-view]))
-    }]))
+   (let [read-only-app? (subscribe [:app/read-only?])]
+     [card-raised-button
+      {:secondary true
+       :label title
+       :on-touch-tap #(do
+                        (dispatch [:messages/set-channel-id ids])
+                        (dispatch [:ui.chat/toggle-view]))
+       }])))
 
 
 (defn owner-investor-chat-button [goal-id]
