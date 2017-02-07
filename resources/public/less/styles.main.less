@@ -3,11 +3,51 @@
 //
 // colors
 //
-@deep-orange-800: #D84315;
+@purple-a-200: #E040FB;
+
+@teal-200: #80CBC4;
+@teal-a-200: #64FFDA;
 
 @green-200: #A5D6A7;
+@green-a-200: #69F0AE;
+
+@light-green-200: #C5E1A5;
+@light-green-a-200: #B2FF59;
+
+@lime-100: #F0F4C3;
 @lime-200: #E6EE9C;
+@lime-a-200: #EEFF41;
+
+@yellow-a-200: #FFFF00;
+
+@amber-a-200: #FFD740;
+
+@orange-a-200: #FFAB40;
+
+@deep-orange-a-200: #FF6E40;
+@deep-orange-800: #D84315;
+
+@grey-200: #EEEEEE;
+@grey-300: #E0E0E0;
 @grey-500: #9E9E9E;
+
+//
+// staged colors
+//
+@stage-unknown-color: @deep-orange-800;
+
+@stage-created-color: @teal-a-200;
+@stage-bid-placed-color: @green-a-200;
+@stage-bid-selected-color: @light-green-a-200;
+@stage-investment-sent-color: @lime-a-200;
+@stage-investment-received-color: @yellow-a-200;
+@stage-goal-achieved-color: @amber-a-200;
+@stage-bonus-asked-color: @orange-a-200;
+@stage-bonus-sent-color: @deep-orange-a-200;
+@stage-goal-completed-color: @purple-a-200;
+
+@stage-cancelled-color: @grey-500;
+
 
 //
 // pulse event bkg color
@@ -78,14 +118,14 @@ strong, b {
 //
 //
 .pulse-event {
-  margin-bottom: 2px !important;
+  margin-bottom: 20px !important;
 }
 .pulse-goal-added {
-  .pulse-event-bkg-color(@green-200);
+  .pulse-event-bkg-color(@stage-created-color);
 }
 
 .pulse-investment-placed {
-  .pulse-event-bkg-color(@lime-200);
+  .pulse-event-bkg-color(@stage-bid-placed-color);
 }
 
 
@@ -99,43 +139,43 @@ strong, b {
 }
 
 .goal-stage-created {
-  .pulse-event-bkg-color(@green-200);
+  .pulse-event-bkg-color(@stage-created-color);
 }
 
 .goal-stage-bid-placed {
-  .pulse-event-bkg-color(@deep-orange-800);
+  .pulse-event-bkg-color(@stage-bid-placed-color);
 }
 
 .goal-stage-bid-selected {
-  .pulse-event-bkg-color(@deep-orange-800);
+  .pulse-event-bkg-color(@stage-bid-selected-color);
 }
 
 .goal-stage-investment-sent {
-  .pulse-event-bkg-color(@deep-orange-800);
+  .pulse-event-bkg-color(@stage-investment-sent-color);
 }
 
 .goal-stage-investment-received {
-  .pulse-event-bkg-color(@deep-orange-800);
+  .pulse-event-bkg-color(@stage-investment-received-color);
 }
 
 .goal-stage-goal-achieved {
-  .pulse-event-bkg-color(@deep-orange-800);
+  .pulse-event-bkg-color(@stage-goal-achieved-color);
 }
 
 .goal-stage-bonus-asked {
-  .pulse-event-bkg-color(@deep-orange-800);
+  .pulse-event-bkg-color(@stage-bonus-asked-color);
 }
 
 .goal-stage-bonus-sent {
-  .pulse-event-bkg-color(@deep-orange-800);
+  .pulse-event-bkg-color(@stage-bonus-sent-color);
 }
 
 .goal-stage-goal-completed {
-  .pulse-event-bkg-color(@deep-orange-800);
+  .pulse-event-bkg-color(@stage-goal-completed-color);
 }
 
 .goal-stage-cancelled {
-  .pulse-event-bkg-color(@grey-500);
+  .pulse-event-bkg-color(@stage-cancelled-color);
 }
 
 //

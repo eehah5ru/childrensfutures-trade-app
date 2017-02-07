@@ -57,7 +57,7 @@
 ;;;
 (def goal-owner-avatar-badge {:top "20px"
                               :right "40px"
-                              :background-color (color :green-200)})
+                              :background-color (color :indigo-50)})
 
 ;;;
 ;;; BID OWNER AVATAR BADGE
