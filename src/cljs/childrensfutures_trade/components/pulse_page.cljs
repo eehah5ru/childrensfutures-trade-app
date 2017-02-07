@@ -102,7 +102,10 @@
       ;; :hover-color (pulse-event-color :goal-added :hover)
       :primary-text description
       :secondary-text (r/as-element
-                       [:span (str "Bonus: " give-in-return)])
+                       [:span
+                        {:style {:display "inline-block"
+                          :max-width "100%"}}
+                        (str "Bonus: " give-in-return)])
       :right-icon-button (r/as-element
                           (staged-icon-button goal-id))
       :on-touch-tap #(dispatch [:ui.view-goal-dialog/open goal-id])}
@@ -123,7 +126,10 @@
      {:class-name "pulse-event pulse-investment-placed"
       :primary-text description
       :secondary-text (r/as-element
-                       [:span (str "Bonus: " give-in-return)])
+                       [:span
+                        {:style {:display "inline-block"
+                                 :max-width "100%"}}
+                        (str "Bonus: " give-in-return)])
       :right-icon-button (r/as-element
                           (staged-icon-button goal-id))
       :on-touch-tap #(dispatch [:ui.view-goal-dialog/open goal-id])}]))
