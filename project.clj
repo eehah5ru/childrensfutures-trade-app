@@ -81,7 +81,8 @@
                                      :asset-path "/js/compiled/out"
                                      :source-map-timestamp true
                                      :optimizations :none
-                                     :closure-defines {goog.DEBUG false}
+                                     :closure-defines {childrensfutures-trade.utils.DEV true
+                                                       goog.DEBUG false}
                                      :preloads [print.foo.preloads.devtools]}}]}}
 
    :uberjar {:hooks [leiningen.cljsbuild]
@@ -93,6 +94,7 @@
                                         :compiler {:main childrensfutures-trade.core
                                                    :output-to "resources/public/js/compiled/app.js"
                                                    :optimizations :advanced
-                                                   :closure-defines {goog.DEBUG false}
+                                                   :closure-defines {childrensfutures-trade.utils.DEV false
+                                                                     goog.DEBUG false}
                                                    :pretty-print true
                                                    :pseudo-names true}}}}}})

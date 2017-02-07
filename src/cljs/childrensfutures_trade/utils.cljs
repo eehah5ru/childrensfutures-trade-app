@@ -11,6 +11,9 @@
 
             ))
 
+(goog-define DEV false)
+
+
 (defn truncate
   "Truncate a string with suffix (ellipsis by default) if it is
    longer than specified length."
