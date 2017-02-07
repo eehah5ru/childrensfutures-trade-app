@@ -39,6 +39,7 @@
     ;;
     [childrensfutures-trade.components.home-page :refer [home-page]]
     [childrensfutures-trade.components.my-goals-page :refer [my-goals-page]]
+    [childrensfutures-trade.components.my-investments-page :refer [my-investments-page]]
     [childrensfutures-trade.components.pulse-page :refer [pulse-page]]
     [childrensfutures-trade.components.about-page :refer [about-page]]
     [childrensfutures-trade.components.how-to-play-page :refer [how-to-play-page]]

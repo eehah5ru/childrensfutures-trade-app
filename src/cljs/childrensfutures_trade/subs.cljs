@@ -252,6 +252,20 @@
    (filter #(= (:owner %) current-address) goals)))
 
 ;;;
+;;; sorted my investments
+;;;
+(reg-sub
+ :db.goals.my-investments/sorted
+ :<- [:db/current-address]
+ :<- [:db.goals/sorted]
+
+ (fn [[current-address goals] _]
+   (filter (fn [g]
+             (some #(and (:selected? %)
+                         (= current-address (:owner %)))
+                   (vals (:bids g))))
+           goals)))
+;;;
 ;;; new goal
 ;;;
 (reg-sub

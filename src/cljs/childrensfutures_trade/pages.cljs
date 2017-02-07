@@ -36,6 +36,12 @@
     :menu-icon icons/action-favorite
     :human-readable "My Goals"
     :page-view "childrensfutures-trade.components.my-goals-page/my-goals-page"}
+   {:key :my-investments
+    :only-full-app? true
+    :route "my-investments"
+    :menu-icon icons/places-pool
+    :human-readable "My Investments"
+    :page-view "childrensfutures-trade.components.my-investments-page/my-investments-page"}
    ;; pulse
    {:key :pulse
     :route "pulse"
