@@ -66,6 +66,15 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
 
   event GoalCompleted(bytes32 goalId);
 
+  //
+  // bid transfered to new owner
+  //
+  event BidSold(bytes32 goalId,
+                address goalOwner,
+                address bidId,
+                address oldBidOwner,
+                address newBidOwner);
+
   /*
    *
    * functions
@@ -84,6 +93,13 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
     numGoals = 0;
   }
 
+  function isWorking()
+    public
+    constant
+    returns(bool)
+  {
+    return true;
+  }
 
   // function getGoal(bytes32 _goalId)
   //   notBeforeStage(Stages.Stage.Created, goals[_goalId])
@@ -124,12 +140,14 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
 
     bytes32 goalId = Goal.mkGoalId(numGoals, msg.sender, description, giveInReturn);
 
+    Goal.Goal g = goals[goalId];
+
     // this goal already exists
-    if(goals[goalId].exists()) {
+    if(g.exists()) {
       throw;
     }
 
-    Goal.Goal g = goals[goalId];
+
     g.description = description;
     g.giveInReturn = giveInReturn;
     g.owner = msg.sender;
@@ -146,8 +164,8 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
   // cancel goal
   //
   function cancelGoal(bytes32 _goalId)
-    notBeforeStage(Stages.Stage.Created, goals[_goalId])
-    notAtStage(Stages.Stage.Cancelled, goals[_goalId])
+    notBeforeStage(Stages.Stage.Created, goals[_goalId].stage)
+    notAtStage(Stages.Stage.Cancelled, goals[_goalId].stage)
     onlyExisted(_goalId)
     onlyDreamer(goals[_goalId])
     public
@@ -156,9 +174,10 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
     // if (goals[_goalId].owner != msg.sender) {
     //   throw;
     // }
+    Goal.Goal g = goals[_goalId];
 
-    goals[_goalId].stage = Stages.Stage.Cancelled;
-    GoalCancelled(_goalId, goals[_goalId].owner, goals[_goalId].description);
+    g.stage = Stages.Stage.Cancelled;
+    GoalCancelled(_goalId, g.owner, g.description);
     return true;
   }
 
@@ -166,8 +185,8 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
   // place bid
   //
   function placeBid(bytes32 _goalId, string _bidDescription)
-    notBeforeStage(Stages.Stage.Created, goals[_goalId])
-    notAtStage(Stages.Stage.Cancelled, goals[_goalId])
+    notBeforeStage(Stages.Stage.Created, goals[_goalId].stage)
+    notAtStage(Stages.Stage.Cancelled, goals[_goalId].stage)
     onlyExisted(_goalId)
     notDreamer(goals[_goalId])
     notBidded(_goalId)
@@ -182,7 +201,8 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
     //
     // add bid to goal
     //
-    Goal.Bid b = goals[_goalId].bids[msg.sender];
+    Goal.Goal g = goals[_goalId];
+    Goal.Bid b = g.bids[msg.sender];
 
     b.owner = msg.sender;
     b.description = _bidDescription;
@@ -191,12 +211,12 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
     //
     // change goal's stage to BidPlaced
     //
-    goals[_goalId].stage = Stages.Stage.BidPlaced;
+    g.stage = Stages.Stage.BidPlaced;
 
     //
     // fire event
     //
-    BidPlaced(_goalId, goals[_goalId].owner, msg.sender, msg.sender, b.description);
+    BidPlaced(_goalId, g.owner, msg.sender, msg.sender, b.description);
 
     return true;
   }
@@ -205,29 +225,30 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
   // select bid
   //
   function selectBid(bytes32 _goalId, address _bidId)
-    onlyStage(Stages.Stage.BidPlaced, goals[_goalId])
+    onlyStage(Stages.Stage.BidPlaced, goals[_goalId].stage)
     onlyExisted(_goalId)
     onlyExistingBid(_goalId, _bidId)
     onlyDreamer(goals[_goalId])
     public
     returns(bool)
   {
-
+    Goal.Goal g = goals[_goalId];
+    Goal.Bid b = g.bids[_bidId];
     //
     // change goal's and bid's state
     //
-    goals[_goalId].selectedBidId = _bidId;
-    goals[_goalId].bids[_bidId].selected = true;
+    g.selectedBidId = _bidId;
+    b.selected = true;
 
     //
     // change goal's stage
     //
-    goals[_goalId].stage = Stages.Stage.BidSelected;
+    g.stage = Stages.Stage.BidSelected;
 
     //
     // fire BidSelected event
     //
-    BidSelected(_goalId, goals[_goalId].owner, _bidId, goals[_goalId].bids[_bidId].owner);
+    BidSelected(_goalId, g.owner, _bidId, b.owner);
 
     return true;
   }
@@ -237,7 +258,7 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
   //
   function sendInvestment(bytes32 _goalId, address _bidId)
     onlyExisted(_goalId)
-    onlyStage(Stages.Stage.BidSelected, goals[_goalId])
+    onlyStage(Stages.Stage.BidSelected, goals[_goalId].stage)
     onlyExistingBid(_goalId, _bidId)
     onlySelectedBid(_goalId, _bidId)
     onlyOwnerOfSelectedBid(_goalId, _bidId)
@@ -251,7 +272,8 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
     //
     // change goal's stage
     //
-    goals[_goalId].stage = Stages.Stage.InvestmentSent;
+    Goal.Goal g = goals[_goalId];
+    g.stage = Stages.Stage.InvestmentSent;
 
     //
     // fire InvestmentSent event
@@ -267,7 +289,7 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
   function receiveInvestment(bytes32 _goalId, address _bidId)
     onlyExisted(_goalId)
     onlyDreamer(goals[_goalId])
-    onlyStage(Stages.Stage.InvestmentSent, goals[_goalId])
+    onlyStage(Stages.Stage.InvestmentSent, goals[_goalId].stage)
     onlySelectedBid(_goalId, _bidId)
     public
     returns(bool)
@@ -276,7 +298,8 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
     //
     // change goal's state
     //
-    goals[_goalId].stage = Stages.Stage.InvestmentReceived;
+    Goal.Goal g = goals[_goalId];
+    g.stage = Stages.Stage.InvestmentReceived;
 
     //
     // fire InvestmentReceived event
@@ -292,14 +315,15 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
   function achieveGoal(bytes32 _goalId)
     onlyExisted(_goalId)
     onlyDreamer(goals[_goalId])
-    onlyStage(Stages.Stage.InvestmentReceived, goals[_goalId])
+    onlyStage(Stages.Stage.InvestmentReceived, goals[_goalId].stage)
     public
     returns(bool)
   {
     //
     // change goal's state
     //
-    goals[_goalId].stage = Stages.Stage.GoalAchieved;
+    Goal.Goal g = goals[_goalId];
+    g.stage = Stages.Stage.GoalAchieved;
 
     //
     // fire GoalAchieved event
@@ -314,7 +338,7 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
   //
   function askBonus(bytes32 _goalId, address _bidId)
     onlyExisted(_goalId)
-    onlyStage(Stages.Stage.GoalAchieved, goals[_goalId])
+    onlyStage(Stages.Stage.GoalAchieved, goals[_goalId].stage)
     onlySelectedBid(_goalId, _bidId)
     onlyOwnerOfSelectedBid(_goalId, _bidId)
     public
@@ -323,7 +347,8 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
     //
     // change goal's state
     //
-    goals[_goalId].stage = Stages.Stage.BonusAsked;
+    Goal.Goal g = goals[_goalId];
+    g.stage = Stages.Stage.BonusAsked;
 
     //
     // fire BonusAsked event
@@ -339,7 +364,7 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
   function sendBonus(bytes32 _goalId, address _bidId)
     onlyExisted(_goalId)
     onlyDreamer(goals[_goalId])
-    onlyStage(Stages.Stage.BonusAsked, goals[_goalId])
+    onlyStage(Stages.Stage.BonusAsked, goals[_goalId].stage)
     onlySelectedBid(_goalId, _bidId)
 
     public
@@ -348,7 +373,8 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
     //
     // change goal's stage
     //
-    goals[_goalId].stage = Stages.Stage.BonusSent;
+    Goal.Goal g = goals[_goalId];
+    g.stage = Stages.Stage.BonusSent;
     //
     // fire BonusSent event
     //
@@ -362,7 +388,7 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
   //
   function completeGoal(bytes32 _goalId, address _bidId)
     onlyExisted(_goalId)
-    onlyStage(Stages.Stage.BonusSent, goals[_goalId])
+    onlyStage(Stages.Stage.BonusSent, goals[_goalId].stage)
     onlySelectedBid(_goalId, _bidId)
     onlyOwnerOfSelectedBid(_goalId, _bidId)
     public
@@ -371,7 +397,8 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
     //
     // change goal's state
     //
-    goals[_goalId].stage = Stages.Stage.GoalCompleted;
+    Goal.Goal g = goals[_goalId];
+    g.stage = Stages.Stage.GoalCompleted;
 
     //
     // fire GoalCompleted event
@@ -381,4 +408,44 @@ contract GoalsStockExchange is owned, staged, withDreamer, withGoals {
     return true;
   }
 
+  //
+  // sell bid
+  //
+  function sellBid(bytes32 _goalId, address _bidId, address _newBidOwner)
+    onlyExisted(_goalId)
+    notBeforeStage(Stages.Stage.BidSelected, goals[_goalId].stage)
+    // notAtStage(Stages.Stage.GoalCompleted, goals[_goalId].stage)
+    onlySelectedBid(_goalId, _bidId)
+    onlyOwnerOfSelectedBid(_goalId, _bidId)
+    public
+    returns(bool)
+  {
+    Goal.Goal g = goals[_goalId];
+    Goal.Bid b = g.bids[_bidId];
+
+    //
+    // checks
+    //
+    // can not sell bid to goal owner
+    if(g.owner == _newBidOwner) {
+      throw;
+    }
+
+    if(b.owner == _newBidOwner) {
+      throw;
+    }
+
+    //
+    // change state
+    //
+    b.owner = _newBidOwner;
+
+    //
+    // fire BidSold event
+    //
+
+    BidSold(_goalId, g.owner, _bidId, msg.sender, _newBidOwner);
+
+    return true;
+  }
 }
