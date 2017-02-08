@@ -64,11 +64,14 @@
 ;;; NEW GOAL BUTTON
 ;;;
 (defn new-goal-button []
-  [ui/floating-action-button
-   {:on-touch-tap #(dispatch [:ui.new-goal/toggle-view])
-    :children (icons/content-add)
-    :z-depth 2
-    :style {:position "fixed"
-            :right 20
-            :bottom "34px"
-            :z-index 99}}])
+  (let [read-only-app? (subscribe [:app/read-only?])]
+    (fn []
+      [ui/floating-action-button
+       {:disabled @read-only-app?
+        :on-touch-tap #(dispatch [:ui.new-goal/toggle-view])
+        :children (icons/content-add)
+        :z-depth 2
+        :style {:position "fixed"
+                :right 20
+                :bottom "34px"
+                :z-index 99}}])))
