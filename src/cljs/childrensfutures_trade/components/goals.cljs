@@ -31,8 +31,8 @@
    [childrensfutures-trade.components.goal.achieved :as achieved-goal]
    [childrensfutures-trade.components.goal.bonus-asked :as bonus-asked-goal]
    [childrensfutures-trade.components.goal.bonus-sent :as bonus-sent-goal]
-   [childrensfutures-trade.components.goal.completed :as completed-goal]
-   ))
+   [childrensfutures-trade.components.goal.completed :as completed-goal])
+  )
 
 
 

@@ -37,6 +37,7 @@
     ;;
     ;; pages
     ;;
+    [childrensfutures-trade.components.read-only :refer [read-only-notification]]
     [childrensfutures-trade.components.home-page :refer [home-page]]
     [childrensfutures-trade.components.my-goals-page :refer [my-goals-page]]
     [childrensfutures-trade.components.my-investments-page :refer [my-investments-page]]
@@ -105,7 +106,8 @@
 (defn main-panel []
   (let [current-page (subscribe [:ui/current-page])
         full-app? (subscribe [:app/full?])
-        read-only-app? (subscribe [:app/read-only?])]
+        read-only-app? (subscribe [:app/read-only?])
+        win-height (subscribe [:ui/window-height])]
     (fn []
       ;; {:fluid true}
       [ui/mui-theme-provider
@@ -154,10 +156,15 @@
         ;;
         ;; show active-page
         ;;
-        [grid {:fluid true
-               :style st/main-grid}
-         (when-let [page (pages (:handler @current-page))]
-           [page])
+        [grid {:id "main-grid"
+               :fluid true
+               :style (st/main-grid @win-height)}
+         [:div
+          (when @read-only-app?
+            [read-only-notification])
+
+          (when-let [page (pages (:handler @current-page))]
+            [page])]
          ]
 
         ;;

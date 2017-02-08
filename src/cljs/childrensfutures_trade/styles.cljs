@@ -14,7 +14,10 @@
 ;;; GRID
 ;;;
 ;;;
-(def main-grid {:margin-top 0})
+(defn main-grid [win-height]
+  {:margin-top 0
+   :padding-top 44
+   :min-height (- win-height 108)})
 
 
 ;;;
@@ -29,8 +32,7 @@
 
 (defn outer-paper-base [win-height]
   (merge paper-base
-         {:margin-top "64px"
-          :min-height (- win-height 128)}))
+         {:margin-top "20px"}))
 
 
 
