@@ -8,11 +8,15 @@
    [childrensfutures-trade.subs]
    [childrensfutures-trade.views :as views]
    [childrensfutures-trade.pages :refer [routes]]
+   [childrensfutures-trade.utils :as u]
    [print.foo.preloads.devtools]
    [re-frame.core :as re-frame :refer [dispatch subscribe]]
    [reagent.core :as reagent]
    [pushy.core :as pushy]
    [bidi.bidi :as bidi]
+   [madvas.re-frame.google-analytics-fx :as google-analytics-fx]
+
+
    ))
 
 
@@ -27,6 +31,7 @@
                   (.getElementById js/document "app")))
 
 (defn ^:export init []
+  (google-analytics-fx/set-enabled! (not childrensfutures-trade.utils.DEV))
 
   (re-frame/dispatch-sync [:initialize])
   (pushy/start! history)

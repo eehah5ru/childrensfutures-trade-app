@@ -8,10 +8,12 @@
    [goog.string :as gstring]
    [goog.string.format]
    [madvas.re-frame.web3-fx]
+   [madvas.re-frame.google-analytics-fx]
+
    [re-frame.core :refer [reg-event-db reg-event-fx path trim-v after debug reg-fx console dispatch]]
    [childrensfutures-trade.utils :as u]
 
-   [childrensfutures-trade.pages :as pages]
+   [childrensfutures-trade.pages :as pages :refer [path-for]]
    ;;
    ;; event handlers
    ;;
@@ -272,7 +274,8 @@
    {:db (assoc db
                :current-page match
                :drawer-open? false)
-    ;; :ga/page-view [(apply u/path-for (:handler match) (flatten (into [] (:route-params match))))]
+
+    :ga/page-view [(apply pages/path-for (:handler match) (flatten (into [] (:route-params match))))]
     :dispatch [:ui.page.title/update]}))
 
 ;;;
