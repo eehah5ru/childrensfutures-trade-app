@@ -12,9 +12,7 @@
    [clavatar-js.core :as clavatar]
 
    [childrensfutures-trade.components.avatars :refer [bid-avatar]]
-   [childrensfutures-trade.components.goal.utils :as gu]
-
-   ))
+   [childrensfutures-trade.components.goal.utils :as gu]))
 
 
 
@@ -114,3 +112,49 @@
      (for [bid @bids]
        ^{:key (:owner bid)}
        [bid-list-item goal-id bid])]))
+
+;;;
+;;; GENERIC NO CONTENT VIEW
+;;;
+(defn generic-no-content-view [& {:keys [message
+                                         button?
+                                         button-label
+                                         button-action]}]
+  (let [read-only-app? (subscribe [:app/read-only?])] [:div
+           {:style {:margin-top 10
+                    :text-align "center"}}
+           [:h2 message]
+           (when button?
+             [ui/raised-button
+              {:style {:margin-top 20}
+               :label button-label
+               :disabled @read-only-app?
+               :primary true
+               ;; :icon (icons/content-add-circle) :label-position "before"
+               :on-touch-tap button-action
+               }])]))
+
+
+;;;
+;;;
+;;; NO GOALS VIEW
+;;;
+;;;
+(defn no-goals-view []
+  (generic-no-content-view
+   :message "No goals at the moment?! Oh my! Create you future now!"
+   :button? true
+   :button-label "Tell about your dream!"
+   :button-action #(dispatch [:ui.new-goal/toggle-view])))
+
+;;;
+;;;
+;;; NO MY INVESTMENTS VIEW
+;;;
+;;; Be a good person – help someone out!
+(defn no-investments-view []
+  (generic-no-content-view
+   :message "No goals at the moment?! Oh my! Create you future now!"
+   :button? true
+   :button-label "Be a good person – help someone out!"
+   :button-action #(dispatch [:ui.go-to-menu :pulse])))

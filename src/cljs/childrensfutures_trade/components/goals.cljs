@@ -224,10 +224,17 @@
 ;;;
 ;;; goals list view
 ;;;
-(defn goals-view [goals-selector]
+(defn goals-view [goals-selector & {:keys [no-goals-view]}]
+  (when (nil? no-goals-view)
+    (throw "no-goals-view is nil!!!"))
+
   (let [goals (goals-selector)]
-    [:div (for [goal @goals]
-            ^{:key (:goal-id goal)} [staged-goal-view goal])]
+    (if (empty? @goals)
+      ;; empty goals notification
+      [no-goals-view]
+      ;; not empty
+      [:div (for [goal @goals]
+              ^{:key (:goal-id goal)} [staged-goal-view goal])])
     ))
 
 (defn view-goal-dialog []

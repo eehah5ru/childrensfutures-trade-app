@@ -25,7 +25,7 @@
  :blockchain/load-my-addresses
  (interceptors-fx :spec false)
  (fn [{:keys [db]}]
-   (when (:provides-web3? db)
+   (when (provides-web3?)
      {:web3-fx.blockchain/fns
       {:web3 (:web3 db)
        :fns [[web3-eth/accounts [:blockchain/my-addresses-loaded] :log-error]]}})))

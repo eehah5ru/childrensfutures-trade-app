@@ -9,11 +9,14 @@
     [re-frame.core :refer [subscribe dispatch]]
     [reagent.core :as r]
 
-    [childrensfutures-trade.components.goals :refer [goals-view]]))
+    [childrensfutures-trade.components.goals :refer [goals-view]]
+    [childrensfutures-trade.components.goal.common :refer [no-goals-view]]
+    ))
 
 
 (defn ^:export my-goals-page []
   [outer-paper
-   [goals-view #(subscribe [:db.goals.my/sorted])]]
+   (goals-view #(subscribe [:db.goals.my/sorted])
+               :no-goals-view no-goals-view)]
 
-   )
+  )

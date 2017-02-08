@@ -3,7 +3,9 @@
             [cemerick.url :as url]
             [childrensfutures-trade.goal-stages :as gs]
 
-            [childrensfutures-trade.pages :as pages]))
+            [childrensfutures-trade.pages :as pages]
+
+            [childrensfutures-trade.db :as db]))
 
 
 
@@ -16,13 +18,28 @@
  :app/full?
 
  (fn [db]
-   (:provides-web3? db)))
+   (and
+    (not (:force-read-only? db))
+    (db/provides-web3?))))
 
 (reg-sub
  :app/read-only?
 
  (fn [db]
-   (not (:provides-web3? db))))
+   (or
+    (:force-read-only? db)
+    (not (db/provides-web3?)))))
+
+;;;
+;;;
+;;; ERRORS
+;;;
+;;;
+(reg-sub
+ :errors/critical-error?
+
+ (fn [db]
+   (:critical-error? db)))
 
 ;;;
 ;;;
@@ -64,7 +81,7 @@
 (reg-sub
  :contract/web3-available?
  (fn [db]
-   (:provides-web3? db)))
+   (db/provides-web3?)))
 
 ;;;
 ;;;

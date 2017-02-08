@@ -15,7 +15,7 @@
    [childrensfutures-trade.goal-stages :as gs]
    [childrensfutures-trade.components.goal-statuses :as statuses]
 
-   [childrensfutures-trade.components.goals :refer [goals-view]]))
+   [childrensfutures-trade.components.goal.common :refer [generic-no-content-view]]))
 
 ;;;
 ;;;
@@ -146,11 +146,17 @@
 (defn ^:export pulse-page []
   (let [events (subscribe [:db.pulse/all-events])]
     [outer-paper
-     [ui/list
-      (for [event @events]
-        (let [{:keys [type goal-id number]} event]
-          (with-meta (condp = (:type event)
-                       :goal-added [goal-added-event-view event]
-                       :investment-placed [investment-placed-event-view event]
-                       :else [unknown-event-view event])
-            {:key (str type "-" goal-id "-" number)})))]]))
+     (if (empty? @events)
+       ;; empty
+       (generic-no-content-view
+        :message "Pulse rate is slowing. Future is gonna struggle to breathe."
+        :button? false)
+       ;; ok
+       [ui/list
+        (for [event @events]
+          (let [{:keys [type goal-id number]} event]
+            (with-meta (condp = (:type event)
+                         :goal-added [goal-added-event-view event]
+                         :investment-placed [investment-placed-event-view event]
+                         :else [unknown-event-view event])
+              {:key (str type "-" goal-id "-" number)})))])]))

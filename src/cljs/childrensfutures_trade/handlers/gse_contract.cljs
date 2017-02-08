@@ -81,6 +81,7 @@
                                                               :address))]
      {:db (assoc-in db [:gse-contract :instance] contract-instance)
 
+      ;; contract events
       :web3-fx.contract/events
       {:instance contract-instance
        :db db
@@ -88,12 +89,32 @@
        :events (map (fn [[event handler]]
                       [event {} from-block handler :log-error])
                     contract-events)}
+
+      ;; contract calls
+      :web3-fx.contract/constant-fns
+      {:instance contract-instance
+       :fns [[:get-num-goals :gse-contract/num-goals-loaded :log-error]]}
+
       })))
 
+;;;
+;;;
+;;; GSE FUNCTION CALLS
+;;;
+;;;
+(reg-event-fx
+ :gse-contract/num-goals-loaded
+ (interceptors-fx :spec false)
+
+ (fn [{:keys [db]} [num-goals]]
+   (let [no-contract? (= (.toNumber num-goals) 0)]
+     (if no-contract?
+       {:dispatch [:app/critical-error]}
+       {}))))
 
 ;;;
 ;;;
-;;; ETHEREUM EVENTS
+;;; GSE CONTRACT EVENTS
 ;;;
 ;;;
 

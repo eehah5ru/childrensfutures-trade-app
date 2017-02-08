@@ -15,6 +15,7 @@
 (defn- right-buttons []
   (let [balance (subscribe [:db/selected-address-balance])
         full-app? (subscribe [:app/full?])]
+    (js/console.log :app-bar @full-app?)
     (fn []
       [row {:middle "xs"}
        ;; NEW GOAL BUTTON
@@ -51,6 +52,7 @@
 (defn app-bar-view []
   [ui/app-bar
    {:title (r/as-component [app-title])
+    :z-depth 0
     :on-left-icon-button-touch-tap #(dispatch [:ui.drawer/toggle-view])
     :icon-element-right (r/as-element [right-buttons])
     :style {:position "fixed"

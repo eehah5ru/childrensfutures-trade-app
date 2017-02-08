@@ -70,7 +70,7 @@
        {:disabled @read-only-app?
         :on-touch-tap #(dispatch [:ui.new-goal/toggle-view])
         :children (icons/content-add)
-        :z-depth 2
+        :z-depth 3
         :style {:position "fixed"
                 :right 20
                 :bottom "34px"

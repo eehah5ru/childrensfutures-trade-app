@@ -56,7 +56,7 @@
  (fn [_ _]
    (js/console.log :initialize)
    (let [db db/default-db
-         full-app? (:provides-web3? db)
+         full-app? (db/provides-web3?)
          read-only-app? (not full-app?)]
      (js/console.log :full-app? full-app?)
      (js/console.log :read-only-app? read-only-app?)

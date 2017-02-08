@@ -331,3 +331,28 @@
          page-title (str "myfutures.trade / " cur-page-name)]
      (aset js/document "title" page-title)
      {})))
+
+;;;
+;;;
+;;; APP MODES
+;;;
+;;;
+(reg-event-fx
+ :app/critical-error
+ (interceptors-fx :spec true)
+
+ (fn [{:keys [db]}]
+   {:db (-> db
+            (assoc :critical-error? true)
+            (assoc :force-read-only? true))
+
+    :dispatch [:sync-db/fetch]}))
+
+(reg-event-fx
+ :app/recover-after-critical-error
+ (interceptors-fx :spec true)
+
+ (fn [{:keys [db]}]
+   {:db (-> db
+            (assoc :critical-error? false)
+            (assoc :force-read-only? true))}))

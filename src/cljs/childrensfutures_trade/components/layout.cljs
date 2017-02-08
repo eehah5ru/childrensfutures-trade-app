@@ -60,5 +60,6 @@
     ;; (js/console.log :debug :win-height @win-height)
     (generic-paper outer-layout-col-flex
                    (u/merge-props
-                    {:paper-props {:style (st/outer-paper-base @win-height)}}
+                    {:paper-props {:z-depth 1
+                                   :style (st/outer-paper-base @win-height)}}
                     props-and-children))))

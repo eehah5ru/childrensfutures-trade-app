@@ -135,6 +135,8 @@
 (s/def ::indicator boolean?)
 (s/def ::owner (s/or :nil nil?
                      :string string?))
+(s/def ::critical-error? boolean?)
+(s/def ::force-read-only? boolean?)
 (s/def ::trx-on-air? boolean?)
 (s/def ::cancelled? boolean?)
 (s/def ::placing? boolean?)
@@ -273,6 +275,8 @@
                              ::select-bid
                              ::current-address
                              ::current-chat-channel-id
+                             ::critical-error?
+                             ::force-read-only?
                              ::show-new-goal?
                              ::show-new-bid?
                              ::show-accounts?
@@ -310,6 +314,8 @@
    :select-bid (default-select-bid)
    :view-goal (default-view-goal)
    :how-to-play (default-how-to-play)
+   :force-read-only? false
+   :critical-error? false
    :show-new-goal? false
    :show-new-bid? false
    :show-accounts? false
@@ -317,7 +323,7 @@
    :chat-open? false
    :window-height nil
    :web3 (mk-web3)
-   :provides-web3? (not (nil? (aget js/window "web3")))
+   :provides-web3? (provides-web3?)
    ;;
    ;; gse contract
    ;;

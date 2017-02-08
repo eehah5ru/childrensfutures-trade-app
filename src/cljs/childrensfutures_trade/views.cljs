@@ -14,7 +14,7 @@
                                                       outer-paper
                                                       full-width-paper]]
 
-    [childrensfutures-trade.pages :refer [pages]]
+    [childrensfutures-trade.pages :refer [pages path-for]]
 
     ;;
     ;; components
@@ -65,13 +65,19 @@
 ;;;
 ;;;
 (defn- error-modal []
-  (let [web3-available? (subscribe [:contract/web3-available?])]
+  (let [critical-error? (subscribe [:errors/critical-error?])]
     [ui/dialog
      {:modal true
-      :title "Oups! Error..."
-      :open (not (if @web3-available? true false))}
+      :open @critical-error?}
 
-     [:p "Welcome! Looks like your browser can't handle Ethereum yet. Please see How to Play"]]))
+     [:h3
+      ;; {:style {:color (color :deep-orange-a700)}}
+
+      "Looks like I can't reach the contract. Are you on Ropsten Testnet? Please check "
+      [:a {:href (path-for :how-to-play)
+           :on-touch-tap #(dispatch [:app/recover-after-critical-error])}
+       "How to Play"]
+      "."]]))
 
 ;;;
 ;;;
@@ -112,7 +118,7 @@
       ;; {:fluid true}
       [ui/mui-theme-provider
        {:mui-theme (get-mui-theme {:palette
-                                   {:primary-color (color :light-blue500)
+                                   {:primary1-color (color :cyan-500)
                                     :accent-color (color :amber700)}})}
        [:div
         {:style {:position "relative"}}
@@ -127,7 +133,7 @@
         ;;
         ;; error modal window
         ;;
-        ;; [error-modal]
+        [error-modal]
 
         ;;
         ;; switch account dialog
