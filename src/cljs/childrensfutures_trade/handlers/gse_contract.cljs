@@ -93,7 +93,7 @@
       ;; contract calls
       :web3-fx.contract/constant-fns
       {:instance contract-instance
-       :fns [[:get-num-goals :gse-contract/num-goals-loaded :log-error]]}
+       :fns [[:is-working :gse-contract/is-working-loaded :log-error]]}
 
       })))
 
@@ -103,11 +103,11 @@
 ;;;
 ;;;
 (reg-event-fx
- :gse-contract/num-goals-loaded
+ :gse-contract/is-working-loaded
  (interceptors-fx :spec false)
 
- (fn [{:keys [db]} [num-goals]]
-   (let [no-contract? (= (.toNumber num-goals) 0)]
+ (fn [{:keys [db]} [is-working?]]
+   (let [no-contract? (not is-working?)]
      (if no-contract?
        {:dispatch [:app/critical-error]}
        {}))))
