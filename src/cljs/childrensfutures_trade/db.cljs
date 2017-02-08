@@ -332,12 +332,12 @@
                           :bin nil
                           :instance nil
                           ;; ropsten testnet contract address
-                          :address "0x641937c1fbf30604809e9701647af90413bb1e3a"
+                          :address "0x4febdfbf70c28ae01dcdbfb490883a31499ed6c2"
                           }
                    childrensfutures-trade.utils/DEV
                    ;; devel GSE contract address
                    ;; depends on testrpc
-                   (merge {:address "0x2f4225883ac9d7e816ed99dc2f3149857a985859"}))
+                   (merge {:address "0xd386a048b29fac26a79fe4d2179483a13a15e943"}))
    ;;
    ;; chat contract
    ;;
