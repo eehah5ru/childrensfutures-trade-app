@@ -42,7 +42,8 @@
 (defn- app-title []
   (let [current-page-name (subscribe [:ui/current-page-name])]
     [:span
-     (str "Goals Exchange Market / " @current-page-name)]))
+     {:class-name "app-title"}
+     (str "myfutures.trade / " @current-page-name)]))
 
 ;;;
 ;;; App bar
