@@ -29,7 +29,15 @@
 ;;;
 (def human-readable-stages
   {:created "just added"
-   :bid-selected "all set"})
+   :bid-placed "bid placed"
+   :bid-selected "all set"
+   :investment-sent "investment sent"
+   :investment-received "investment received"
+   :goal-achieved "achieved"
+   :bonus-asked "bonus asked"
+   :bonus-sent "bonus sent"
+   :goal-completed "completed"
+   })
 
 (defn human-readable [stage]
   (get human-readable-stages stage stage))

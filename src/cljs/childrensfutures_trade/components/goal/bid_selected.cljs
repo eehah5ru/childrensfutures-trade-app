@@ -25,7 +25,7 @@
         bid-id (:bid-id @selected-bid)]
     [gc/card-raised-button
      {:primary true
-      :label "Investment on the way!"
+      :label "Congrats! Investment sent!"
       :on-touch-tap #(dispatch
                       [:blockchain.send-investment/send goal-id bid-id])}]))
 
@@ -51,11 +51,11 @@
   (gu/with-role
     goal
     {:goal-owner [gc/simple-card-title
-                  "Wait while investments is being send to you. Or discuss details via chat"]
+                  "Wait while the investment is being send to you. Or discuss details via chat!"]
      :investor [gc/simple-card-title
-                "Help her get her dream achieved! Send an investment or discuss details via chat!"]}
+                "Help the dreamer to get goals achieved! Send an investment or discuss details via chat! After sending your investment – provide an information about that by pushing the button!"]}
     [gc/simple-card-title
-     "Let's wait for incredible moments! Or invest in your future now!"]))
+     "Let's wait for the incredible moments! Or work on your future NOW!"]))
 
 
 ;;;

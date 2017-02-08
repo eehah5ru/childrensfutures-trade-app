@@ -32,7 +32,7 @@
 ;;;
 (defn simple-card-title [title]
   [ui/card-title
-   {:title title}])
+   {:title (r/as-element title)}])
 
 ;;;
 ;;; card button

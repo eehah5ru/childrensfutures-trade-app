@@ -40,7 +40,7 @@
       {:secondary true
        :disabled (or trx-on-air?
                      @read-only-app?)
-       :label "Invest Now"
+       :label "Don’t wait! Invest now!"
        :on-touch-tap #(dispatch [:place-bid/show-new-bid goal-id])}]]))
 
 (defn- card-actions [goal]
@@ -55,7 +55,7 @@
 ;;;
 (defn- owner-card-text [goal]
   [ui/card-title
-   {:title "OK! let's wait for bids! There surely are people who are interresting in your dreams!"}])
+   {:title "OK! Let's wait for bids! There are surely people who are interested in your dreams!"}])
 
 (defn- stranger-card-text [goal]
   [ui/card-title

@@ -53,6 +53,8 @@
      [ui/text-field {:default-value (:description @new-bid)
                      :on-change #(dispatch [:place-bid/update (:goal-id new-bid) :description (u/evt-val %)])
                      :name "description"
+                     :error-text "Suggest something that might interest the dream keeper! What might this person need? What would you like to give in exchange? It could be a secret about her/his friend or a material gift! You can send it or hide it near the district a person lives in."
+                     :error-style {:color (color :grey-600)}
                      :max-length 2000 ;FIXME
                      :floating-label-text "Bid's description"
                      :style {:width "100%"}}]]))
@@ -101,9 +103,9 @@
                 (r/as-element cancel-button)]
       :open @dialog-open?}
 
-     [:h1 "Are you sure?"]]))
+     [:h2 "Hey! Don’t look at my appearance! Once you have sliced me, you can’t make me go back!"]]))
 
-;;; get staged view properties
+;;; staged view properties
 (defn- staged-card-properties [stage]
   (cond
     (gs/unknown? stage) unknown-goal/card-properties

@@ -51,9 +51,9 @@
     {:goal-owner [gc/simple-card-title
                   "As soon you've got an investment tell Investor about it! Or discuss details in chat!"]
      :investor [gc/simple-card-title
-                "Discuss weather in chat while your investment is on the way!"]}
+                "Discuss the weather in a chat while your investment is on the way!"]}
     [gc/simple-card-title
-     "Let's wait for incredible moments! Or invest in your future now!"]))
+     "Let's wait for the incredible moments! Or work on your future NOW!"]))
 
 
 ;;;

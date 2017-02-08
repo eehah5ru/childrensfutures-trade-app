@@ -85,7 +85,7 @@
 ;;; bid owner
 (defn- bid-owner-card-text [goal]
   [gc/simple-card-title
-   "Wait for the goal owner's decision"])
+   "You’ve made it! Now wait for the goal owner's decision!"])
 
 ;;; stranger
 (defn- stranger-card-text [goal]

@@ -36,11 +36,16 @@
 (defn goal-statuses [goal extra-statuses]
   (let [{:keys [stage goal-id]} goal
         role (subscribe [:role/role goal-id])
+        stranger? (subscribe [:role/stranger? goal-id])
         extra-statuses (extra-statuses goal)]
-    (concat [{:key :stage
-              :content (gs/human-readable stage)}
-             {:key :role
-              :content @role}]
+    (concat (cond-> [{:key :stage
+                      :content (gs/human-readable stage)}]
+              (not @stranger?)
+              (conj {:key :role
+                     :content (get {:goal-owner "goal owner"
+                                    :bid-owner "bid owner"}
+                                   @role
+                                   @role)}))
             extra-statuses)))
 
 ;;;
