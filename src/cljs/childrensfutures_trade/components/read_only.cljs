@@ -18,7 +18,12 @@
   [outer-paper
    [:h3
     ;; {:style {:color (color :deep-orange-a700)}}
-    "Oops! In order to trade you need to open the app in Google Chrome browser on your computer. Otherwise you will have a “read only” version. Please check "
+    "Oops! In order to trade you need to open the app in "
+    [:a
+     {:target "blank"
+      :href "https://www.google.com/chrome/"}
+     "Google Chrome"]
+    " browser on your computer. Otherwise you will have a “read only” version. Please check "
     [:a {:href (path-for :how-to-play)}
      "How to Play"]
     "."]]
