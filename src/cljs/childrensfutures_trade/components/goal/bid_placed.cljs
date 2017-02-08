@@ -77,20 +77,19 @@
   (let [{:keys [goal-id]} goal
         bids (subscribe [:db.goal.bids/sorted goal-id])]
     [:div
-     [ui/card-title
-      {:title "Select your investment!"}]
+     [gc/simple-card-title "Select your investment!"]
      [gc/goal-bids-view goal]]))
 
 
 ;;; bid owner
 (defn- bid-owner-card-text [goal]
   [gc/simple-card-title
-   "You’ve made it! Now wait for the goal owner's decision!"])
+   "You’ve made it! Now wait for goal owner's decision!"])
 
 ;;; stranger
 (defn- stranger-card-text [goal]
   [gc/simple-card-title
-   "Don't wait! invest now!"])
+   "Don’t wait! Invest now!"])
 
 (defn card-text [goal]
   (gu/with-role

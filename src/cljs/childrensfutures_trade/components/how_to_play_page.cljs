@@ -63,7 +63,7 @@
                                          {:href "https://www.google.com/chrome/"
                                           :target "blank"}
                                          "Google Chrome"] ". "
-                  "Add the plugin " [:a
+                  "Simply add the plugin " [:a
                                      {:href "https/metamask.io/"
                                       :target "blank"}
                                      "MetaMask"]
@@ -76,7 +76,18 @@
   (how-to-play-step
    step-number
    :step-button-content "Create your new wallet"
-   :step-content [:p "Добавить игровые деньги/пробные эзереумы себе на счет — как это сделать? Описать или найти видос"]))
+   :step-content [:p "You’ll need in-game money, that are not real. For that you need to choose Test Net called Ropsten in Metamask."]))
+
+;;;
+;;; get gas
+;;;
+(defn get-gas-step [step-number]
+  (how-to-play-step
+   step-number
+   :step-button-content "Get “gas fees”"
+   :step-content [:div
+                  [:p "To put in-game money on your wallet you need to press “BUY” and then choose “GO TO TEST FAUCET” and request 1 ether from faucet. It will be enough to cover all expenses!"]
+                  [:p "Now you are able to pay “gas fees” for given operations!"]]))
 
 ;;;
 ;;; third step
@@ -86,7 +97,7 @@
    step-number
    :step-button-content "Tell everyone about your dream!"
    :step-content [:section
-                  [:p "Press + button at the right corner and you are ready to write down your goal and what you can give a person instead"]
+                  [:p "Press “+“ button at the right bottom corner and you are ready to write down your goal and what you can give a person instead"]
                   [:p "After you are done with writing, you can publish it, paying with игровые деньги"]
                   [:p "Now you are a dreamer! Wait for your investments! Remember that you can now choose one proposition that you like."]]))
 
@@ -96,8 +107,8 @@
 (defn select-investment-step [step-number]
   (how-to-play-step
    step-number
-   :step-button-content "Be an investor!"
-   :step-content [:p "And you can also become an investor. By clicking on someone’s dream! So simple as that!"]))
+   :step-button-content "Become an investor!"
+   :step-content [:p "You can become an investor by clicking on someone’s dream! So simple as that!"]))
 
 ;;;
 ;;;
@@ -105,10 +116,14 @@
 (defn be-careful-with-community-step [step-number]
   (how-to-play-step
    step-number
-   :step-button-content "Decentralize everything!"
+   :step-button-content "Decentralise everything!"
    :step-content [:section
-                  [:p "Remember that every transaction needs to be verified and approved by other users – this infrastructure needs to be supplied by paying a small fee for not having any middle men between users (like banks, for ex.) and for being completely independent and decentralised! "]
-                  [:p "New era of transparent tools starts from you!"]]))
+                  [:p "Remember that every transaction needs to be verified and approved by other users – this infrastructure needs to be supplied by paying a small fee (in our case, not real, test money) for not having any middle men between users (like banks, for ex.) and for being completely independent and decentralised!"]
+                  [:p "New era of transparent tools starts from you!"]
+                  [:p "If you have any questions, don’t hesitate to ask: "
+                   [:a
+                    {:href "mailto:eeefff.org@gmail.com"}
+                    "eeefff.org@gmail.com"]]]))
 
 ;;;
 ;;; fourth
@@ -124,14 +139,17 @@
     :reagent-render (fn []
                       (let [step (subscribe [:ui.how-to-play/step])]
                         [outer-paper
-                         [:h1 "How to play on this exhange market?"]
+                         [:h1 "How to play on this exchange market?"]
+                         [:p "Since my futures.trade is based on blockchain technology Ethereum, you will need a special tool to be able to interact with it."]
                          [ui/stepper
-                          {:linear false
+                          {:style {:padding-bottom "60px"}
+                           :linear false
                            :active-step @step
                            :orientation :vertical
                            :children (r/as-element (map #(%1 %2)
                                            [open-google-chrome-step
                                             get-ethers-step
+                                            get-gas-step
                                             add-dream-step
                                             select-investment-step
                                             be-careful-with-community-step]

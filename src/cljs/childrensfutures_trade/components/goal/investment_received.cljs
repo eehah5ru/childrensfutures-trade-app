@@ -48,11 +48,11 @@
   (gu/with-role
     goal
     {:goal-owner [gc/simple-card-title
-                  "As soon you've achieved the goal tell Investor about it! Or discuss details in chat!"]
+                  "As soon as you achieve the goal tell the investor about it!"]
      :investor [gc/simple-card-title
-                "Discuss weather in chat while she is working hard!"]}
+                "Discuss the weather in a chat while the dreamer is working hard!"]}
     [gc/simple-card-title
-     "Let's wait for incredible moments! Or invest in your future now!"]))
+     "Let's wait for the incredible moments! Or work on your future NOW!"]))
 
 
 ;;;

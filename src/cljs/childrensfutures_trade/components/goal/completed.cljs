@@ -49,11 +49,11 @@
   (gu/with-role
     goal
     {:goal-owner [gc/simple-card-title
-                  "Great job!"]
+                  "WOW! You’ve made it! Say YES to the future without debts!"]
      :investor [gc/simple-card-title
-                "See you!"]}
+                "You know what you are looking for! See you soon!"]}
     [gc/simple-card-title
-     "Let's wait for incredible moments! Or invest in your future now!"]))
+     "Let's wait for the incredible moments! Or work on your future NOW!"]))
 
 
 ;;;

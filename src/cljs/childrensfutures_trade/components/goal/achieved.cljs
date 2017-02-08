@@ -49,11 +49,11 @@
   (gu/with-role
     goal
     {:goal-owner [gc/simple-card-title
-                  "You're cool creature! Now investor can ask her bonus back. Be polite with her! Chat now or later!"]
+                  "You're a cool creature! Now the investor can ask the bonus back. Be polite with her/him! Chat now or later!"]
      :investor [gc/simple-card-title
-                "Ask bonus or discuss details!"]}
+                "Ask for your bonus or discuss details!"]}
     [gc/simple-card-title
-     "Let's wait for incredible moments! Or invest in your future now!"]))
+     "Let's wait for the incredible moments! Or work on your future NOW!"]))
 
 
 ;;;

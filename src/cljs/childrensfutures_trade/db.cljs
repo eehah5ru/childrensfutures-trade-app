@@ -114,7 +114,7 @@
 ;;;
 (defn default-how-to-play []
   {:step 0
-   :steps-count 5})
+   :steps-count 6})
 
 ;;;
 ;;;

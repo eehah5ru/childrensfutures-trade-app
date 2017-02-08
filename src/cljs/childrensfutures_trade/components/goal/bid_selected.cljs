@@ -51,9 +51,9 @@
   (gu/with-role
     goal
     {:goal-owner [gc/simple-card-title
-                  "Wait while the investment is being send to you. Or discuss details via chat!"]
+                  "Wait while the investment is being sent to you. Or discuss details via chat!"]
      :investor [gc/simple-card-title
-                "Help the dreamer to get goals achieved! Send an investment or discuss details via chat! After sending your investment – provide an information about that by pushing the button!"]}
+                "Help the dreamer to get the goal achieved! Send an investment or discuss details via chat! After sending your investment provide an information about that by pushing the button!"]}
     [gc/simple-card-title
      "Let's wait for the incredible moments! Or work on your future NOW!"]))
 

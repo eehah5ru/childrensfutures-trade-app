@@ -49,7 +49,7 @@
   (gu/with-role
     goal
     {:goal-owner [gc/simple-card-title
-                  "As soon you've got an investment tell Investor about it! Or discuss details in chat!"]
+                  "As soon as you've got an investment tell the investor about it!"]
      :investor [gc/simple-card-title
                 "Discuss the weather in a chat while your investment is on the way!"]}
     [gc/simple-card-title

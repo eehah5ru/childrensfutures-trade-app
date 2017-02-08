@@ -142,7 +142,7 @@
 ;;;
 (defn no-goals-view []
   (generic-no-content-view
-   :message "No goals at the moment?! Oh my! Create you future now!"
+   :message "No goals at the moment?! Oh my! Create your future now!"
    :button? true
    :button-label "Tell about your dream!"
    :button-action #(dispatch [:ui.new-goal/toggle-view])))
@@ -154,7 +154,7 @@
 ;;; Be a good person – help someone out!
 (defn no-investments-view []
   (generic-no-content-view
-   :message "No goals at the moment?! Oh my! Create you future now!"
+   :message "No goals at the moment?! Oh my! Create your future now!"
    :button? true
    :button-label "Be a good person – help someone out!"
    :button-action #(dispatch [:ui.go-to-menu :pulse])))

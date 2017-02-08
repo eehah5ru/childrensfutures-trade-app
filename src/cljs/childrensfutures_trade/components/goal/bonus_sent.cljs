@@ -50,11 +50,11 @@
   (gu/with-role
     goal
     {:goal-owner [gc/simple-card-title
-                  "Wait while bonus is on the way!"]
+                  "Wait while the bonus is on the way!"]
      :investor [gc/simple-card-title
                 "Got it? Say thanks!"]}
     [gc/simple-card-title
-     "Let's wait for incredible moments! Or invest in your future now!"]))
+     "Let's wait for the incredible moments! Or work on your future NOW!"]))
 
 
 ;;;
