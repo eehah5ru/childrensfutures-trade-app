@@ -42,15 +42,18 @@
       [ui/subheader
        [:span (u/truncate @channel-id 30)]]
       [ui/divider]
+
       (for [msg @messages]
         (let [{:keys [message-id
                       owner
                       text]} msg]
           ^{:key message-id}
           [ui/list-item
-           {:inset-children true
-            :secondary-text (r/as-element text)
-            :secondary-text-lines 2
+           {:class-name "chat-message"
+            :style {:font-size "14px"
+                    :color (color :grey-600)}
+            :inset-children true
+            :primary-text text
             :left-avatar (r/as-element
                           [avatars/avatar
                            owner
