@@ -6,6 +6,7 @@
    [childrensfutures-trade.db :as db]
 
    [goog.string :as gstring]
+   [goog.dom :as dom]
    [goog.string.format]
    [madvas.re-frame.web3-fx]
    [madvas.re-frame.google-analytics-fx]
@@ -359,3 +360,23 @@
    {:db (-> db
             (assoc :critical-error? false)
             (assoc :force-read-only? true))}))
+
+;;;
+;;;
+;;; SPINNER
+;;;
+;;;
+(reg-event-fx
+ :ui.spinner/hide
+ (interceptors-fx :spec false)
+
+ (fn [_]
+   #_(js/console.log (dom/getElement "spinner-overlay"))
+   (-> "spinner-overlay"
+       (dom/getElement)
+       (dom/removeNode))
+
+   (-> "spinner"
+       (dom/getElement)
+       (dom/removeNode))
+   {}))

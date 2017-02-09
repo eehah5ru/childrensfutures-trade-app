@@ -76,7 +76,10 @@
                     (conj [:ui.window/set-size])
 
                     full-app?
-                    (conj [:blockchain/load-my-addresses]))})))
+                    (conj [:blockchain/load-my-addresses]))
+
+      :dispatch-later [{:ms 3000
+                        :dispatch [:ui.spinner/hide]}]})))
 
 
 
