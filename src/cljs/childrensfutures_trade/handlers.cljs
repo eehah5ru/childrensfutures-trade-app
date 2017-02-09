@@ -63,6 +63,9 @@
      {:db db
       ;; TODO: refactor and extract this code to contract/fetch-abi
       :dispatch-n (cond-> []
+                    true
+                    (conj [:ui.spinner/hide-later 3000])
+
                     full-app?
                     (conj [:chat-contract/fetch-abi])
 
@@ -76,10 +79,7 @@
                     (conj [:ui.window/set-size])
 
                     full-app?
-                    (conj [:blockchain/load-my-addresses]))
-
-      :dispatch-later [{:ms 3000
-                        :dispatch [:ui.spinner/hide]}]})))
+                    (conj [:blockchain/load-my-addresses]))})))
 
 
 

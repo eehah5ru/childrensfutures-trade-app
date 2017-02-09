@@ -367,6 +367,15 @@
 ;;;
 ;;;
 (reg-event-fx
+ :ui.spinner/hide-later
+ (interceptors-fx :spec false)
+
+ (fn [_ [delay]]
+   {:dispatch-later [{:ms delay
+                      :dispatch [:ui.spinner/hide]}]}))
+
+
+(reg-event-fx
  :ui.spinner/hide
  (interceptors-fx :spec false)
 
