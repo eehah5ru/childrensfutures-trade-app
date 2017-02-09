@@ -16,13 +16,19 @@
 @offset: 187;
 @duration: 1.4s;
 
-#spinner {
+#spinner-div {
   position: absolute;
   z-index: 99999;  
-  animation: rotator @duration linear infinite;
   left: 50%;
   top: 50%;
-  transform: translate(-50%,-50%);  
+  transform: translate(-50%,-50%);
+  display: block;  
+}
+
+#spinner {
+  animation: rotator @duration linear infinite;
+  // left: calc(50% - 32px);
+  // top: calc(50% - 32px);
 }
 
 @keyframes rotator {
