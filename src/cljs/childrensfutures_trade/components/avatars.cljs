@@ -32,11 +32,12 @@
 ;;; goal avatar
 ;;;
 (defn goal-avatar [goal]
-  (let [goals-count (subscribe [:db.goals/count (:owner goal)])]
+  (let [avatar-id (get goal :owner "unknwon-owner")
+        goals-count (subscribe [:db.goals/count (:owner goal)])]
     [ui/badge
      {:badge-content @goals-count
       :badge-style st/goal-owner-avatar-badge}
-     [avatar (:owner goal)
+     [avatar avatar-id
       {:avatar-style {:margin-top 5
                       :margin-right 20}}]]))
 
@@ -44,7 +45,8 @@
 ;;; bid avatar
 ;;;
 (defn  bid-avatar [bid]
-  (let [goals-count (subscribe [:db.goals/count (:owner bid)])]
+  (let [avatar-id (get goal :owner "unknwon-owner")
+        goals-count (subscribe [:db.goals/count (:owner bid)])]
     [:div
      {:style {:position "absolute"
               :left "15px"
@@ -58,4 +60,4 @@
                :position "relative"
                :height 40
                :width 40}}
-      [avatar (:owner bid)]]]))
+      [avatar avatar-id]]]))
