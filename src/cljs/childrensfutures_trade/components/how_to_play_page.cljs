@@ -64,7 +64,7 @@
                                           :target "blank"}
                                          "Google Chrome"] ". "
                   "Simply add the plugin " [:a
-                                     {:href "https/metamask.io/"
+                                     {:href "https://metamask.io/"
                                       :target "blank"}
                                      "MetaMask"]
                   " to Chrome Browser."]))
