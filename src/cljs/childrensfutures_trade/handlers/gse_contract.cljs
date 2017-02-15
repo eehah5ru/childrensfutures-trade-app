@@ -25,11 +25,8 @@
 ;;;
 ;;; from block options
 ;;;
-;; (def from-block
-;;   "latest")
-
-(def from-block
-  {:from-block 0})
+(defn- from-block [db]
+  (get-in db [:gse-contract :from-block] 0))
 
 ;;;
 ;;;
@@ -58,6 +55,7 @@
  :gse-contract/fetch-abi
  (interceptors-fx :spec false)
  (fn [{:keys [db]} _]
+   (js/console.log :debug :abi-loading)
    {:http-xhrio {:method :get
                  :uri (gstring/format "/contracts/build/%s.abi"
                                       (get-in db/default-db [:gse-contract :name]))
@@ -75,10 +73,12 @@
  :gse-contract/abi-loaded
  (interceptors-fx :spec true)
  (fn [{:keys [db]} [abi]]
+   (js/console.log :debug :abi-loaded)
    (let [web3 (:web3 db)
          contract-instance (web3-eth/contract-at web3 abi (-> db
                                                               :gse-contract
-                                                              :address))]
+                                                              :address))
+         from-block-n (from-block db)]
      {:db (assoc-in db [:gse-contract :instance] contract-instance)
 
       ;; contract events
@@ -87,7 +87,7 @@
        :db db
        :db-path [:gse-contract :events]
        :events (map (fn [[event handler]]
-                      [event {} from-block handler :log-error])
+                      [event {} {:from-block from-block-n} handler :log-error])
                     contract-events)}
 
       ;; contract calls
@@ -107,6 +107,7 @@
  (interceptors-fx :spec false)
 
  (fn [{:keys [db]} [is-working?]]
+   (js/console.log :debug :is-working-loaded is-working?)
    (let [no-contract? (not is-working?)]
      (if no-contract?
        {:dispatch [:app/critical-error]}

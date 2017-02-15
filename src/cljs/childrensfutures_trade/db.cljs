@@ -429,16 +429,19 @@
 
                    ;; ropsten testnet in production
                    (not childrensfutures-trade.utils/DEV)
-                   (merge {:address "0x4febdfbf70c28ae01dcdbfb490883a31499ed6c2"})
+                   (merge {:address "0x4febdfbf70c28ae01dcdbfb490883a31499ed6c2"
+                           :from-block 497069})
 
                    ;; ropsten testnet in devel env
                    childrensfutures-trade.utils/DEV
-                   (merge {:address "0x4febdfbf70c28ae01dcdbfb490883a31499ed6c2"})
+                   (merge {:address "0x4febdfbf70c28ae01dcdbfb490883a31499ed6c2"
+                           :from-block 497069})
 
                    ;; devel GSE contract address
                    ;; depends on testrpc
-                   ;;  childrensfutures-trade.utils/DEV
-                   ;; (merge {:address "0xd386a048b29fac26a79fe4d2179483a13a15e943"})
+                    ;; childrensfutures-trade.utils/DEV
+                    ;; (merge {:address "0xd386a048b29fac26a79fe4d2179483a13a15e943"
+                    ;;         :from-block 0})
 
                    )
 
@@ -446,14 +449,16 @@
    ;; chat contract
    ;;
    :chat-contract (cond-> {:name "Chat"
-                           ;; ropsten testnet contract address
-                           :address "0x6e600f0939c3aec1aece8735c38f2e10ccc44cf3"}
+                           :abi nil
+                           :bin nil
+                           :instance nil}
 
                     ;;
                     ;; production contract address
                     ;;
                     (not childrensfutures-trade.utils/DEV)
-                    (merge {:address "0x6e600f0939c3aec1aece8735c38f2e10ccc44cf3"})
+                    (merge {:address "0x6e600f0939c3aec1aece8735c38f2e10ccc44cf3"
+                            :from-block 487332})
 
 
                     ;;
@@ -461,11 +466,13 @@
                     ;;
                     ;; in ropsten
                     childrensfutures-trade.utils/DEV
-                    (merge {:address "0x6e600f0939c3aec1aece8735c38f2e10ccc44cf3"})
+                    (merge {:address "0x6e600f0939c3aec1aece8735c38f2e10ccc44cf3"
+                            :from-block 487332})
 
                     ;; depends on testrpc
                     ;; childrensfutures-trade.utils/DEV
-                    ;; (merge {:address "0x7759a1442466ea622e44238de2e628b2001b8741"})
+                    ;; (merge {:address "0x7759a1442466ea622e44238de2e628b2001b8741"
+                    ;;         :from-block 0})
 
                     )
    })

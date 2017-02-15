@@ -38,8 +38,8 @@
 ;; (def from-block
 ;;   "latest")
 
-(def from-block
-  {:from-block 0})
+(defn from-block [db]
+  (get-in db [:chat-contract :from-block] 0))
 
 ;;;
 ;;;
@@ -81,7 +81,8 @@
    (let [web3 (:web3 db)
          contract-instance (web3-eth/contract-at web3 abi (-> db
                                                               :chat-contract
-                                                              :address))]
+                                                              :address))
+         from-block-n (from-block db)]
      {:db (assoc-in db [:chat-contract :instance] contract-instance)
 
       :web3-fx.contract/events
@@ -89,7 +90,7 @@
        :db db
        :db-path [:chat-contract :events]
        :events (map (fn [[event handler]]
-                      [event {} from-block handler :log-error])
+                      [event {} {:from-block from-block-n} handler :log-error])
                     contract-events)}
       })))
 

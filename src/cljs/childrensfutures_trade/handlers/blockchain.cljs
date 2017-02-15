@@ -26,6 +26,7 @@
  (interceptors-fx :spec false)
  (fn [{:keys [db]}]
    (when (db/provides-web3?)
+     (js/console.log :debug :loading-my-addresses)
      {:web3-fx.blockchain/fns
       {:web3 (:web3 db)
        :fns [[web3-eth/accounts [:blockchain/my-addresses-loaded] :log-error]]}})))
@@ -40,6 +41,7 @@
  :blockchain/my-addresses-loaded
  (interceptors-fx :spec true)
  (fn [{:keys [db]} [addresses]]
+   (js/console.log :debug :loaded-my-addresses)
    {:db (-> db
             (assoc :my-addresses addresses)
             (assoc :current-address (first addresses)))
