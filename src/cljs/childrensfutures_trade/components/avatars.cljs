@@ -7,6 +7,7 @@
    [re-frame.core :refer [subscribe dispatch]]
    [reagent.core :as r]
    [clavatar-js.core :as clavatar]
+   [clojure.string :refer [blank?]]
 
    [childrensfutures-trade.components.layout :refer [grid row col outer-paper]]
    [childrensfutures-trade.styles :as st]
@@ -25,8 +26,17 @@
 ;;;
 (defn avatar [avatar-id & {:keys [avatar-style]
                            :or {avatar-style {}}}]
-  [ui/avatar {:style avatar-style
-              :src (clavatar/gravatar avatar-id)}])
+  (let [avatar-id (cond
+                    (nil? avatar-id)
+                    "unknwon-owner"
+
+                    (blank? avatar-id)
+                    "unknwon-owner"
+
+                    :else
+                    avatar-id)]
+   [ui/avatar {:style avatar-style
+               :src (clavatar/gravatar avatar-id)}]))
 
 ;;;
 ;;; goal avatar
@@ -45,7 +55,7 @@
 ;;; bid avatar
 ;;;
 (defn  bid-avatar [bid]
-  (let [avatar-id (get goal :owner "unknwon-owner")
+  (let [avatar-id (get bid :owner "unknwon-owner")
         goals-count (subscribe [:db.goals/count (:owner bid)])]
     [:div
      {:style {:position "absolute"
