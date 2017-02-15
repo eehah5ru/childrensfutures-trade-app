@@ -35,7 +35,6 @@
 ;;;
 (def contract-events
   [[:GoalAdded :gse-contract/on-goal-added]
-   [:GoalCancelled :gse-contract/on-goal-cancelled]
    [:BidPlaced :gse-contract/on-bid-placed]
    [:BidSelected :gse-contract/on-bid-selected]
    [:InvestmentSent :gse-contract/on-investment-sent]
@@ -43,7 +42,8 @@
    [:GoalAchieved :gse-contract/on-goal-achieved]
    [:BonusAsked :gse-contract/on-bonus-asked]
    [:BonusSent :gse-contract/on-bonus-sent]
-   [:GoalCompleted :gse-contract/on-goal-completed]])
+   [:GoalCompleted :gse-contract/on-goal-completed]
+   [:GoalCancelled :gse-contract/on-goal-cancelled]])
 
 
 ;;;

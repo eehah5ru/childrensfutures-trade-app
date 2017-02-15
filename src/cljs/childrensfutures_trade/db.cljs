@@ -493,13 +493,16 @@
 ;;; get goal or default
 
 (defn get-goal [db goal-id]
-  (get-in db [:goals goal-id] (default-goal)))
+  (-> db
+      (get-in [:goals goal-id] (default-goal))
+      (assoc :goal-id goal-id)))
 
 ;;; get bid or default
 (defn get-bid [db goal-id bid-id]
   (-> db
       (get-goal goal-id)
-      (get-in [:bids bid-id] (default-bid))))
+      (get-in [:bids bid-id] (default-bid))
+      (assoc :bid-id bid-id)))
 
 ;;; returns updated db
 (defn update-goal [db goal-id f]
