@@ -174,6 +174,8 @@
 (s/def ::dialog-open? boolean?)
 (s/def ::on-view-goal-page? boolean?)
 (s/def ::chat-open? boolean?)
+(s/def ::db-synced-at int?)
+(s/def ::db-syncing? boolean?)
 (s/def ::type #{:goal-added
                 :investment-placed})
 (s/def ::number int?)
@@ -377,6 +379,8 @@
                              ::drawer-open?
                              ::chat-open?
                              ::window-height
+                             ::db-synced-at
+                             ::db-syncing?
                              ::gse-contract
                              ::chat-contract]))
 ;;;
@@ -418,6 +422,8 @@
    :window-height nil
    :web3 (mk-web3)
    :provides-web3? (provides-web3?)
+   :db-synced-at 0
+   :db-syncing? false
    ;;
    ;; gse contract
    ;;

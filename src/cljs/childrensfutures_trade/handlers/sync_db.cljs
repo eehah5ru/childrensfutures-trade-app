@@ -18,7 +18,22 @@
    ))
 
 ;;;
+;;; constants
+;;;
+
+;;; min interval between syncing sessions
+(def sync-interval 3000)
+
+;;;
 ;;; utils
+;;;
+
+;;; get current timestamp as int
+(defn current-timestamp []
+  (.getTime (js/Date.)))
+
+;;;
+;;; db utils
 ;;;
 
 ;;; returns updated db
@@ -53,14 +68,50 @@
 
  (fn [{:keys [db]} [db-version]]
    {:db (update-db-version db db-version)
-    :dispatch [:sync-db/sync]}))
+    :dispatch [:sync-db/check-and-sync db-version]}))
+
+
+(reg-event-fx
+ :sync-db/check-and-sync
+ (interceptors-fx :spec false)
+
+ (fn [{:keys [db]} [db-version-to-sync]]
+   (let [cur-db-version (:db-version db)
+         syncing? (:db-syncing? db)
+         db-synced-at (:db-synced-at db)
+         cur-timestamp (current-timestamp)
+         sync-now? (> cur-timestamp
+                      (+ db-synced-at
+                         sync-interval))]
+     (if (< db-version-to-sync
+            cur-db-version)
+       ;; do nothing
+       {}
+       ;; try to sync
+       (cond
+         (and (not syncing?)
+              sync-now?)
+         (do
+           (js/console.log :syncing-now)
+           {:dispatch [:sync-db/do-sync]})
+
+         (and (not syncing?)
+              (not sync-now?))
+         (do
+           (js/console.log :syncing-later db-synced-at)
+           {:dispatch-later [{:ms sync-interval
+                              :dispatch [:sync-db/check-and-sync  db-version-to-sync]}]})
+
+         :else
+         {}))
+     )))
 
 
 ;;;
 ;;; sync with server
 ;;;
 (reg-event-fx
- :sync-db/sync
+ :sync-db/do-sync
  (interceptors-fx :spec true)
 
  (fn [{:keys [db]}]
@@ -80,7 +131,7 @@
                    ;; :body (js/FormData. (serialize-db {:a 1}))
                    :body form-data
                    }
-      :db db})))
+      :db (assoc db :db-syncing? true)})))
 
 ;;;
 ;;; when synced successful
@@ -91,7 +142,10 @@
 
  (fn [{:keys [db]}]
    (js/console.log :sync-db/synced)
-   {:db db}))
+   {:db (-> db
+            (assoc :db-synced-at (current-timestamp)
+                   :db-syncing? false))}))
+
 
 ;;;
 ;;; fetch db
