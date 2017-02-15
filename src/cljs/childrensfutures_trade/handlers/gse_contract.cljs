@@ -146,6 +146,7 @@
  (fn [{:keys [db]} [goal {:keys [block-number]}]]
    (js/console.log :debug :on-goal-cancelled (:goal-id goal))
    {:dispatch-n [[:db.goal/cancel goal]
+                 [:pulse/push-goal-cancelled block-number (:goal-id goal)]
                  [:sync-db/on-db-updated block-number]]}))
 
 
@@ -179,6 +180,7 @@
    {:dispatch-n [[:db.goal/select-bid goal-id bid-id]
                  [:chat-thread/create goal-owner (u/chat-channel-id goal-id bid-id)]
                  [:chat-thread/create bid-owner (u/chat-channel-id goal-id bid-id)]
+                 [:pulse/push-investment-selected block-number goal-id bid-id]
                  [:sync-db/on-db-updated block-number]]}))
 
 ;;;
@@ -194,6 +196,7 @@
    (js/console.log :info :investment-sent goal-id bid-id)
 
    {:dispatch-n [[:db.goal/send-investment goal-id bid-id]
+                 [:pulse/push-investment-sent block-number goal-id bid-id]
                  [:sync-db/on-db-updated block-number]]}))
 
 
@@ -210,6 +213,7 @@
    (js/console.log :info :investment-received goal-id bid-id)
 
    {:dispatch-n [[:db.goal/receive-investment goal-id bid-id]
+                 [:pulse/push-investment-received block-number goal-id bid-id]
                  [:sync-db/on-db-updated block-number]]}))
 
 ;;;
@@ -225,6 +229,7 @@
    (js/console.log :info :goal-achieved goal-id)
 
    {:dispatch-n [[:db.goal/achieve goal-id]
+                 [:pulse/push-goal-achieved block-number goal-id]
                  [:sync-db/on-db-updated block-number]]}))
 
 
@@ -240,6 +245,7 @@
    (js/console.log :info :bonus-asked goal-id bid-id)
 
    {:dispatch-n [[:db.goal/ask-bonus goal-id bid-id]
+                 [:pulse/push-bonus-asked block-number goal-id bid-id]
                  [:sync-db/on-db-updated block-number]]}))
 
 ;;;
@@ -255,6 +261,7 @@
    (js/console.log :info :bonus-sent goal-id bid-id)
 
    {:dispatch-n [[:db.goal/send-bonus goal-id bid-id]
+                 [:pulse/push-bonus-sent block-number goal-id bid-id]
                  [:sync-db/on-db-updated block-number]]}))
 
 
@@ -271,4 +278,5 @@
    (js/console.log :info :goal-completed goal-id)
 
    {:dispatch-n [[:db.goal/complete goal-id]
+                 [:pulse/push-goal-completed block-number goal-id]
                  [:sync-db/on-db-updated block-number]]}))

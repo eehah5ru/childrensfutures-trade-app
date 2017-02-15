@@ -79,16 +79,37 @@
 ;;; default pulse states
 ;;;
 ;;;
-(defn default-pulse-goal-added []
+(defn default-pulse-event [type]
   {:number 0
    :goal-id ""
-   :type :goal-added})
+   :type type})
+
+(defn default-pulse-goal-added []
+  (default-pulse-event :goal-added))
 
 (defn default-pulse-investment-placed []
-  {:number 0
-   :type :investment-placed
-   :goal-id ""
-   :bid-id ""})
+  (default-pulse-event :investment-placed))
+
+(defn default-pulse-investment-sent []
+  (default-pulse-event :investment-sent))
+
+(defn default-pulse-investment-received []
+  (default-pulse-event :investment-received))
+
+(defn default-pulse-goal-achieved []
+  (default-pulse-event :goal-achieved))
+
+(defn default-pulse-bonus-asked []
+  (default-pulse-event :bonus-asked))
+
+(defn default-pulse-bonus-sent []
+  (default-pulse-event :bonus-sent))
+
+(defn default-pulse-goal-completed []
+  (default-pulse-event :goal-completed))
+
+(defn default-pulse-goal-cancelled []
+  (default-pulse-event :goal-cancelled))
 
 (defn default-pulse []
   [])
@@ -237,16 +258,89 @@
                    ::type
                    ::goal-id]))
 
-(s/def ::investmentplaced-pulse-event
+(s/def ::investment-placed-pulse-event
   (s/keys :req-un [::number
                    ::type
                    ::goal-id
                    ::bid-id]))
 
+(s/def ::investment-selected-pulse-event
+  (s/keys :req-un [::number
+                   ::type
+                   ::goal-id
+                   ::bid-id]))
+
+(s/def ::investment-sent-pulse-event
+  (s/keys :req-un [::number
+                   ::type
+                   ::goal-id
+                   ::bid-id]))
+
+(s/def ::investment-received-pulse-event
+  (s/keys :req-un [::number
+                   ::type
+                   ::goal-id
+                   ::bid-id]))
+
+(s/def ::goal-achieved-pulse-event
+  (s/keys :req-un [::number
+                   ::type
+                   ::goal-id]))
+
+(s/def ::bonus-asked-pulse-event
+  (s/keys :req-un [::number
+                   ::type
+                   ::goal-id
+                   ::bid-id]))
+
+(s/def ::bonus-sent-pulse-event
+  (s/keys :req-un [::number
+                   ::type
+                   ::goal-id
+                   ::bid-id]))
+
+(s/def ::goal-completed-pulse-event
+  (s/keys :req-un [::number
+                   ::type
+                   ::goal-id]))
+
+
+(s/def ::goal-cancelled-pulse-event
+  (s/keys :req-un [::number
+                   ::type
+                   ::goal-id]))
+
+
+
 (s/def ::pulse-event #(s/or :goal-added
                             (partial s/conform ::goal-added-pulse-event)
+
                             :investment-placed
-                            (partial s/conform ::investmentplaced-pulse-event)))
+                            (partial s/conform ::investment-placed-pulse-event)
+
+                            :investment-selected
+                            (partial s/conform ::investment-selected-pulse-event)
+
+                            :investment-sent
+                            (partial s/conform ::investment-sent-pulse-event)
+
+                            :investment-received
+                            (partial s/conform ::investment-received-pulse-event)
+
+                            :goal-achieved
+                            (partial s/conform ::goal-achieved-pulse-event)
+
+                            :bonus-asked
+                            (partial s/conform ::bonus-asked-pulse-event)
+
+                            :bonus-sent
+                            (partial s/conform ::bonus-sent-pulse-event)
+
+                            :goal-completed
+                            (partial s/conform ::goal-completed-pulse-event)
+
+                            :goal-cancelled
+                            (partial s/conform ::goal-cancelled-pulse-event)))
 ;;;
 ;;; collections
 ;;;
@@ -331,23 +425,50 @@
                           :abi nil
                           :bin nil
                           :instance nil
-                          ;; ropsten testnet contract address
-                          :address "0x4febdfbf70c28ae01dcdbfb490883a31499ed6c2"
                           }
+
+                   ;; ropsten testnet in production
+                   (not childrensfutures-trade.utils/DEV)
+                   (merge {:address "0x4febdfbf70c28ae01dcdbfb490883a31499ed6c2"})
+
+                   ;; ropsten testnet in devel env
                    childrensfutures-trade.utils/DEV
+                   (merge {:address "0x4febdfbf70c28ae01dcdbfb490883a31499ed6c2"})
+
                    ;; devel GSE contract address
                    ;; depends on testrpc
-                   (merge {:address "0xd386a048b29fac26a79fe4d2179483a13a15e943"}))
+                   ;;  childrensfutures-trade.utils/DEV
+                   ;; (merge {:address "0xd386a048b29fac26a79fe4d2179483a13a15e943"})
+
+                   )
+
    ;;
    ;; chat contract
    ;;
    :chat-contract (cond-> {:name "Chat"
                            ;; ropsten testnet contract address
                            :address "0x6e600f0939c3aec1aece8735c38f2e10ccc44cf3"}
-                    childrensfutures-trade.utils/DEV
+
+                    ;;
+                    ;; production contract address
+                    ;;
+                    (not childrensfutures-trade.utils/DEV)
+                    (merge {:address "0x6e600f0939c3aec1aece8735c38f2e10ccc44cf3"})
+
+
+                    ;;
                     ;; devel Chat contract address
+                    ;;
+                    ;; in ropsten
+                    childrensfutures-trade.utils/DEV
+                    (merge {:address "0x6e600f0939c3aec1aece8735c38f2e10ccc44cf3"})
+
                     ;; depends on testrpc
-                    (merge {:address "0x7759a1442466ea622e44238de2e628b2001b8741"}))})
+                    ;; childrensfutures-trade.utils/DEV
+                    ;; (merge {:address "0x7759a1442466ea622e44238de2e628b2001b8741"})
+
+                    )
+   })
 
 
 ;;;

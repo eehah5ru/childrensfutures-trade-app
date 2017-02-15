@@ -134,6 +134,54 @@
                           (staged-icon-button goal-id))
       :on-touch-tap #(dispatch [:ui.view-goal-dialog/open goal-id])}]))
 
+
+(defn- staged-disabled-event-view [e e-class]
+  (let [goal-id (:goal-id e)
+        event-number (:number e)
+        goal (subscribe [:db.goals/get goal-id])
+        bid (subscribe [:db.goal.bids/selected goal-id])
+        {:keys [description give-in-return]} @goal
+        stage (subscribe [:db.goal/stage goal-id])
+        ]
+    [ui/list-item
+     {:class-name (str "pulse-event " e-class)
+      :primary-text description
+      :secondary-text (r/as-element
+                       [:span
+                        {:style {:display "inline-block"
+                                 :max-width "100%"}}
+                        (str "Bonus: " give-in-return)
+                        [:br]
+                        (str "Investment: " (:description @bid))])
+      :right-icon-button (r/as-element
+                          (staged-icon-button goal-id))}]))
+
+(defn investment-selected-event-view [e]
+  (staged-disabled-event-view e "goal-stage-bid-selected"))
+
+(defn investment-sent-event-view [e]
+  (staged-disabled-event-view e "goal-stage-investment-sent"))
+
+(defn investment-received-event-view [e]
+  (staged-disabled-event-view e "goal-stage-investment-received"))
+
+(defn goal-achieved-event-view [e]
+  (staged-disabled-event-view e "goal-stage-goal-achieved"))
+
+(defn bonus-asked-event-view [e]
+  (staged-disabled-event-view e "goal-stage-bonus-asked"))
+
+(defn bonus-sent-event-view [e]
+  (staged-disabled-event-view e "goal-stage-bonus-sent"))
+
+(defn goal-completed-event-view [e]
+  (staged-disabled-event-view e "goal-stage-goal-completed"))
+
+(defn goal-cancelled-event-view [e]
+  (staged-disabled-event-view e "goal-stage-goal-cancelled"))
+
+
+
 ;; (defn- bid-selected-event-view [e]
 ;;   [:h3
 ;;    "Bid Selected"])
@@ -158,5 +206,13 @@
             (with-meta (condp = (:type event)
                          :goal-added [goal-added-event-view event]
                          :investment-placed [investment-placed-event-view event]
+                         :investment-selected [investment-selected-event-view event]
+                         :investment-sent [investment-sent-event-view event]
+                         :investment-received [investment-received-event-view event]
+                         :goal-achieved [goal-achieved-event-view event]
+                         :bonus-asked [bonus-asked-event-view event]
+                         :bonus-sent [bonus-sent-event-view event]
+                         :goal-completed [goal-completed-event-view event]
+                         :goal-cancelled [goal-cancelled-event-view event]
                          :else [unknown-event-view event])
               {:key (str type "-" goal-id "-" number)})))])]))
