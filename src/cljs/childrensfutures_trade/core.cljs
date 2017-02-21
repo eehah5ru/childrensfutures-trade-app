@@ -4,6 +4,7 @@
    [cljsjs.material-ui]
    [cljsjs.react-flexbox-grid]
    [cljsjs.web3]
+   [madvas.re-frame.google-analytics-fx]
    [childrensfutures-trade.handlers]
    [childrensfutures-trade.subs]
    [childrensfutures-trade.views :as views]
@@ -31,7 +32,9 @@
                   (.getElementById js/document "app")))
 
 (defn ^:export init []
-  (google-analytics-fx/set-enabled! (not childrensfutures-trade.utils.DEV))
+
+  (when (not childrensfutures-trade.utils.DEV)
+    (google-analytics-fx/set-enabled! (not childrensfutures-trade.utils.DEV)))
 
   (re-frame/dispatch-sync [:initialize])
   (pushy/start! history)
