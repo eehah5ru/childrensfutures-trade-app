@@ -1,4 +1,4 @@
-(defproject childrensfutures-trade "0.1.0-SNAPSHOT"
+(defproject childrensfutures-trade "0.1.1-SNAPSHOT"
   :dependencies [[bidi "2.0.10"]
                  [bk/ring-gzip "0.1.1"]
                  [cljs-ajax "0.5.8"]
