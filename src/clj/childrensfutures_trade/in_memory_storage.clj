@@ -12,11 +12,9 @@
 (defn refresh-db [new-db]
   (let [current-version (get @db :db-version 0)
         next-version (get new-db :db-version 0)]
-    (if (> next-version current-version)
-      (do
-       (reset! db new-db)
-       true)
-      false)))
+    (do
+      (reset! db new-db)
+      true)))
 
 (defn get-db []
   @db)
