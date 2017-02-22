@@ -23,3 +23,7 @@
 
 (defn db-version []
   (get @db :db-version 0))
+
+
+(defn reset-db []
+  (reset! db default-db))

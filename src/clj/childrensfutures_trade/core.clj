@@ -79,6 +79,16 @@
      :headers {"Content-Type" "text/plain"}
      :body (pr-str result)}))
 
+
+;;;
+;;; reset db
+;;;
+(defn reset-db [req]
+  (db/reset-db)
+  {:status 200
+   :headers {"Content-Type" "text/plain"}
+   :body "ok"})
+
 (defroutes routes
   (wrap-multipart-params
    (POST "/refresh-db"
@@ -88,6 +98,10 @@
   (GET "/fetch-db"
        req
        (fetch-db req))
+
+  (GET "/reset-db"
+       req
+       (reset-db req))
 
   ;; (wrap-multipart-params
   ;;  (POST "/print-body"
