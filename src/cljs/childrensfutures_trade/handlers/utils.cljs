@@ -31,18 +31,20 @@
   (let [address (:current-address db)
         fn-options {:from address
                     :gas goal-gas-limit}
-        error-event (or error-event :log-error)]
+        error-event (or error-event :log-error)
+        contract-instance (:instance (contract db))]
     {:web3-fx.contract/state-fn
-     {:instance (:instance (contract db))
+     {:instance contract-instance
       :web3 (:web3 db)
       :db-path (flatten [contract
                          f-name
                          (map keyword db-path)])
-      :fn (concat (flatten [f-name f-args])
-                  [fn-options
-                   confirmed-event
-                   error-event
-                   receipt-loaded-event])}}))
+      :fns [(concat [contract-instance]
+                    (flatten [f-name f-args])
+                    [fn-options
+                     confirmed-event
+                     error-event
+                     receipt-loaded-event])]}}))
 
 
 ;;;

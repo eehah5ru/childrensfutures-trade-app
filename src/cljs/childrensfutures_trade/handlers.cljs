@@ -110,17 +110,19 @@
  :cancel-goal/send
  (interceptors-fx :spec false)
  (fn [{:keys [db]} [goal-id]]
-   (let [address (:current-address db)]
+   (let [address (:current-address db)
+         contract-instance (:instance (:gse-contract db))]
      {:web3-fx.contract/state-fn
-      {:instance (:instance (:gse-contract db))
+      {:instance contract-instance
        :web3 (:web3 db)
        :db-path [:gse-contract :cancel-goal (keyword goal-id)]
-       :fn [:cancel-goal goal-id
-            {:from address
-             :gas goal-gas-limit}
-            [:cancel-goal/confirmed goal-id]
-            :log-error
-            [:cancel-goal/transaction-receipt-loaded goal-id]]}})))
+       :fns [[contract-instance
+              :cancel-goal goal-id
+              {:from address
+               :gas goal-gas-limit}
+              [:cancel-goal/confirmed goal-id]
+              :log-error
+              [:cancel-goal/transaction-receipt-loaded goal-id]]]}})))
 
 ;;;
 ;;; change state of cancelled goal
@@ -171,17 +173,19 @@
  (interceptors-fx :spec false)
  (fn [{:keys [db]} [goal-id]]
    (let [address (:current-address db)
-         {:keys [description]} (:new-bid db) ]
+         {:keys [description]} (:new-bid db)
+         contract-instance (:instance (:gse-contract db))]
      {:web3-fx.contract/state-fn
-      {:instance (:instance (:gse-contract db))
+      {:instance contract-instance
        :web3 (:web3 db)
        :db-path [:gse-contract :place-bid (keyword goal-id)]
-       :fn [:place-bid goal-id description
-            {:from address
-             :gas goal-gas-limit}
-            [:place-bid/confirmed goal-id]
-            :log-error
-            [:place-bid/transaction-receipt-loaded goal-id]]}})))
+       :fns [[contract-instance
+              :place-bid goal-id description
+              {:from address
+               :gas goal-gas-limit}
+              [:place-bid/confirmed goal-id]
+              :log-error
+              [:place-bid/transaction-receipt-loaded goal-id]]]}})))
 
 ;;;
 ;;; change state of placed bid

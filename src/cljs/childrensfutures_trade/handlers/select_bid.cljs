@@ -35,17 +35,19 @@
  :blockchain.select-bid/send
  (interceptors-fx :spec false)
  (fn [{:keys [db]} [goal-id bid-id]]
-   (let [address (:current-address db)]
+   (let [address (:current-address db)
+         contract-instance (:instance (:gse-contract db))]
      {:web3-fx.contract/state-fn
-      {:instance (:instance (:gse-contract db))
+      {:instance contract-instance
        :web3 (:web3 db)
        :db-path [:gse-contract :select-bid (keyword goal-id) (keyword bid-id)]
-       :fn [:select-bid goal-id bid-id
-            {:from address
-             :gas goal-gas-limit}
-            [:blockchain.select-bid/confirmed goal-id bid-id]
-            :log-error
-            [:blockchain.select-bid/transaction-receipt-loaded goal-id bid-id]]}})))
+       :fns [[contract-instance
+              :select-bid goal-id bid-id
+              {:from address
+               :gas goal-gas-limit}
+              [:blockchain.select-bid/confirmed goal-id bid-id]
+              :log-error
+              [:blockchain.select-bid/transaction-receipt-loaded goal-id bid-id]]]}})))
 
 ;;;
 ;;; change state of selected bid

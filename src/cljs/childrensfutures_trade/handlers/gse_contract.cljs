@@ -43,7 +43,8 @@
    [:BonusAsked :gse-contract/on-bonus-asked]
    [:BonusSent :gse-contract/on-bonus-sent]
    [:GoalCompleted :gse-contract/on-goal-completed]
-   [:GoalCancelled :gse-contract/on-goal-cancelled]])
+   [:GoalCancelled :gse-contract/on-goal-cancelled]
+   ])
 
 
 ;;;
@@ -78,7 +79,11 @@
          contract-instance (web3-eth/contract-at web3 abi (-> db
                                                               :gse-contract
                                                               :address))
-         from-block-n (from-block db)]
+         from-block-n (from-block db)
+         ;; to-block-n (+ from-block-n 5000)
+         to-block-n "latest"
+         ]
+     ;; (js/console.log :latest-block (web3-eth/block-number web3 "latest"))
      {:db (assoc-in db [:gse-contract :instance] contract-instance)
 
       ;; contract events
@@ -87,13 +92,19 @@
        :db db
        :db-path [:gse-contract :events]
        :events (map (fn [[event handler]]
-                      [event {} {:from-block from-block-n} handler :log-error])
+                      [contract-instance
+                       event
+                       {}
+                       {:from-block from-block-n
+                        :to-block to-block-n}
+                       handler
+                       :log-error])
                     contract-events)}
 
       ;; contract calls
       :web3-fx.contract/constant-fns
       {:instance contract-instance
-       :fns [[:is-working :gse-contract/is-working-loaded :log-error]]}
+       :fns [[contract-instance :is-working :gse-contract/is-working-loaded :log-error]]}
 
       })))
 

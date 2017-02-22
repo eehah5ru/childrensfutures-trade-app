@@ -85,12 +85,12 @@
          from-block-n (from-block db)]
      {:db (assoc-in db [:chat-contract :instance] contract-instance)
 
-      :web3-fx.contract/events
-      {:instance contract-instance
+      ; :web3-fx.contract/events
+      #_{:instance contract-instance
        :db db
        :db-path [:chat-contract :events]
        :events (map (fn [[event handler]]
-                      [event {} {:from-block from-block-n} handler :log-error])
+                      [contract-instance event {} {:from-block from-block-n} handler :log-error])
                     contract-events)}
       })))
 
