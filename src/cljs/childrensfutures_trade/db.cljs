@@ -176,6 +176,8 @@
 (s/def ::chat-open? boolean?)
 (s/def ::db-synced-at int?)
 (s/def ::db-syncing? boolean?)
+(s/def ::latest-block int?)
+
 (s/def ::type #{:goal-added
                 :investment-placed})
 (s/def ::number int?)
@@ -192,8 +194,11 @@
                                             ::name]))
 
 
-(s/def ::gse-contract (partial s/conform ::ethereum-contract))
-(s/def ::chat-contract (partial s/conform ::ethereum-contract))
+(s/def ::gse-contract (s/and (partial s/conform ::ethereum-contract)
+                             (s/keys :req-un [::latest-block])))
+
+(s/def ::chat-contract (s/and (partial s/conform ::ethereum-contract)
+                              (s/keys :req-un [::latest-block])))
 
 ;;;
 ;;; structures
@@ -431,6 +436,7 @@
                           :abi nil
                           :bin nil
                           :instance nil
+                          :latest-block 0
                           }
 
                    ;; ropsten testnet in production
@@ -457,7 +463,8 @@
    :chat-contract (cond-> {:name "Chat"
                            :abi nil
                            :bin nil
-                           :instance nil}
+                           :instance nil
+                           :latest-block 0}
 
                     ;;
                     ;; production contract address

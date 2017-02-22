@@ -53,27 +53,34 @@
 ;;;
 (reg-event-fx
  :initialize
+ (interceptors-fx :spec true)
+
  (fn [_ _]
    (js/console.log :initialize)
    (let [db db/default-db
          full-app? (db/provides-web3?)
          read-only-app? (not full-app?)]
-     (js/console.log :full-app? full-app?)
-     (js/console.log :read-only-app? read-only-app?)
+     (js/console.log :initialize :full-app? full-app?)
+
      {:db db
       ;; TODO: refactor and extract this code to contract/fetch-abi
       :dispatch-n (cond-> []
                     true
                     (conj [:ui.spinner/hide-later 3000])
 
-                    full-app?
-                    (conj [:chat-contract/fetch-abi])
+                    ;; full-app?
+                    ;; (conj [:blockchain/init])
+                    ;; full-app?
+                    ;; (conj [:chat-contract/fetch-abi])
+
+                    ;; full-app?
+                    ;; (conj [:gse-contract/fetch-abi])
 
                     full-app?
-                    (conj [:gse-contract/fetch-abi])
+                    (conj [:initialize.full/fetch-db])
 
                     read-only-app?
-                    (conj [:sync-db/fetch])
+                    (conj [:sync-db/fetch-forever])
 
                     true
                     (conj [:ui.window/set-size])
@@ -82,26 +89,16 @@
                     (conj [:blockchain/load-my-addresses]))})))
 
 
+(reg-event-fx
+ :initialize.full/fetch-db
+ (interceptors-fx :spec false)
 
-;;;
-;;;
-;;; GOAL
-;;;
-;;;
-
-
-;;;
-;;;
-;;; GOAL ACTIONS
-;;;
-;;;
+ (fn [_]
+   {:dispatch [:sync-db/fetch
+               {:dispatch-n [[:chat-contract/fetch-abi]
+                             [:gse-contract/fetch-abi]]}]}))
 
 
-;;;
-;;;
-;;; CANCEL GOAL
-;;;
-;;;
 
 ;;;
 ;;; make cancel goal trx in the ethereum contract

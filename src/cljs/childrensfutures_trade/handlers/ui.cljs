@@ -350,7 +350,7 @@
             (assoc :critical-error? true)
             (assoc :force-read-only? true))
 
-    :dispatch [:sync-db/fetch]}))
+    :dispatch [:sync-db/fetch-forever]}))
 
 (reg-event-fx
  :app/recover-after-critical-error

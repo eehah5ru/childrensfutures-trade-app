@@ -5,7 +5,7 @@
 
 
    [childrensfutures-trade.db :as db]
-   [re-frame.core :refer [reg-event-db reg-event-fx path trim-v after debug reg-fx console dispatch]]
+   [re-frame.core :refer [reg-event-db reg-event-fx path trim-v after debug reg-fx console]]
    [childrensfutures-trade.utils :as u]
 
    ;;
@@ -148,13 +148,13 @@
 
 
 ;;;
-;;; fetch db
+;;; fetch db once and fire event
 ;;;
 (reg-event-fx
  :sync-db/fetch
- (interceptors-fx :spec true)
+ (interceptors-fx :spec false)
 
- (fn [{:keys [db]}]
+ (fn [{:keys [db]} [on-fetched]]
    (js/console.log :sync-db/fetching)
 
    {:http-xhrio {:method :get
@@ -162,9 +162,20 @@
                  :uri "/fetch-db"
                  :response-format (ajax/raw-response-format)
                  :timeout 6000
-                 :on-success [:sync-db/fetched]
-                 :on-failure [:log-error]}
-    :db db}))
+                 :on-success [:sync-db/fetched on-fetched]
+                 :on-failure [:log-error]}}))
+
+;;;
+;;; fetching db periodically
+;;;
+(reg-event-fx
+ :sync-db/fetch-forever
+ (interceptors-fx :spec false)
+
+ (fn [{:keys [db]}]
+   {:dispatch [:sync-db/fetch
+               {:dispatch-later [{:ms 5000
+                                  :dispatch [:sync-db/fetch-forever]}]}]}))
 
 ;;;
 ;;; fetched
@@ -173,18 +184,27 @@
  :sync-db/fetched
  (interceptors-fx :spec true)
 
- (fn [{:keys [db]} [fetched-db]]
+ (fn [{:keys [db]} [{:keys [dispatch-later dispatch dispatch-n]} fetched-db]]
    (js/console.log :sync-db/fetched)
 
    (let [fetched-db (cljs.reader/read-string fetched-db)
          current-version (:db-version db)
          new-version (get fetched-db :db-version 0)
          need-update? (> new-version current-version)]
-     {:db (cond-> db
-            need-update?
-            (merge fetched-db))
-      :dispatch-later [{:ms 5000
-                      :dispatch [:sync-db/fetch]}]})))
+     (cond-> {:db db}
+       need-update?
+       (update :db #(merge % fetched-db))
+
+       dispatch
+       (assoc :dispatch (conj (vec dispatch) new-version))
+
+       dispatch-n
+       (assoc :dispatch-n (map #(conj % new-version) (vec dispatch-n)))
+
+       dispatch-later
+       (assoc :dispatch-later (map (fn [x]
+                                     (update x :dispatch #(conj % new-version)))
+                                   dispatch-later))))))
 
 
 (reg-event-fx
