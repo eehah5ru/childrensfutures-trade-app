@@ -43,48 +43,59 @@
       (assoc db :db-version new-db-version)
       db)))
 
+;;; returns updated db
+(defn update-db-version-synced [db version]
+  (let [current-synced-db-version (:db-version-synced db)]
+    (assoc db :db-version-synced (min version current-synced-db-version))))
+
 ;;;
-;;;
+;;; select what to sync
 ;;;
 (defn db-for-sync [db]
   (select-keys db [:db-version
                    :goals
                    :pulse]))
 
+;;;
+;;; db -> string
+;;;
 (defn serialize-db [db]
   (let [w (t/writer :json)
         data (db-for-sync db)]
     (t/write w data)))
+
 ;;;
 ;;;
 ;;;
 ;;; events
 ;;;
 ;;;
-
 (reg-event-fx
  :sync-db/on-db-updated
  (interceptors-fx :spec true)
 
  (fn [{:keys [db]} [db-version]]
-   {:db (update-db-version db db-version)
-    :dispatch [:sync-db/check-and-sync db-version]}))
+   {:db (-> db
+            (update-db-version db-version)
+            (update-db-version-synced db-version))
+    :dispatch [:sync-db/check-and-sync]}))
 
 
 (reg-event-fx
  :sync-db/check-and-sync
- (interceptors-fx :spec false)
+ (interceptors-fx :spec true)
 
- (fn [{:keys [db]} [db-version-to-sync]]
+ (fn [{:keys [db]}]
    (let [cur-db-version (:db-version db)
+         cur-db-version-synced (:db-version-synced db)
          syncing? (:db-syncing? db)
          db-synced-at (:db-synced-at db)
          cur-timestamp (current-timestamp)
          sync-now? (> cur-timestamp
                       (+ db-synced-at
                          sync-interval))]
-     (if (< db-version-to-sync
-            cur-db-version)
+     (if (<= cur-db-version
+            cur-db-version-synced)
        ;; do nothing
        {}
        ;; try to sync
@@ -93,14 +104,15 @@
               sync-now?)
          (do
            (js/console.log :syncing-now)
-           {:dispatch [:sync-db/do-sync]})
+           {:db (assoc db :db-syncing? true)
+            :dispatch [:sync-db/do-sync]})
 
          (and (not syncing?)
               (not sync-now?))
          (do
            (js/console.log :syncing-later db-synced-at)
            {:dispatch-later [{:ms sync-interval
-                              :dispatch [:sync-db/check-and-sync  db-version-to-sync]}]})
+                              :dispatch [:sync-db/check-and-sync]}]})
 
          :else
          {}))
@@ -117,7 +129,8 @@
  (fn [{:keys [db]}]
    (js/console.log :sync-db/syncing)
 
-   (let [form-data (doto (js/FormData.)
+   (let [cur-db-version (:db-version db)
+         form-data (doto (js/FormData.)
                      (.append "db" (db-for-sync db)))]
      {:http-xhrio {:method :post
                    :format :transit
@@ -131,7 +144,7 @@
                    ;; :body (js/FormData. (serialize-db {:a 1}))
                    :body form-data
                    }
-      :db (assoc db :db-syncing? true)})))
+      :db (assoc db :db-version-synced cur-db-version)})))
 
 ;;;
 ;;; when synced successful

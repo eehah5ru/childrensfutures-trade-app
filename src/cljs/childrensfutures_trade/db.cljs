@@ -144,6 +144,7 @@
 ;;;
 (s/def ::stage gs/stages)
 (s/def ::db-version int?)
+(s/def ::db-version-synced int?)
 (s/def ::goal-id string?)
 (s/def ::channel-id string?)
 (s/def ::message-id int?)
@@ -364,6 +365,7 @@
 
 ;;; DB structure
 (s/def ::db (s/keys :req-un [::db-version
+                             ::db-version-synced
                              ::goals
                              ;; ::messages
                              ;; ::pulse
@@ -429,6 +431,7 @@
    :provides-web3? (provides-web3?)
    :db-synced-at 0
    :db-syncing? false
+   :db-version-synced 0
    ;;
    ;; gse contract
    ;;
