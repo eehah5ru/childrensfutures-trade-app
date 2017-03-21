@@ -448,15 +448,15 @@
                            :from-block 497069})
 
                    ;; ropsten testnet in devel env
-                   childrensfutures-trade.utils/DEV
-                   (merge {:address "0x4febdfbf70c28ae01dcdbfb490883a31499ed6c2"
-                           :from-block 497069})
+                   ;; childrensfutures-trade.utils/DEV
+                   ;; (merge {:address "0x4febdfbf70c28ae01dcdbfb490883a31499ed6c2"
+                   ;;         :from-block 497069})
 
                    ;; devel GSE contract address
                    ;; depends on testrpc
-                    ;; childrensfutures-trade.utils/DEV
-                    ;; (merge {:address "0xd386a048b29fac26a79fe4d2179483a13a15e943"
-                    ;;         :from-block 0})
+                   childrensfutures-trade.utils/DEV
+                   (merge {:address "0x2d30b9315448ddd146cb17e606ab594f3eccf910"
+                           :from-block 0})
 
                    )
 
