@@ -33,7 +33,7 @@
                     :gas goal-gas-limit}
         error-event (or error-event :log-error)
         contract-instance (:instance (contract db))]
-    {:web3-fx.contract/state-fn
+    {:web3-fx.contract/state-fns
      {:instance contract-instance
       :web3 (:web3 db)
       :db-path (flatten [contract

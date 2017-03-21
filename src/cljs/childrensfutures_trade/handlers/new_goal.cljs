@@ -55,6 +55,7 @@
    (let [{:keys [description
                  owner
                  give-in-return]} (:new-goal db)]
+     (js/console.log :new-goal :send-button-pressed)
      (hu/blockchain-send-transaction
       db
       :gse-contract

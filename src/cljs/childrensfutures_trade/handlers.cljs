@@ -109,7 +109,7 @@
  (fn [{:keys [db]} [goal-id]]
    (let [address (:current-address db)
          contract-instance (:instance (:gse-contract db))]
-     {:web3-fx.contract/state-fn
+     {:web3-fx.contract/state-fns
       {:instance contract-instance
        :web3 (:web3 db)
        :db-path [:gse-contract :cancel-goal (keyword goal-id)]
@@ -172,7 +172,7 @@
    (let [address (:current-address db)
          {:keys [description]} (:new-bid db)
          contract-instance (:instance (:gse-contract db))]
-     {:web3-fx.contract/state-fn
+     {:web3-fx.contract/state-fns
       {:instance contract-instance
        :web3 (:web3 db)
        :db-path [:gse-contract :place-bid (keyword goal-id)]
