@@ -31,7 +31,11 @@
                  [cljsjs/clipboard "1.5.13-1"]
                  [com.cemerick/url "0.1.1"]
                  [com.cognitect/transit-cljs "0.8.239"]
-                 [com.cognitect/transit-clj "0.8.297"]]
+                 [com.cognitect/transit-clj "0.8.297"]
+
+                 ;; redis
+                 [com.taoensso/carmine "2.15.1"]]
+
 
   :plugins [[lein-auto "0.1.2"]
             [lein-cljsbuild "1.1.4"]
