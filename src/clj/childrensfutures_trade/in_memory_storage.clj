@@ -1,27 +1,31 @@
 (ns childrensfutures-trade.in-memory-storage
   (:require [clojure.java.io :as io]
             [ring.logger.onelog :as logger.onelog]
+
+            [childrensfutures-trade.db :as db]
             ))
 
-(def default-db {:db-version 0
-                 :goals (hash-map)
-                 :pulse []})
+(defn new-db-storage []
+  (atom db/default-db))
 
-(def db (atom default-db))
+(deftype InMemoryStorage [db-storage]
+  db/IStorage
 
-(defn refresh-db [new-db]
-  (let [current-version (get @db :db-version 0)
+  (refresh-db [this new-db]
+    (let [current-version (get @db-storage :db-version 0)
         next-version (get new-db :db-version 0)]
     (do
-      (reset! db new-db)
+      (reset! db-storage new-db)
       true)))
 
-(defn get-db []
-  @db)
+  (get-db [_]
+    @db-storage)
 
-(defn db-version []
-  (get @db :db-version 0))
+  (db-version [_]
+    (get @db-storage :db-version 0))
 
+  (reset-db [_]
+    (reset! db-storage db/default-db)))
 
-(defn reset-db []
-  (reset! db default-db))
+(defn create []
+  (InMemoryStorage. (new-db-storage)))

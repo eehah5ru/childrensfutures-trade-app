@@ -17,7 +17,8 @@
 
             [childrensfutures-trade.utils :as u]
 
-            [childrensfutures-trade.in-memory-storage :as db]
+            [childrensfutures-trade.db :as db]
+            [childrensfutures-trade.in-memory-storage :as in-memory]
             )
   (:gen-class))
 
@@ -47,20 +48,24 @@
 ;;    :body "ok"})
 
 ;;;
+;;; db handlers
+;;;
+
+;;; storage adaptor
+(def db-storage (in-memory/create))
+
+;;;
 ;;; refresh db
 ;;;
 (defn refresh-db [req]
   (let [raw-db (get-in req [:params :db] db/default-db)
         parsed-db (edn/read-string raw-db)
         new-db-version (get parsed-db :db-version -1)]
-    ;; (println "\n\n")
-    ;; (clojure.pprint/pprint raw-db)
-    ;; (println "\n\n")
 
-    (println (str "Trying to refresh db (version " (db/db-version) ") with version " new-db-version))
+    (println (str "Trying to refresh db (version " (db/db-version db-storage) ") with version " new-db-version))
 
-    (if (db/refresh-db parsed-db)
-      (println (str "refreshed. new version " (db/db-version)))
+    (if (db/refresh-db db-storage parsed-db)
+      (println (str "refreshed. new version " (db/db-version db-storage)))
       (println "not refreshed")))
   {:status 200
    :headers {"Content-Type" "text/plain"}
@@ -71,9 +76,9 @@
 ;;;
 (defn fetch-db [req]
   (let [remote-db-version (u/parse-int (get-in req [:params :db-version] "0"))
-        need-to-fetch? (> (db/db-version) remote-db-version)
+        need-to-fetch? (> (db/db-version db-storage) remote-db-version)
         result (if need-to-fetch?
-                 (db/get-db)
+                 (db/get-db db-storage)
                  {})]
     {:status 200
      :headers {"Content-Type" "text/plain"}
@@ -84,11 +89,15 @@
 ;;; reset db
 ;;;
 (defn reset-db [req]
-  (db/reset-db)
+  (db/reset-db db-storage)
   {:status 200
    :headers {"Content-Type" "text/plain"}
    :body "ok"})
 
+
+;;;
+;;; define routes
+;;;
 (defroutes routes
   (wrap-multipart-params
    (POST "/refresh-db"
