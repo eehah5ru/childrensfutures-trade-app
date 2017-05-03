@@ -62,7 +62,8 @@
               [lein-cljsbuild "1.1.4"]
               [lein-shell "0.5.0"]
               [deraen/lein-less4j "0.5.0"]
-              [lein-file-replace "0.1.0"]]
+              [lein-file-replace "0.1.0"]
+              [com.roomkey/lein-v "6.1.0"]]
 
     :min-lein-version "2.5.3"
     :main childrensfutures-trade.core
@@ -90,6 +91,12 @@
            :compression true}
 
     :uberjar-name "childrensfutures-trade.jar"
+
+    :prep-tasks [["v" "cache" "src"]]
+    :release-tasks [["vcs" "assert-committed"]
+                    ["v" "update"] ;; compute new version & tag it
+                    ["vcs" "push"]
+                    ["deploy"]]
 
     ;;
     ;;
