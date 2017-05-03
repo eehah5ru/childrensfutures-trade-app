@@ -13,3 +13,4 @@ out
 /.lein-repl-history
 /log/figwheel.log
 /src/clj/childrensfutures_trade/sandbox/play_with_redis.clj
+/resources/public/index.html
