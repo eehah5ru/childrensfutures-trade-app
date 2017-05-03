@@ -19,7 +19,7 @@
 ;;;
 ;;;
 (let [revision (get-revision)]
-  (defproject childrensfutures-trade "0.1.1"
+  (defproject childrensfutures-trade :lein-v
     :dependencies [[bidi "2.0.10"]
                    [bk/ring-gzip "0.1.1"]
                    [cljs-ajax "0.5.8"]
