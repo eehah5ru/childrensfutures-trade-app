@@ -120,10 +120,10 @@
       ;;
       ;; generate index.html
       ;;
-      :filegen-ng [{:data {:tpl ~(slurp "resources/public/index_tpl.html")
-                        :version ~(fn [p] nil)}
-                 :template-fn ~(fn [p d] (:version p))
-                 :target "resources/public/index.html"}]
+      :filegen-ng [{:data {:template ~(slurp "resources/public/index_tpl.html")
+                           :version ~(fn [p] (:version p))}
+                    :template-fn src
+                    :target "resources/public/index.html"}]
       ;;
       ;; build cljs
       ;;
@@ -144,14 +144,23 @@
      ;; production
      ;;
      :uberjar {:hooks [leiningen.cljsbuild]
-               :prep-tasks ["file-replace" ]
+               ;;
+               ;; generate index.html
+               ;;
+               :filegen-ng [{:data
+                             {:template ~(slurp "resources/public/index_tpl.html")
+                              :version ~(fn [p] (:version p))}
+                             :template-fn #(.replaceAll (:template %2) "app.js" (str "app_" (:version %2) ".js"))
+                             :target "resources/public/index.html"}]
+
                :omit-source true
                :aot :all
                :main childrensfutures-trade.core
                :cljsbuild {:builds {:app {:id "uberjar"
                                           :source-paths ["src/cljs"]
                                           :compiler {:main childrensfutures-trade.core
-                                                     :output-to ~(str "resources/public/js/compiled/app_" revision ".js")
+                                                     ;; :output-to ~(str "resources/public/js/compiled/app_" revision ".js")
+                                                     :output-to ~(fn [p] "aaa.js")
                                                      :optimizations :advanced
                                                      :closure-defines {childrensfutures-trade.utils.DEV false
                                                                        goog.DEBUG false}
