@@ -63,7 +63,8 @@
               [lein-shell "0.5.0"]
               [deraen/lein-less4j "0.5.0"]
               [lein-file-replace "0.1.0"]
-              [com.roomkey/lein-v "6.1.0"]]
+              [com.roomkey/lein-v "6.1.0"]
+              [filegen-ng "0.1.0-SNAPSHOT"]]
 
     :min-lein-version "2.5.3"
     :main childrensfutures-trade.core
@@ -116,6 +117,16 @@
 
       :plugins [[lein-figwheel "0.5.8"]]
       :source-paths ["env/dev"]
+      ;;
+      ;; generate index.html
+      ;;
+      :filegen-ng [{:data {:tpl ~(slurp "resources/public/index_tpl.html")
+                        :version ~(fn [p] nil)}
+                 :template-fn ~(fn [p d] (:lein-v p))
+                 :target "resources/public/index.html"}]
+      ;;
+      ;; build cljs
+      ;;
       :cljsbuild {:builds [{:id "dev"
                             :source-paths ["src/cljs"]
                             :figwheel {:on-jsload "childrensfutures-trade.core/mount-root"}
@@ -133,6 +144,7 @@
      ;; production
      ;;
      :uberjar {:hooks [leiningen.cljsbuild]
+               :prep-tasks ["file-replace" ]
                :omit-source true
                :aot :all
                :main childrensfutures-trade.core
