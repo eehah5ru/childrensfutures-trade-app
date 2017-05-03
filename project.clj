@@ -95,8 +95,8 @@
     :prep-tasks [["v" "cache" "src"]]
     :release-tasks [["vcs" "assert-committed"]
                     ["v" "update"] ;; compute new version & tag it
-                    ["vcs" "push"]
-                    ["deploy"]]
+                    ["vcs" "push"]]
+
 
     ;;
     ;;
