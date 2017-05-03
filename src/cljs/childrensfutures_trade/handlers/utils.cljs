@@ -15,7 +15,7 @@
 
    ))
 
-(def goal-gas-limit 1000000)
+(def goal-gas-limit 1500000)
 
 
 ;;;
