@@ -1,0 +1,185 @@
+* begining of may
+* redis storage
+* spinners when transaction is in progress
+* anti-cache policy for app.js
+
+* old suff
+* DONE new chat message
+  CLOSED: [2017-02-04 Sat 10:27]
+** DONE chat-message contstructor
+   CLOSED: [2017-02-01 Wed 12:08]
+*** DONE text
+    CLOSED: [2017-02-01 Wed 12:07]
+*** DONE owner
+    CLOSED: [2017-02-01 Wed 12:07]
+*** DONE channel-id
+    CLOSED: [2017-02-01 Wed 12:07]
+*** DONE trx-on-air?
+    CLOSED: [2017-02-01 Wed 12:08]
+** DONE default channel id
+   CLOSED: [2017-02-01 Wed 12:08]
+** DONE db spec
+   CLOSED: [2017-02-01 Wed 12:24]
+*** DONE for gse-contract
+    CLOSED: [2017-02-01 Wed 12:22]
+*** DONE for chat-contract
+    CLOSED: [2017-02-01 Wed 12:23]
+*** DONE new message
+    CLOSED: [2017-02-01 Wed 12:16]
+**** DONE owner
+     CLOSED: [2017-02-04 Sat 10:27]
+**** DONE text
+     CLOSED: [2017-02-04 Sat 10:27]
+**** DONE channel-id
+     CLOSED: [2017-02-04 Sat 10:27]
+**** DONE trx-on-ai?r
+     CLOSED: [2017-02-01 Wed 12:23]
+** DONE default-db
+   CLOSED: [2017-02-01 Wed 12:25]
+*** DONE gse-contract
+    CLOSED: [2017-02-01 Wed 12:25]
+*** DONE chat-contract
+    CLOSED: [2017-02-01 Wed 12:25]
+*** DONE new-chat-message
+    CLOSED: [2017-02-01 Wed 12:24]
+** DONE new_goal owner -> new-chat-mesasge owner
+   CLOSED: [2017-02-01 Wed 12:44]
+*** DONE set new goal owner -> separate event
+    CLOSED: [2017-02-01 Wed 12:43]
+*** DONE set new-chat-message owner -> separate event
+    CLOSED: [2017-02-01 Wed 12:43]
+*** DONE put them into my-addresses loaded
+    CLOSED: [2017-02-01 Wed 12:43]
+** DONE new secondary drawer
+   CLOSED: [2017-02-02 Thu 20:25]
+*** drawer
+**** DONE db chat/open?
+     CLOSED: [2017-02-01 Wed 14:15]
+***** DONE spec
+      CLOSED: [2017-02-01 Wed 14:15]
+***** DONE default value
+      CLOSED: [2017-02-01 Wed 14:15]
+**** DONE event ui.chat/toggle-view
+     CLOSED: [2017-02-01 Wed 14:15]
+**** DONE sub ui.chat/open?
+     CLOSED: [2017-02-01 Wed 14:15]
+**** DONE send message button
+     CLOSED: [2017-02-02 Thu 20:15]
+**** DONE enter message text field
+     CLOSED: [2017-02-02 Thu 20:15]
+
+* DONE messages list
+  CLOSED: [2017-02-04 Sat 10:27]
+** DONE db.messages collection
+   CLOSED: [2017-02-02 Thu 20:17]
+*** DONE spec
+    CLOSED: [2017-02-02 Thu 20:17]
+**** DONE map; channel-id -> chat-message
+     CLOSED: [2017-02-02 Thu 20:17]
+*** DONE default value
+    CLOSED: [2017-02-02 Thu 20:17]
+
+** DONE on-chat-message-sent event implementation
+   CLOSED: [2017-02-03 Fri 13:52]
+
+** DONE chat drawer
+   CLOSED: [2017-02-04 Sat 10:27]
+**** DONE messages list
+     CLOSED: [2017-02-03 Fri 13:52]
+*** DONE chat drawer title
+    CLOSED: [2017-02-04 Sat 10:27]
+* DONE selectable channel
+  CLOSED: [2017-02-04 Sat 10:23]
+** DONE current chaneel id
+   CLOSED: [2017-02-04 Sat 10:23]
+*** DONE db/current channel id
+    CLOSED: [2017-02-03 Fri 13:52]
+*** DONE subs current channel id
+    CLOSED: [2017-02-03 Fri 13:52]
+*** DONE event chat/set-current-channel-id
+    CLOSED: [2017-02-04 Sat 10:22]
+* DONE select bid
+  CLOSED: [2017-02-04 Sat 12:28]
+** DONE dialog are you sure?
+   CLOSED: [2017-02-04 Sat 12:28]
+*** DONE dialog view
+    CLOSED: [2017-02-04 Sat 12:28]
+*** DONE sub ui.select-bid/dialog-open?
+    CLOSED: [2017-02-04 Sat 12:27]
+*** DONE db seelect-bid
+    CLOSED: [2017-02-04 Sat 12:27]
+**** DONE goal-id
+     CLOSED: [2017-02-04 Sat 12:27]
+**** DONE bid-id
+     CLOSED: [2017-02-04 Sat 12:27]
+**** dialog-open?
+**** DONE default
+     CLOSED: [2017-02-04 Sat 12:27]
+**** DONE spec
+     CLOSED: [2017-02-04 Sat 12:27]
+*** DONE handler ui.select-bid-dialog/toggle-view?
+    CLOSED: [2017-02-04 Sat 12:28]
+*** DONE handler ui.select-bif-dialog/ok
+    CLOSED: [2017-02-04 Sat 12:28]
+*** DONE handler ui.select-bid-dialog/cancel
+    CLOSED: [2017-02-04 Sat 12:28]
+* TODO my goals page
+** DONE page-def
+   CLOSED: [2017-02-04 Sat 12:42]
+** TODO icon !!
+** DONE list
+   CLOSED: [2017-02-04 Sat 12:42]
+** TODO statuses - color?
+* pulse page
+** DONE db pulse
+   CLOSED: [2017-02-04 Sat 13:08]
+*** default values
+**** DONE pulse
+     CLOSED: [2017-02-04 Sat 13:05]
+***** []
+**** DONE goal-added
+     CLOSED: [2017-02-04 Sat 13:06]
+***** goal-id
+**** DONE investment-placed
+     CLOSED: [2017-02-04 Sat 13:07]
+***** goal-id
+***** bid-id
+*** DONE specs
+    CLOSED: [2017-02-04 Sat 13:07]
+**** goal-added
+**** investment-placed
+** DONE events
+   CLOSED: [2017-05-03 Wed 14:20]
+*** DONE goal added
+    CLOSED: [2017-02-04 Sat 13:34]
+*** DONE investment placed
+    CLOSED: [2017-02-04 Sat 13:34]
+** DONE subs
+   CLOSED: [2017-02-04 Sat 13:36]
+*** DONE all-pulse-events
+    CLOSED: [2017-02-04 Sat 13:36]
+** handlers
+*** refactor gse contract handlers
+*** pulse/push-goal-added
+*** pulse/push-investment-placed
+* TODO chat
+** TODO whats about long messages?
+* goal card
+** long goal
+** long investment
+** long give-in-return
+* pages
+** Home
+   all events
+** my events
+*** my bids
+*** my goals
+** My Goals
+   status of my goals
+* indicators
+** what should I get
+** what shoud I send to my supporters
+* words
+** dreamer
+** investor
+** supporter
