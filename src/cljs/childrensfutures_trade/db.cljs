@@ -449,8 +449,8 @@
 
                    ;; ropsten testnet in staging
                    (= "staging" childrensfutures-trade.utils/CONTRACTS)
-                   (merge {:address "0x641937c1fbf30604809e9701647af90413bb1e3a"
-                           :from-block 424770})
+                   (merge {:address "0xe1059f8c273776fea9d4fb7de1b14fb4f684208d"
+                           :from-block 868341})
 
                    ;; ropsten testnet in devel env
                    ;; childrensfutures-trade.utils/DEV
@@ -484,8 +484,8 @@
                     ;; production contract address
                     ;;
                    (= "staging" childrensfutures-trade.utils/CONTRACTS)
-                    (merge {:address "0x6e600f0939c3aec1aece8735c38f2e10ccc44cf3"
-                            :from-block 487332})
+                    (merge {:address "0x777117851865397d4659d84f1ce3b122bd1a0819"
+                            :from-block 868350})
 
 
                     ;;
