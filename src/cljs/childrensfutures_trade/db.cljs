@@ -443,9 +443,14 @@
                           }
 
                    ;; ropsten testnet in production
-                   (not childrensfutures-trade.utils/DEV)
+                   (= "production" childrensfutures-trade.utils/CONTRACTS)
                    (merge {:address "0x4febdfbf70c28ae01dcdbfb490883a31499ed6c2"
                            :from-block 497069})
+
+                   ;; ropsten testnet in staging
+                   (= "staging" childrensfutures-trade.utils/CONTRACTS)
+                   (merge {:address "0x641937c1fbf30604809e9701647af90413bb1e3a"
+                           :from-block 424770})
 
                    ;; ropsten testnet in devel env
                    ;; childrensfutures-trade.utils/DEV
@@ -454,10 +459,9 @@
 
                    ;; devel GSE contract address
                    ;; depends on testrpc
-                   childrensfutures-trade.utils/DEV
-                   (merge {:address "0x2d30b9315448ddd146cb17e606ab594f3eccf910"
-                           :from-block 0})
-
+                   ;; childrensfutures-trade.utils/DEV
+                   ;; (merge {:address "0x2d30b9315448ddd146cb17e606ab594f3eccf910"
+                   ;;         :from-block 0})
                    )
 
    ;;
@@ -472,7 +476,14 @@
                     ;;
                     ;; production contract address
                     ;;
-                    (not childrensfutures-trade.utils/DEV)
+                   (= "production" childrensfutures-trade.utils/CONTRACTS)
+                    (merge {:address "0x6e600f0939c3aec1aece8735c38f2e10ccc44cf3"
+                            :from-block 487332})
+
+                    ;;
+                    ;; production contract address
+                    ;;
+                   (= "staging" childrensfutures-trade.utils/CONTRACTS)
                     (merge {:address "0x6e600f0939c3aec1aece8735c38f2e10ccc44cf3"
                             :from-block 487332})
 
@@ -481,9 +492,9 @@
                     ;; devel Chat contract address
                     ;;
                     ;; in ropsten
-                    childrensfutures-trade.utils/DEV
-                    (merge {:address "0x6e600f0939c3aec1aece8735c38f2e10ccc44cf3"
-                            :from-block 487332})
+                    ;; childrensfutures-trade.utils/DEV
+                    ;; (merge {:address "0x6e600f0939c3aec1aece8735c38f2e10ccc44cf3"
+                    ;;         :from-block 487332})
 
                     ;; depends on testrpc
                     ;; childrensfutures-trade.utils/DEV

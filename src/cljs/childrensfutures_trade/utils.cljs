@@ -11,8 +11,13 @@
 
             ))
 
+;;; local figwheel if true
 (goog-define DEV false)
+;;; dev.myfutures.trade if true
+(goog-define STAGING false)
 
+;;; could be :production, :staging or :private
+(goog-define CONTRACTS "production")
 
 (defn truncate
   "Truncate a string with suffix (ellipsis by default) if it is

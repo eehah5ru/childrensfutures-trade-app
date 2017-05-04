@@ -134,36 +134,76 @@
                                      :source-map-timestamp true
                                      :optimizations :none
                                      :closure-defines {childrensfutures-trade.utils.DEV true
+                                                       childrensfutures-trade.utils.STAGING false
+                                                       childrensfutures-trade.utils.CONTRACTS "staging"
                                                        goog.DEBUG false}
                                      :preloads [print.foo.preloads.devtools]}}]}}
 
    ;;
    ;; production
    ;;
-   :uberjar {:hooks [
-                     leiningen.cljsbuild-extras
-                     leiningen.cljsbuild]
-             ;;
-             ;; generate index.html
-             ;;
-             :filegen-ng [{:data
-                           {:template ~(slurp "resources/public/index_tpl.html")
-                            :version ~(fn [p] (:version p))}
-                           :template-fn #(.replaceAll (:template %2) "app.js" (str "app_" (:version %2) ".js"))
-                           :target "resources/public/index.html"}]
+   :production
+   {:hooks [
+            leiningen.cljsbuild-extras
+            leiningen.cljsbuild]
+    ;;
+    ;; generate index.html
+    ;;
+    :filegen-ng [{:data
+                  {:template ~(slurp "resources/public/index_tpl.html")
+                   :version ~(fn [p] (:version p))}
+                  :template-fn #(.replaceAll (:template %2) "app.js" (str "app_" (:version %2) ".js"))
+                  :target "resources/public/index.html"}]
 
-             :omit-source true
-             :aot :all
-             :main childrensfutures-trade.core
-             :cljsbuild {:builds {:app {:id "uberjar"
-                                        :source-paths ["src/cljs"]
-                                        :compiler {:main childrensfutures-trade.core
-                                                   ;; :output-to ~(str "resources/public/js/compiled/app_" revision ".js")
-                                                   ;; :output-to :version
-                                                   ;; :output-to "aaa.js"
-                                                   :output-to #=(eval (fn [p] (str "resources/public/js/compiled/app_" (:version p) ".js")))
-                                                   :optimizations :advanced
-                                                   :closure-defines {childrensfutures-trade.utils.DEV false
-                                                                     goog.DEBUG false}
-                                                   :pretty-print true
-                                                   :pseudo-names true}}}}}})
+    :omit-source true
+    :aot :all
+    :main childrensfutures-trade.core
+    :cljsbuild {:builds {:app {:id "production"
+                               :source-paths ["src/cljs"]
+                               :compiler {:main childrensfutures-trade.core
+                                          ;; :output-to ~(str "resources/public/js/compiled/app_" revision ".js")
+                                          ;; :output-to :version
+                                          ;; :output-to "aaa.js"
+                                          :output-to #=(eval (fn [p] (str "resources/public/js/compiled/app_" (:version p) ".js")))
+                                          :optimizations :advanced
+                                          :closure-defines {childrensfutures-trade.utils.DEV false
+                                                            childrensfutures-trade.utils.STAGING false
+                                                            childrensfutures-trade.utils.CONTRACTS "production"
+                                                            goog.DEBUG false}
+                                          :pretty-print true
+                                          :pseudo-names true}}}}}
+   ;;
+   ;; staging
+   ;;
+   :staging
+   {:hooks [
+            leiningen.cljsbuild-extras
+            leiningen.cljsbuild]
+    ;;
+    ;; generate index.html
+    ;;
+    :filegen-ng [{:data
+                  {:template ~(slurp "resources/public/index_tpl.html")
+                   :version ~(fn [p] (:version p))}
+                  :template-fn #(.replaceAll (:template %2) "app.js" (str "app_" (:version %2) ".js"))
+                  :target "resources/public/index.html"}]
+
+    :omit-source true
+    :aot :all
+    :main childrensfutures-trade.core
+    :cljsbuild {:builds {:app {:id "staging"
+                               :source-paths ["src/cljs"]
+                               :compiler {:main childrensfutures-trade.core
+                                          ;; :output-to ~(str "resources/public/js/compiled/app_" revision ".js")
+                                          ;; :output-to :version
+                                          ;; :output-to "aaa.js"
+                                          :output-to #=(eval (fn [p] (str "resources/public/js/compiled/app_" (:version p) ".js")))
+                                          :optimizations :advanced
+                                          :closure-defines {childrensfutures-trade.utils.DEV false
+                                                            childrensfutures-trade.utils.STAGING true
+                                                            childrensfutures-trade.utils.CONTRACTS "staging"
+                                                            goog.DEBUG false}
+                                          :pretty-print true
+                                          :pseudo-names true}}}}}
+
+   })
