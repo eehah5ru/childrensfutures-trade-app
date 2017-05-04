@@ -109,10 +109,10 @@
    :dev
    {:dependencies [[binaryage/devtools "0.8.2"]
                    [com.cemerick/piggieback "0.2.1"]
-                   [figwheel-sidecar "0.5.8"]
+                   [figwheel-sidecar "0.5.10"]
                    [org.clojure/tools.nrepl "0.2.11"]]
 
-    :plugins [[lein-figwheel "0.5.8"]]
+    :plugins [[lein-figwheel "0.5.9"]]
     :source-paths ["env/dev"]
     ;;
     ;; generate index.html
