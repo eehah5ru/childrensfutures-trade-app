@@ -119,7 +119,7 @@
     ;;
     :filegen-ng [{:data {:template ~(slurp "resources/public/index_tpl.html")
                          :version ~(fn [p] (:version p))}
-                  :template-fn str
+                  :template-fn ~(fn [p d] (:template d))
                   :target "resources/public/index.html"}]
     ;;
     ;; build cljs
