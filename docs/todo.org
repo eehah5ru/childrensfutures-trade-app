@@ -1,9 +1,22 @@
-* begining of may
+* _begining of may_
 * redis storage
 * spinners when transaction is in progress
-* anti-cache policy for app.js
+** refactor select_bid to do that
+** check all methods
+* syncing db
+** remove state flags from goals
+*** trx-on-air
+*** cancelling
+*** bid placing?
+*** bid selecting?
+* server side rendering for crawler bots
+* check begin spinner in webmaset interface
+* DONE disable spinner faster if we're not in chrome
+  CLOSED: [2017-05-05 Fri 18:25]
+* DONE anti-cache policy for app.js
+  CLOSED: [2017-05-05 Fri 17:41]
 
-* old suff
+* _old suff_
 * DONE new chat message
   CLOSED: [2017-02-04 Sat 10:27]
 ** DONE chat-message contstructor
