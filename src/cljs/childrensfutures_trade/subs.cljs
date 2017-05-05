@@ -473,6 +473,17 @@
  (fn [goals [_ goal-id]]
    (get-in goals [goal-id :show-share-url?])))
 
+;;;
+;;; is trx on air?
+;;; @return boolean
+;;;
+(reg-sub
+ :ui.goal/show-trx-on-air-splash?
+ :<- [:db/goals]
+
+ (fn [goals [_ goal-id]]
+   (get-in goals [goal-id :trx-on-air?] false)))
+
 
 ;;; FIXME: deprecated
 (reg-sub

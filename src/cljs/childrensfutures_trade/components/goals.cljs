@@ -133,8 +133,13 @@
                                        show-expandable-button?]
                                 :or {expanded? false
                                      show-expandable-button? true}}]
-  (let [{:keys [goal-id stage description give-in-return]} goal
+  (let [{:keys [goal-id
+                stage
+                description
+                give-in-return
+                trx-on-air?]} goal
         show-share-url? (subscribe [:ui.goal/show-share-url? goal-id])
+        show-splash? (subscribe [:ui.goal/show-trx-on-air-splash? goal-id])
         card-properties (staged-card-properties stage)
         location (subscribe [:location/root])
         {:keys [card-style
@@ -147,6 +152,20 @@
       :style (card-style goal)
       ;; :expanded expanded?
       :initially-expanded expanded?}
+
+     ;; trx on air spinner
+     (when @show-splash?
+       [:div
+        {:class "trx-on-air-splash"}])
+
+     (when @show-splash?
+       [:div
+        {:class "trx-on-air-spinner"}
+        [ui/circular-progress
+         {:mode :indeterminate
+          :color (color :cyan-50)
+          :thickness 10
+          :size 80}]])
 
      ;; header
      [ui/card-header
