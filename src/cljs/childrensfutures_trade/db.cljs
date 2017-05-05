@@ -447,6 +447,7 @@
                    (merge {:address "0x4febdfbf70c28ae01dcdbfb490883a31499ed6c2"
                            :from-block 497069})
 
+
                    ;; ropsten testnet in staging
                    (= "staging" childrensfutures-trade.utils/CONTRACTS)
                    (merge {:address "0xe1059f8c273776fea9d4fb7de1b14fb4f684208d"

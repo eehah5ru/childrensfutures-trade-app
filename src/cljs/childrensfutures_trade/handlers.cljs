@@ -65,7 +65,11 @@
      {:db db
       ;; TODO: refactor and extract this code to contract/fetch-abi
       :dispatch-n (cond-> []
-                    true
+                    ;; hide spinner imidiatelly for read-only-app
+                    read-only-app?
+                    (conj [:ui.spinner/hide])
+
+                    full-app?
                     (conj [:ui.spinner/hide-later 3000])
 
                     ;; full-app?
