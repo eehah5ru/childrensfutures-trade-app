@@ -28,6 +28,7 @@
    ;; blockchain GSE contract events
    [childrensfutures-trade.handlers.goal] ; general goal events
    [childrensfutures-trade.handlers.new-goal]
+   [childrensfutures-trade.handlers.place-bid]
    [childrensfutures-trade.handlers.select-bid]
    [childrensfutures-trade.handlers.send-investment]
    [childrensfutures-trade.handlers.receive-investment]
@@ -164,52 +165,52 @@
  (fn [{:keys [db]} [goal-id]]
    {:db db
     :dispatch-n [[:ui.new-bid/toggle-view goal-id]
-                 [:place-bid/send goal-id]]}))
+                 [:blockchain.place-bid/send goal-id]]}))
 
 ;;;
 ;;; make place bid trx in the ethereum
 ;;;
-(reg-event-fx
- :place-bid/send
- (interceptors-fx :spec false)
- (fn [{:keys [db]} [goal-id]]
-   (let [address (:current-address db)
-         {:keys [description]} (:new-bid db)
-         contract-instance (:instance (:gse-contract db))]
-     {:web3-fx.contract/state-fns
-      {:instance contract-instance
-       :web3 (:web3 db)
-       :db-path [:gse-contract :place-bid (keyword goal-id)]
-       :fns [[contract-instance
-              :place-bid goal-id description
-              {:from address
-               :gas goal-gas-limit}
-              [:place-bid/confirmed goal-id]
-              :log-error
-              [:place-bid/transaction-receipt-loaded goal-id]]]}})))
+;; (reg-event-fx
+;;  :place-bid/send
+;;  (interceptors-fx :spec false)
+;;  (fn [{:keys [db]} [goal-id]]
+;;    (let [address (:current-address db)
+;;          {:keys [description]} (:new-bid db)
+;;          contract-instance (:instance (:gse-contract db))]
+;;      {:web3-fx.contract/state-fns
+;;       {:instance contract-instance
+;;        :web3 (:web3 db)
+;;        :db-path [:gse-contract :place-bid (keyword goal-id)]
+;;        :fns [[contract-instance
+;;               :place-bid goal-id description
+;;               {:from address
+;;                :gas goal-gas-limit}
+;;               [:place-bid/confirmed goal-id]
+;;               :log-error
+;;               [:place-bid/transaction-receipt-loaded goal-id]]]}})))
 
-;;;
-;;; change state of placed bid
-;;; if trx was confirmed by user
-;;;
-(reg-event-db
- :place-bid/confirmed
- (interceptors)
- (fn [db [goal-id tx-hash]]
-   (assoc-in db [:new-bid :placing?] true)))
+;; ;;;
+;; ;;; change state of placed bid
+;; ;;; if trx was confirmed by user
+;; ;;;
+;; (reg-event-db
+;;  :place-bid/confirmed
+;;  (interceptors)
+;;  (fn [db [goal-id tx-hash]]
+;;    (assoc-in db [:new-bid :placing?] true)))
 
-;;;
-;;; confirms that bid was placed
-;;;
-(reg-event-db
- :place-bid/transaction-receipt-loaded
- (interceptors)
- (fn [db [goal-id & {:keys [gas-used] :as transaction-receipt}]]
-   (console :log transaction-receipt)
-   (when (= gas-used goal-gas-limit)
-     (console :error "All gas used"))
-   (-> db
-       (assoc-in [:new-bid :placing?] false))))
+;; ;;;
+;; ;;; confirms that bid was placed
+;; ;;;
+;; (reg-event-db
+;;  :place-bid/transaction-receipt-loaded
+;;  (interceptors)
+;;  (fn [db [goal-id & {:keys [gas-used] :as transaction-receipt}]]
+;;    (console :log transaction-receipt)
+;;    (when (= gas-used goal-gas-limit)
+;;      (console :error "All gas used"))
+;;    (-> db
+;;        (assoc-in [:new-bid :placing?] false))))
 
 ;;;
 ;;; show new bid form

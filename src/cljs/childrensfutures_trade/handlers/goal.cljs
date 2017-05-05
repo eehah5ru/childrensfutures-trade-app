@@ -29,6 +29,7 @@
  :blockchain.goal/transaction-confirmed
  (interceptors)
  (fn [db [goal-id tx-hash]]
+   (js/console.log :trx-on-air goal-id true)
    (assoc-in db [:goals goal-id :trx-on-air?] true)))
 
 
@@ -41,6 +42,7 @@
 
  (hu/blockchain-trx-receipt-loaded
   (fn [db [goal-id _]]
+   (js/console.log :trx-on-air goal-id false)
     (-> db
         (assoc-in [:goals goal-id :trx-on-air?] false)))))
 
