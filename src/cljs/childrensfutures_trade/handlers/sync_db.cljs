@@ -49,12 +49,25 @@
     (assoc db :db-version-synced (min version current-synced-db-version))))
 
 ;;;
+;;; remove unnecessary info from goal
+;;;
+(defn filter-goal [g]
+  (dissoc g
+          :trx-on-air?
+          :show-details?))
+
+;;;
 ;;; select what to sync
 ;;;
 (defn db-for-sync [db]
-  (select-keys db [:db-version
-                   :goals
-                   :pulse]))
+  (-> db
+      (update :goals (fn [goals]
+                       (reduce-kv #(assoc %1 %2 (filter-goal %3))
+                                  {}
+                                  goals)))
+      (select-keys [:db-version
+                    :goals
+                    :pulse])))
 
 ;;;
 ;;; db -> string
