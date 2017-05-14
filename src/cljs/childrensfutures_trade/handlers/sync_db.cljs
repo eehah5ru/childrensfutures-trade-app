@@ -49,12 +49,23 @@
     (assoc db :db-version-synced (min version current-synced-db-version))))
 
 ;;;
+;;; remove unnecessary keys from bid
+;;;
+(defn filter-bid [b]
+  (dissoc b
+          :placing?
+          :selecting?))
+;;;
 ;;; remove unnecessary info from goal
 ;;;
 (defn filter-goal [g]
-  (dissoc g
-          :trx-on-air?
-          :show-details?))
+  (-> g
+      (dissoc :trx-on-air?
+              :show-details?)
+      (update :bids (fn [bids]
+                      (reduce-kv #(assoc %1 %2 (filter-bid %3))
+                                 {}
+                                 bids)))))
 
 ;;;
 ;;; select what to sync
