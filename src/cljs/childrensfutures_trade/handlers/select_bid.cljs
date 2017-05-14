@@ -20,6 +20,9 @@
    [childrensfutures-trade.handlers.utils :refer [goal-gas-limit]]
    [childrensfutures-trade.handlers.interceptors :refer [interceptors
                                                          interceptors-fx]]
+
+   [childrensfutures-trade.handlers.utils :as hu]
+
    ))
 
 ;;;
@@ -34,40 +37,41 @@
 (reg-event-fx
  :blockchain.select-bid/send
  (interceptors-fx :spec false)
+
  (fn [{:keys [db]} [goal-id bid-id]]
-   (let [address (:current-address db)
-         contract-instance (:instance (:gse-contract db))]
-     {:web3-fx.contract/state-fns
-      {:instance contract-instance
-       :web3 (:web3 db)
-       :db-path [:gse-contract :select-bid (keyword goal-id) (keyword bid-id)]
-       :fns [[contract-instance
-              :select-bid goal-id bid-id
-              {:from address
-               :gas goal-gas-limit}
-              [:blockchain.select-bid/confirmed goal-id bid-id]
-              :log-error
-              [:blockchain.select-bid/transaction-receipt-loaded goal-id bid-id]]]}})))
+   (hu/blockchain-send-transaction
+    db
+    :gse-contract
+    :select-bid
+    [goal-id bid-id]
+    :db-path [goal-id :select-bid bid-id]
+    :confirmed-event [:blockchain.goal.select-bid/transaction-confirmed goal-id bid-id]
+    :error-event :log-error
+    :receipt-loaded-event [:blockchain.goal.select-bid/transaction-receipt-loaded goal-id bid-id])))
+
 
 ;;;
 ;;; change state of selected bid
 ;;; if trx was confirmed by user
 ;;;
 (reg-event-db
- :blockchain.select-bid/confirmed
+ :blockchain.goal.select-bid/transaction-confirmed
  (interceptors)
  (fn [db [goal-id bid-id tx-hash]]
-   (assoc-in db [:goals goal-id :bids bid-id :selecting?] true)))
+   (-> db
+       (assoc-in [:goals goal-id :trx-on-air?] true)
+       (assoc-in [:goals goal-id :bids bid-id :selecting?] true))))
 
 ;;;
 ;;; confirms that bid was selected
 ;;;
 (reg-event-db
- :blockchain.select-bid/transaction-receipt-loaded
+ :blockchain.goal.select-bid/transaction-receipt-loaded
  (interceptors)
  (fn [db [goal-id bid-id & {:keys [gas-used] :as transaction-receipt}]]
    (console :log transaction-receipt)
    (when (= gas-used goal-gas-limit)
      (console :error "All gas used"))
    (-> db
+       (assoc-in [:goals goal-id :trx-on-air?] false)
        (assoc-in [:goals goal-id :bids bid-id :selecting?] false))))
