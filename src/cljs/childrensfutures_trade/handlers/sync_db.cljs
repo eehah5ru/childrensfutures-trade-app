@@ -88,6 +88,33 @@
         data (db-for-sync db)]
     (t/write w data)))
 
+
+;;;
+;;; add default values to each bid for goal
+;;;
+(defn add-default-vals-to-bids [goal]
+  (update goal
+          :bids
+          (fn [bids]
+            (reduce-kv #(assoc %1 %2 (merge (db/default-bid) %3))
+                       {}
+                       bids))))
+
+;;;
+;;; add default values to each goal in db
+;;;
+(defn add-default-vals-to-goals [db]
+  (update db
+          :goals
+          (fn [goals]
+            (reduce-kv (fn [r owner goal]
+                         (assoc r owner (->> goal
+                                             (merge (db/default-goal))
+                                             add-default-vals-to-bids)))
+                       {}
+                       goals))))
+
+
 ;;;
 ;;;
 ;;;
@@ -231,6 +258,9 @@
      (cond-> {:db db}
        need-update?
        (update :db #(merge % fetched-db))
+
+       need-update?
+       (update :db #(add-default-vals-to-goals %))
 
        dispatch
        (assoc :dispatch (conj (vec dispatch) new-version))
