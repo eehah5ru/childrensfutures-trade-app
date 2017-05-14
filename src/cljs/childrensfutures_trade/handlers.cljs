@@ -58,12 +58,19 @@
 
  (fn [_ _]
    (js/console.log :initialize)
-   (let [db db/default-db
-         full-app? (db/provides-web3?)
-         read-only-app? (not full-app?)]
+   (let [full-app? (db/provides-web3?)
+         read-only-app? (not full-app?)
+         db (cond-> db/default-db
+              full-app?
+              (assoc :web3 (db/mk-web3))
+
+              full-app?
+              (assoc :provides-web3? full-app?))]
      (js/console.log :initialize :full-app? full-app?)
+     (js/console.log :initialize :db db)
 
      {:db db
+
       ;; TODO: refactor and extract this code to contract/fetch-abi
       :dispatch-n (cond-> []
                     ;; hide spinner imidiatelly for read-only-app

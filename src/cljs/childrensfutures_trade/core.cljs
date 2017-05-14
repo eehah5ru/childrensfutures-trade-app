@@ -36,7 +36,10 @@
   (when (not childrensfutures-trade.utils.DEV)
     (google-analytics-fx/set-enabled! (not childrensfutures-trade.utils.DEV)))
 
-  (re-frame/dispatch-sync [:initialize])
-  (pushy/start! history)
-  (mount-root)
+  (.addEventListener js/window
+                     "load"
+                     (fn []
+                       (re-frame/dispatch-sync [:initialize])
+                       (pushy/start! history)
+                       (mount-root)))
   (.addEventListener js/window "resize" #(dispatch [:ui.window/resize])))
