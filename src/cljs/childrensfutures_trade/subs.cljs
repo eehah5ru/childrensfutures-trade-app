@@ -39,7 +39,7 @@
  :errors/critical-error?
 
  (fn [db]
-   (:critical-error? db)))
+   (boolean (:critical-error? db))))
 
 ;;;
 ;;;
