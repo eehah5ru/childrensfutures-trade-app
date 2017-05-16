@@ -54,24 +54,26 @@
 ;;; change state of selected bid
 ;;; if trx was confirmed by user
 ;;;
-(reg-event-db
+(reg-event-fx
  :blockchain.goal.select-bid/transaction-confirmed
- (interceptors)
- (fn [db [goal-id bid-id tx-hash]]
-   (-> db
-       (assoc-in [:goals goal-id :trx-on-air?] true)
-       (assoc-in [:goals goal-id :bids bid-id :selecting?] true))))
+ (interceptors-fx :spec true)
+ (fn [{:keys [db]} [goal-id bid-id tx-hash]]
+   {:db (-> db
+            (assoc-in [:goals goal-id :trx-on-air?] true)
+            (assoc-in [:goals goal-id :bids bid-id :selecting?] true))
+    :dispatch [:ui.snackbar/show "Saving your decision into blockchain. Please wait!"]}))
 
 ;;;
 ;;; confirms that bid was selected
 ;;;
-(reg-event-db
+(reg-event-fx
  :blockchain.goal.select-bid/transaction-receipt-loaded
- (interceptors)
- (fn [db [goal-id bid-id & {:keys [gas-used] :as transaction-receipt}]]
+ (interceptors-fx :spec true)
+ (fn [{:keys [db]} [goal-id bid-id & {:keys [gas-used] :as transaction-receipt}]]
    (console :log transaction-receipt)
    (when (= gas-used goal-gas-limit)
      (console :error "All gas used"))
-   (-> db
+   {:db (-> db
        (assoc-in [:goals goal-id :trx-on-air?] false)
-       (assoc-in [:goals goal-id :bids bid-id :selecting?] false))))
+       (assoc-in [:goals goal-id :bids bid-id :selecting?] false))
+    :dispatch [:ui.snackbar/show-updating]}))

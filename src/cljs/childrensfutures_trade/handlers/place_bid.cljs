@@ -77,4 +77,4 @@
    {:db (-> db
        (assoc-in [:goals goal-id :trx-on-air?] false)
        (assoc-in [:new-bid :placing?] false))
-    :dispatch [:ui.snackbar/show "Updating..."]}))
+    :dispatch [:ui.snackbar/show-updating]}))

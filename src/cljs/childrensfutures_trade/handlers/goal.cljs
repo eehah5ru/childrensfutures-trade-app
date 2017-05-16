@@ -25,26 +25,28 @@
 ;;; mark goal as on air
 ;;; if trx was confirmed by user
 ;;;
-(reg-event-db
+(reg-event-fx
  :blockchain.goal/transaction-confirmed
- (interceptors)
- (fn [db [goal-id tx-hash]]
-   (js/console.log :trx-on-air goal-id true)
-   (assoc-in db [:goals goal-id :trx-on-air?] true)))
+ (interceptors-fx :spec true)
+ (fn [{:keys [db]} [goal-id tx-hash]]
+   ;; (js/console.log :trx-on-air goal-id true)
+   {:db (assoc-in db [:goals goal-id :trx-on-air?] true)
+    :dispatch [:ui.snackbar/show "Changes are being saved to blockhain. Please wait!"]}))
 
 
 ;;;
 ;;; confirms that bid was selected
 ;;;
-(reg-event-db
+(reg-event-fx
  :blockchain.goal/transaction-receipt-loaded
- (interceptors)
+ (interceptors-fx :spec true)
 
- (hu/blockchain-trx-receipt-loaded
+ (hu/blockchain-trx-receipt-loaded-fx
   (fn [db [goal-id _]]
-   (js/console.log :trx-on-air goal-id false)
-    (-> db
-        (assoc-in [:goals goal-id :trx-on-air?] false)))))
+    ;; (js/console.log :trx-on-air goal-id false)
+    {:db (-> db
+             (assoc-in [:goals goal-id :trx-on-air?] false))
+     :dispatch [:ui.snackbar/show-updating]})))
 
 ;;;
 ;;;
@@ -55,132 +57,142 @@
 ;;;
 ;;; add goal
 ;;;
-(reg-event-db
+(reg-event-fx
  :db.goal/add
- (interceptors)
+ (interceptors-fx :spec true)
 
- (fn [db [goal created-at]]
-   (-> db
-       (db/update-goal
-        (:goal-id goal)
-        #(merge % (select-keys goal [:owner
-                                     :description
-                                     :goal-id
-                                     :give-in-return])
-                {:created-at created-at}))
+ (fn [{:keys [db]} [goal created-at]]
+   {:db (-> db
+            (db/update-goal
+             (:goal-id goal)
+             #(merge % (select-keys goal [:owner
+                                          :description
+                                          :goal-id
+                                          :give-in-return])
+                     {:created-at created-at}))
 
-       (db/change-stage
-        (:goal-id goal)
-        :created))))
+            (db/change-stage
+             (:goal-id goal)
+             :created))
+    :dispatch [:ui.snackbar/show "new goal added!"]}))
 
 ;;;
 ;;; cancel goal
 ;;;
-(reg-event-db
+(reg-event-fx
  :db.goal/cancel
- (interceptors)
+ (interceptors-fx :spec true)
 
- (fn [db [goal]]
-   (-> db
-       (db/update-goal
-        (:goal-id goal)
-        #(merge % {:cancelled? true}))
+ (fn [{:keys [db]} [goal]]
+   {:db (-> db
+            (db/update-goal
+             (:goal-id goal)
+             #(merge % {:cancelled? true}))
 
-       (db/change-stage (:goal-id goal) :cancelled))))
+            (db/change-stage (:goal-id goal) :cancelled))
+    :dispatch [:ui.snackbar/show "goal cancelled!"]}))
 
 ;;;
 ;;; place bid
 ;;;
-(reg-event-db
+(reg-event-fx
  :db.goal/place-bid
- (interceptors)
- (fn [db [bid]]
-   (-> db
-       (db/change-stage (:goal-id bid) :bid-placed)
+ (interceptors-fx :spec true)
+ (fn [{:keys [db]} [bid]]
+   {:db (-> db
+            (db/change-stage (:goal-id bid) :bid-placed)
 
-       (db/update-bid (:goal-id bid)
-                      (:bid-owner bid)
-                      #(merge %
-                              (let [{:keys [bid-owner description goal-id]} bid]
-                                {:goal-id goal-id
-                                 :bid-id bid-owner ;FIXME use bid-id instead
-                                 :owner bid-owner
-                                 :description description}))))))
+            (db/update-bid (:goal-id bid)
+                           (:bid-owner bid)
+                           #(merge %
+                                   (let [{:keys [bid-owner description goal-id]} bid]
+                                     {:goal-id goal-id
+                                      :bid-id bid-owner ;FIXME use bid-id instead
+                                      :owner bid-owner
+                                      :description description}))))
+    :dispatch [:ui.snackbar/show "someone has invested in the goal!"]}))
 
 
 ;;;
 ;;; select bid
 ;;;
-(reg-event-db
+(reg-event-fx
  :db.goal/select-bid
- (interceptors)
- (fn [db [goal-id bid-id]]
-   (-> db
+ (interceptors-fx :spec true)
+ (fn [{:keys [db]} [goal-id bid-id]]
+   {:db (-> db
        (db/change-stage goal-id :bid-selected)
 
        (db/update-bid goal-id
                       bid-id
                       #(merge % {:goal-id goal-id
                                  :bid-id bid-id
-                                 :selected? true})))))
+                                 :selected? true})))
+    :dispatch [:ui.snackbar/show "supporter was selected!"]}))
 
 
 ;;;
 ;;; send investment
 ;;;
-(reg-event-db
+(reg-event-fx
  :db.goal/send-investment
- (interceptors)
+ (interceptors-fx :spec true)
 
- (fn [db [goal-id bid-id]]
-   (db/change-stage db goal-id :investment-sent)))
+ (fn [{:keys [db]} [goal-id bid-id]]
+   {:db (db/change-stage db goal-id :investment-sent)
+    :dispatch [:ui.snackbar/show "investment was sent!"]}))
 
 ;;;
 ;;; receive investment
 ;;;
-(reg-event-db
+(reg-event-fx
  :db.goal/receive-investment
- (interceptors)
+ (interceptors-fx :spec true)
 
- (fn [db [goal-id bid-id]]
-   (db/change-stage db goal-id :investment-received)))
+ (fn [{:keys [db]} [goal-id bid-id]]
+   {:db (db/change-stage db goal-id :investment-received)
+    :dispatch [:ui.snackbar/show "someone has just received some support!"]}))
 
 ;;;
 ;;; achieve goal
 ;;;
-(reg-event-db
+(reg-event-fx
  :db.goal/achieve
- (interceptors)
+ (interceptors-fx :spec true)
 
- (fn [db [goal-id]]
-   (db/change-stage db goal-id :goal-achieved)))
+ (fn [{:keys [db]} [goal-id]]
+   {:db (db/change-stage db goal-id :goal-achieved)
+    :dispatch [:ui.snackbar/show "Wow! Goal has been just achieved!"]}))
 
 ;;;
 ;;; ask bonus
 ;;;
-(reg-event-db
+(reg-event-fx
  :db.goal/ask-bonus
- (interceptors)
+ (interceptors-fx :spec true)
 
- (fn [db [goal-id bid-id]]
-   (db/change-stage db goal-id :bonus-asked)))
+ (fn [{:keys [db]} [goal-id bid-id]]
+   {:db (db/change-stage db goal-id :bonus-asked)
+    :dispatch [:ui.snackbar/show "Anonymous has just asked for her bonus!"]}))
 
 ;;;
 ;;; send bonus
 ;;;
-(reg-event-db
+(reg-event-fx
  :db.goal/send-bonus
- (interceptors)
+ (interceptors :spec true)
 
- (fn [db [goal-id bid-id]]
-   (db/change-stage db goal-id :bonus-sent)))
+ (fn [{:keys [db]} [goal-id bid-id]]
+   {:db (db/change-stage db goal-id :bonus-sent)
+    :dispatch [:ui.snackbar/show "Bonus was sent to anonymous!"]}))
 
 ;;;
 ;;; complete goal
 ;;;
-(reg-event-db
+(reg-event-fx
  :db.goal/complete
- (interceptors)
+ (interceptors-fx :spec true)
 
- (fn [db [goal-id]]
-   (db/change-stage db goal-id :goal-completed)))
+ (fn [{:keys [db]} [goal-id]]
+   {:db (db/change-stage db goal-id :goal-completed)
+    :dispatch [:ui.snackbar/show "Yeap! Anonymous has just completed her goal!"]}))
