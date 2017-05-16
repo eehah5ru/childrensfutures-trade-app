@@ -68,3 +68,10 @@
      (when (= gas-used goal-gas-limit)
        (console :error "All gas used")))
     (f db args)))
+
+;;;
+;;; fx version of previous function
+;;;
+(defn blockchain-trx-receipt-loaded-fx [f]
+  (fn [{:keys [db]} args]
+    ((blockchain-trx-receipt-loaded f) db args)))

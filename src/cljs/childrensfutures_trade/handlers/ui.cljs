@@ -404,6 +404,14 @@
        (assoc-in [:snackbar :open?] true))))
 
 (reg-event-db
+ :ui.snackbar/show-updating
+
+ (fn [db _]
+   (-> db
+       (assoc-in [:snackbar :message] "Updating...")
+       (assoc-in [:snackbar :open?] true))))
+
+(reg-event-db
  :ui.snackbar/hide
 
  (fn [db]
