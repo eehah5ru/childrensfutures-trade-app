@@ -567,6 +567,11 @@
  (fn [db [_ step]]
    (= step 0)))
 
+(reg-sub
+ :ui/snackbar
+
+ (fn [db]
+   (get db :snackbar)))
 ;;;
 ;;; window height
 ;;;

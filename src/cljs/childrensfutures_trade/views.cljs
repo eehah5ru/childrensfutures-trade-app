@@ -113,7 +113,8 @@
   (let [current-page (subscribe [:ui/current-page])
         full-app? (subscribe [:app/full?])
         read-only-app? (subscribe [:app/read-only?])
-        win-height (subscribe [:ui/window-height])]
+        win-height (subscribe [:ui/window-height])
+        snackbar (subscribe [:ui/snackbar])]
     (fn []
       ;; {:fluid true}
       [ui/mui-theme-provider
@@ -180,7 +181,9 @@
 
         [footer]
 
-        ;; [ui/snackbar {:message "Adding Goal"
-        ;;               :open @sending-new-goal?}]
-        ]
+        [ui/snackbar {:message (:message @snackbar)
+                      :open (:open? @snackbar)
+                      :class-name "snackbar"
+                      :auto-hide-duration 5000
+                      }]]
        ])))

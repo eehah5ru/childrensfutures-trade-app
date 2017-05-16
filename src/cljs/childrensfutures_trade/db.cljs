@@ -138,6 +138,13 @@
    :steps-count 6})
 
 ;;;
+;;; snackbar
+;;;
+(defn default-snackbar []
+  {:message ""
+   :open? false})
+
+;;;
 ;;;
 ;;; SPECS
 ;;;
@@ -185,6 +192,12 @@
 
 (s/def ::window-height (s/or :nil nil?
                              :integer integer?))
+
+;;;
+;;; snackbar
+;;;
+(s/def ::open? boolean?)
+(s/def ::message string?)
 
 ;;;
 ;;; contracts
@@ -349,6 +362,12 @@
 
                             :goal-cancelled
                             (partial s/conform ::goal-cancelled-pulse-event)))
+
+;;;
+;;; snackbar structure
+;;;
+(s/def ::snackbar (s/keys :req-un [::open?
+                                   ::message]))
 ;;;
 ;;; collections
 ;;;
@@ -367,6 +386,7 @@
 (s/def ::db (s/keys :req-un [::db-version
                              ::db-version-synced
                              ::goals
+                             ::snackbar
                              ;; ::messages
                              ;; ::pulse
                              ;; ::view-goal
@@ -419,6 +439,7 @@
    :select-bid (default-select-bid)
    :view-goal (default-view-goal)
    :how-to-play (default-how-to-play)
+   :snackbar (default-snackbar)
    :force-read-only? false
    :critical-error? false
    :show-new-goal? false

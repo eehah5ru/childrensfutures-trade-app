@@ -389,3 +389,22 @@
        (dom/getElement)
        (dom/removeNode))
    {}))
+
+;;;
+;;;
+;;; SNACKBAR
+;;;
+;;;
+(reg-event-db
+ :ui.snackbar/show
+
+ (fn [db [_ message]]
+   (-> db
+       (assoc-in [:snackbar :message] message)
+       (assoc-in [:snackbar :open?] true))))
+
+(reg-event-db
+ :ui.snackbar/hide
+
+ (fn [db]
+   (assoc-in db [:snackbar :open?] false)))
