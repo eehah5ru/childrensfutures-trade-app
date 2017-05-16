@@ -9,7 +9,7 @@
    [cljs-web3.core :as web3]
    [cljs-web3.eth :as web3-eth]
    [cljs-web3.personal :as web3-personal]
-   [cljsjs.web3]
+   ;; [cljsjs.web3]
 
    [childrensfutures-trade.db :as db]
 
