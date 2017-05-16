@@ -3,7 +3,7 @@
    [cljs-time.extend]
    [cljsjs.material-ui]
    [cljsjs.react-flexbox-grid]
-   ;; [cljsjs.web3]
+   [cljsjs.web3]
    [madvas.re-frame.google-analytics-fx]
    [childrensfutures-trade.handlers]
    [childrensfutures-trade.subs]
