@@ -15,27 +15,41 @@
 ;;;
 ;;;
 (defproject childrensfutures-trade :lein-v
-  :dependencies [[bidi "2.0.10"]
+  :dependencies [
+                 ;;
+                 ;; web3
+                 ;;
+                 [cljs-web3 "0.19.0-0"]
+                 [madvas.re-frame/web3-fx "0.1.6"]
+
+                 ;;
+                 ;; ui
+                 ;;
+                 [cljs-react-material-ui "0.2.43"]
+                 [cljsjs/react-flexbox-grid "1.0.0-0" :exclusions [cljsjs/react cljsjs/react-dom]]
+
+                 [day8.re-frame/http-fx "0.0.4"]
+                 [re-frame "0.9.2" :exclusions [reagent]]
+                 [madvas/reagent-patched "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]
+                 [madvas.re-frame/google-analytics-fx "0.1.0"]
+
+                 ;;
+                 ;; misc and server side
+                 ;;
+                 [bidi "2.0.14"]
                  [bk/ring-gzip "0.1.1"]
                  [cljs-ajax "0.5.8"]
-                 [cljs-react-material-ui "0.2.43"]
-                 [cljs-web3 "0.18.4-0"]
+
                  [cljsjs/bignumber "2.1.4-1"]
-                 [cljsjs/react-flexbox-grid "0.10.2-1" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [com.andrewmcveigh/cljs-time "0.4.0"]
                  [compojure "1.6.0-beta1"]
-                 [day8.re-frame/http-fx "0.0.4"]
                  [environ "1.0.3"]
                  [http-kit "2.2.0"]
-                 [madvas.re-frame/google-analytics-fx "0.1.0"]
-                 [madvas.re-frame/web3-fx "0.1.5"]
                  [medley "0.8.3"]
                  [kibu/pushy "0.3.6"]
                  [org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.229"]
                  [print-foo-cljs "2.0.3"]
-                 [re-frame "0.9.2" :exclusions [cljsjs/react cljsjs/react-dom]]
-                 [reagent "0.6.1" :exclusions [cljsjs/react org.clojure/tools.reader cljsjs/react-dom]]
                  ;; [ring.middleware.logger "0.5.0"]
                  [ring-logger-onelog "0.7.6"]
                  [clj-logging-config "1.9.12"]
