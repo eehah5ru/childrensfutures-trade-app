@@ -83,13 +83,14 @@
 ;;;
 ;;; confirms that goal was sent to ethereum contract
 ;;;
-(reg-event-db
+(reg-event-fx
  :blockchain.new-goal/transaction-receipt-loaded
- (interceptors)
- (fn [db [{:keys [gas-used] :as transaction-receipt}]]
+ (interceptors-fx :spec true)
+ (fn [{:keys [db]} [{:keys [gas-used] :as transaction-receipt}]]
    (console :log transaction-receipt)
    (when (= gas-used goal-gas-limit)
      (console :error "All gas used"))
-   (-> db
-       (assoc :new-goal (db/default-goal))
-       (assoc-in [:new-goal :owner] (:current-address db)))))
+   {:db (-> db
+            (assoc :new-goal (db/default-goal))
+            (assoc-in [:new-goal :owner] (:current-address db)))
+    :dispatch [:ui.snackbar/show "Goal added. You'll see it soon"]}))
