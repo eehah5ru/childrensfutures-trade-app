@@ -4,7 +4,7 @@
    [cljs-web3.core :as web3]
    [cljs-web3.eth :as web3-eth]
    [cljs-web3.personal :as web3-personal]
-   [cljsjs.web3]
+   ;; [cljsjs.web3]
    [cljs.spec :as s]
    [childrensfutures-trade.db :as db]
    [day8.re-frame.http-fx]
@@ -97,14 +97,13 @@
               :is-working
               :gse-contract/is-working-loaded :log-error]]}
 
-      :dispatch-n [[:gse-contract.history/init fetched-db-version]
-                   [:gse-contract/subscribe-to-events]]})))
+      :dispatch-n [[:gse-contract.latest-block/load fetched-db-version]]})))
 
 ;;;
 ;;; init blockchain logs
 ;;;
 (reg-event-fx
- :gse-contract.history/init
+ :gse-contract.latest-block/load
  (interceptors-fx :spec false)
 
  (fn [{:keys [db]} [fetched-db-version]]
@@ -113,15 +112,15 @@
       {:web3 web3
        :fns [[web3-eth/get-block "latest"
               {}
-              [:gse-contract.history/latest-block-loaded fetched-db-version]
+              [:gse-contract.latest-block/loaded fetched-db-version]
               :log-error]]}})))
 
 ;;;
 ;;; when latest blockhain block loaded
 ;;;
 (reg-event-fx
- :gse-contract.history/latest-block-loaded
- (interceptors-fx :spec false)
+ :gse-contract.latest-block/loaded
+ (interceptors-fx :spec true)
 
  (fn [{:keys [db]} [fetched-db-version latest-block]]
    ;; (js/console.log :latest-block latest-block)
@@ -129,15 +128,11 @@
          from-block (inc fetched-db-version)
          need-to-fetch-history? (> to-block fetched-db-version)]
 
-     (if need-to-fetch-history?
-       {:dispatch-n (map (fn [[event handler]]
-                           (vector :gse-contract.history/fetch-history
-                                   event
-                                   handler
-                                   from-block
-                                   to-block))
-                         contract-events)}
-       {}))))
+     {:db (assoc-in db [:gse-contract :events-latest-block] to-block)
+      :dispatch-n (cond-> [[:gse-contract.block-loaded/setup-filter]]
+
+                    need-to-fetch-history?
+                    (concat [[:gse-contract.history/fetch-history-for-all-events from-block to-block]]))})))
 
 ;;;
 ;;;
@@ -157,54 +152,166 @@
 ;;;
 ;;; fetch history event
 ;;;
+;; (reg-event-fx
+;;  :gse-contract.history/fetch-history
+;;  (interceptors-fx :spec false)
+
+;;  (fn [{:keys [db]} [event handler from-block to-block]]
+;;    (let [contract-instance (:instance (:gse-contract db))
+;;          contract-start-block (get-in db [:gse-contract :from-block] 0)
+;;          from-block (max contract-start-block from-block)]
+;;      (js/console.log :gse/fetch-history event from-block to-block)
+
+;;      {:web3-fx.contract/events
+;;       {:db db
+;;        :db-path [:gse-contract :events :history :event]
+;;        :events (map (fn [[from-block to-block]]
+;;                       (vector contract-instance
+;;                               (str event "-history-" from-block to-block)
+;;                               event
+;;                               {}
+;;                               {:from-block from-block
+;;                                :to-block to-block}
+;;                               handler
+;;                               :log-error))
+;;                     (history-steps from-block to-block))}})))
+
 (reg-event-fx
- :gse-contract.history/fetch-history
+ :gse-contract.history/fetch-history-for-all-events
  (interceptors-fx :spec false)
 
- (fn [{:keys [db]} [event handler from-block to-block]]
+ (fn [{:keys [db]} [from-block to-block]]
    (let [contract-instance (:instance (:gse-contract db))
          contract-start-block (get-in db [:gse-contract :from-block] 0)
-         from-block (max contract-start-block from-block)]
-     (js/console.log :gse/fetch-history event from-block to-block)
+         from-block (max contract-start-block from-block)
+         mk-events (fn [[event handler]]
+                     (map (fn [[f-block t-block]]
+                            (vector
+                             contract-instance
+                             (str event "-history-" f-block t-block)
+                             event
+                             {}
+                             {:from-block f-block
+                              :to-block t-block}
+                             handler
+                             :log-error))
+                          (history-steps from-block to-block)))
+         events (apply concat (map mk-events
+                             contract-events))]
+
+     (js/console.log :gse/fetch-history from-block to-block)
+     (js/console.log :gse/fetch-history events)
 
      {:web3-fx.contract/events
       {:db db
-       :db-path [:gse-contract :events]
-       :events (map (fn [[from-block to-block]]
-                      (vector contract-instance
-                              (str event "-history-" from-block to-block)
-                              event
-                              {}
-                              {:from-block from-block
-                               :to-block to-block}
-                              handler
-                              :log-error))
-                    (history-steps from-block to-block))}})))
-
+       :db-path [:gse-contract :events :history]
+       :events events}})))
 
 ;;;
 ;;;
 ;;; setup events
 ;;;
 ;;;
+;; (reg-event-fx
+;;  :gse-contract/subscribe-to-events
+;;  (interceptors-fx :spec false)
+
+;;  (fn [{:keys [db]}]
+;;    (let [from-block-n "latest"
+;;          contract-instance (:instance (:gse-contract db))]
+;;      {:web3-fx.contract/events
+;;       {:db db
+;;        :db-path [:gse-contract-events-latest]
+;;        :events (map (fn [[event handler]]
+;;                       (js/console.log :subscribe-to-events :subscribing event)
+;;                       (vector contract-instance
+;;                               (str event "-latest")
+;;                               event
+;;                               {}
+;;                               ;; "latest"
+;;                               {:from-block "latest"}
+;;                               ;; {:from-block "942055"
+;;                               ;;  :to-block "latest"
+;;                               ;;  }
+;;                               handler
+;;                               :log-error))
+;;                     contract-events)}})))
+
+;;;
+;;; subscribe to events in few latest blocks
+;;;
 (reg-event-fx
- :gse-contract/subscribe-to-events
+ :gse-contract.latest-events/subscribe
+ (interceptors-fx :spec false)
+
+ (fn [{:keys [db]} [from-block to-block]]
+   (let [contract-instance (get-in db [:gse-contract :instance])]
+     {:web3-fx.contract/events
+      {:db db
+       :db-path [:gse-contract :events :latest]
+       :events (map (fn [[event handler]]
+                      (vector contract-instance
+                              (str event "-latest")
+                              event
+                              {}
+                              {:from-block from-block
+                               :to-block to-block}
+                              handler
+                              :log-error))
+                    contract-events)}})))
+;;;
+;;;
+;;; setup block filter
+;;;
+;;;
+(reg-event-fx
+ :gse-contract.block-loaded/setup-filter
  (interceptors-fx :spec false)
 
  (fn [{:keys [db]}]
-   (let [from-block-n "latest"
-         contract-instance (:instance (:gse-contract db))]
-     {:web3-fx.contract/events
-      {:db db
-       :db-path [:gse-contract :events]
-       :events (map (fn [[event handler]]
-                      [contract-instance
-                       event
-                       {}
-                       {:from-block from-block-n}
-                       handler
-                       :log-error])
-                    contract-events)}})))
+   {:web3-fx.blockchain/filter
+    {:web3 (:web3 db)
+     :db-path [:gse-contract :block-loaded-filter]
+     :blockchain-filter-opts "latest"
+     :dispatches [:gse-contract.block-loaded/new :log-error]}}))
+
+;;;
+;;; handler for new loaded block
+;;;
+(reg-event-fx
+ :gse-contract.block-loaded/new
+ (interceptors-fx :spec false)
+ (fn [{:keys [db]} [block-hash]]
+   ;; (js/console.log :new-block-loaded block-hash)
+   {:web3-fx.blockchain/fns
+    {:web3 (:web3 db)
+     :fns [[web3-eth/get-block block-hash
+            {}
+            :gse-contract.block-loaded/got-block-number
+            :log-error]]}}))
+
+;;;
+;;; when got block number of new loaded block
+;;;
+(reg-event-fx
+ :gse-contract.block-loaded/got-block-number
+ (interceptors-fx :spec true)
+
+ (fn [{:keys [db]} [block-data]]
+   ;; (js/console.log :got-block-number block-data)
+   (let [prev-events-latest-block (get-in db [:gse-contract :events-latest-block] 0)
+         next-events-latest-block (get block-data :number 0)
+         need-to-fetch-history? (> next-events-latest-block
+                                   (+ 1 prev-events-latest-block))]
+     (js/console.log :got-block-number next-events-latest-block :resubscribing? need-to-fetch-history?)
+     (if need-to-fetch-history?
+       (do
+         (js/console.log :got-block-number :resubscribing (inc prev-events-latest-block) next-events-latest-block)
+         {:db (assoc-in db [:gse-contract :events-latest-block] next-events-latest-block)
+          :dispatch [:gse-contract.latest-events/subscribe (inc prev-events-latest-block) next-events-latest-block]})
+       {}))))
+
+
 
 ;;;
 ;;;
