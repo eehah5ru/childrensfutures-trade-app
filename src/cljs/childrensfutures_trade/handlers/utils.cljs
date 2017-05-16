@@ -27,24 +27,29 @@
                                    f-args & {:keys [db-path
                                                     confirmed-event
                                                     error-event
-                                                    receipt-loaded-event]}]
+                                                    receipt-loaded-event
+                                                    snackbar-msg]
+                                             :or {snackbar-msg "use metamask to confirm action"}}]
   (let [address (:current-address db)
         fn-options {:from address
                     :gas goal-gas-limit}
         error-event (or error-event :log-error)
         contract-instance (:instance (contract db))]
-    {:web3-fx.contract/state-fns
-     {:instance contract-instance
-      :web3 (:web3 db)
-      :db-path (flatten [contract
-                         f-name
-                         (map keyword db-path)])
-      :fns [(concat [contract-instance]
-                    (flatten [f-name f-args])
-                    [fn-options
-                     confirmed-event
-                     error-event
-                     receipt-loaded-event])]}}))
+    (merge
+     {:web3-fx.contract/state-fns
+      {:instance contract-instance
+       :web3 (:web3 db)
+       :db-path (flatten [contract
+                          f-name
+                          (map keyword db-path)])
+       :fns [(concat [contract-instance]
+                     (flatten [f-name f-args])
+                     [fn-options
+                      confirmed-event
+                      error-event
+                      receipt-loaded-event])]}}
+     (when snackbar-msg
+       {:dispatch [:ui.snackbar/show snackbar-msg]}))))
 
 
 ;;;
