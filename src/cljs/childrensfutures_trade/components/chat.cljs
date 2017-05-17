@@ -102,14 +102,31 @@
 ;;; DRAWER
 ;;;
 (defn chat-drawer-view []
-  (let [drawer-open? (subscribe [:ui.chat/drawer-open?])]
+  (let [drawer-open? (subscribe [:ui.chat/drawer-open?])
+        show-splash? (subscribe [:ui.chat/show-trx-on-air-splash?])]
     (fn []
       [ui/drawer {:open @drawer-open?
                   :open-secondary true
                   :docked false
                   :width 320
                   :on-request-change #(dispatch [:ui.chat/toggle-view])}
+
+       (when @show-splash?
+         [:div
+          {:class "trx-on-air-splash"}])
+
+     (when @show-splash?
+       [:div
+        {:class "trx-on-air-spinner"}
+        [ui/circular-progress
+         {:mode :indeterminate
+          :color (color :cyan-50)
+          :thickness 10
+          :size 80}]])
+
+
        [chat-app-bar]
+
 
        [chat-messages]
 

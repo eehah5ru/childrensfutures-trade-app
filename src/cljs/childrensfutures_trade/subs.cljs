@@ -501,6 +501,12 @@
  (fn [db]
    (:chat-open? db)))
 
+(reg-sub
+ :ui.chat/show-trx-on-air-splash?
+
+ (fn [db]
+   (get-in db [:new-chat-message :trx-on-air?] false)))
+
 ;;;
 ;;; page subs
 ;;;

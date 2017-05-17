@@ -72,24 +72,30 @@
 ;;; fired after the trx has been confirmed
 ;;; see event handler above
 ;;;
-(reg-event-db
+(reg-event-fx
  :blockchain.new-chat-message/confirmed
- (interceptors)
- (fn [db [transaction-hash]]
-   (-> db
-       (assoc-in [:new-chat-message :trx-on-air?] true))))
+ (interceptors-fx :spec true)
+
+ (fn [{:keys [db]} [transaction-hash]]
+
+   {:db (-> db
+            (assoc-in [:new-chat-message :trx-on-air?] true))
+    :dispatch [:ui.snackbar/show "sending message. plz wait a bit!"]}))
 
 
 ;;;
 ;;; confirms that chat message was sent to ethereum contract
 ;;;
-(reg-event-db
+(reg-event-fx
  :blockchain.new-chat-message/transaction-receipt-loaded
- (interceptors)
- (fn [db [{:keys [gas-used] :as transaction-receipt}]]
+ (interceptors-fx :spec true)
+
+ (fn [{:keys [db]} [{:keys [gas-used] :as transaction-receipt}]]
    (console :log transaction-receipt)
    (when (= gas-used goal-gas-limit)
      (console :error "All gas used"))
-   (-> db
-       (assoc :new-chat-message (db/default-chat-message))
-       (assoc-in [:new-chat-message :owner] (:current-address db)))))
+   {:db (update db :new-chat-message #(merge
+                                       (db/default-chat-message)
+                                       (select-keys % [:owner
+                                                       :channel-id])))
+    :dispatch [:ui.snackbar/show "updating chat from blockchain. plz wait!"]}))

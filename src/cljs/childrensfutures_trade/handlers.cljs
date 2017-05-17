@@ -67,7 +67,7 @@
               full-app?
               (assoc :provides-web3? full-app?))]
      (js/console.log :initialize :full-app? full-app?)
-     (js/console.log :initialize :db db)
+     ;; (js/console.log :initialize :db db)
 
      {:db db
 
