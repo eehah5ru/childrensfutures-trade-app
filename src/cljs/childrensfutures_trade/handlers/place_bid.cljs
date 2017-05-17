@@ -61,6 +61,7 @@
  (fn [{:keys [db]} [goal-id tx-hash]]
    {:db (-> db
             (assoc-in [:goals goal-id :trx-on-air?] true)
+            (assoc :new-bid (db/default-bid))
             (assoc-in [:new-bid :placing?] true))
     :dispatch [:ui.snackbar/show "Wait while bid is being saved to blockchain"]}))
 
