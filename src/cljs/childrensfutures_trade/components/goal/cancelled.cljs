@@ -16,7 +16,7 @@
 
 
 (defn card-text [goal]
-  [ui/card-title
+  [gu/card-title
    {:title "It's sad to say but this dream has passed away!"}])
 
 

@@ -29,7 +29,7 @@
 ;;; simple card title
 ;;;
 (defn simple-card-title [title]
-  [ui/card-title
+  [gu/card-title
    {:title (r/as-element title)}])
 
 ;;;

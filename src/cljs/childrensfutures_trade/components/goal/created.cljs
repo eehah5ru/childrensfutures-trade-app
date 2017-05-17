@@ -54,11 +54,11 @@
 ;;; card text
 ;;;
 (defn- owner-card-text [goal]
-  [ui/card-title
+  [gu/card-title
    {:title "OK! Let's wait for bids! There are surely people who are interested in your dreams!"}])
 
 (defn- stranger-card-text [goal]
-  [ui/card-title
+  [gu/card-title
    {:title "Don't wait! invest now!"}])
 
 (defn card-text [goal]

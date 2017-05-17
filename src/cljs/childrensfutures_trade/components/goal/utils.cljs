@@ -24,3 +24,15 @@
   (let [goal-id (:goal-id goal)
         role (subscribe [:role/role goal-id])]
     (get selections @role default)))
+
+;;;
+;;;
+;;; UI ELEMS
+;;;
+;;;
+
+(defn card-title [props]
+  [ui/card-title
+   (merge {:title "Place some text here!!!!"
+           :class-name "goal-card-title"}
+          props)])
