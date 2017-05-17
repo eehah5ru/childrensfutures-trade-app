@@ -19,7 +19,7 @@
                  ;;
                  ;; web3
                  ;;
-                 [cljs-web3 "0.19.0-0"]
+                 [cljsjs/web3 "0.19.0-0"]
                  [madvas.re-frame/web3-fx "0.1.6"]
 
                  ;;
