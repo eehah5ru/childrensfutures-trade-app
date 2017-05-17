@@ -1,20 +1,28 @@
 * _begining of may_
+* new design
 * redis storage
 * spinners when transaction is in progress
-** refactor select_bid to do that
+** TODO refactor select_bid to do that
 ** check all methods
+** cancel goal - in handlers
 * syncing db
-** remove state flags from goals
-*** trx-on-air
-*** cancelling
-*** bid placing?
-*** bid selecting?
+** DONE remove state flags from goals
+   CLOSED: [2017-05-14 Sun 19:32]
+*** DONE trx-on-air
+    CLOSED: [2017-05-14 Sun 19:31]
+*** DONE cancelling
+    CLOSED: [2017-05-14 Sun 19:31]
+*** DONE bid placing?
+    CLOSED: [2017-05-14 Sun 19:32]
+*** DONE bid selecting?
+    CLOSED: [2017-05-14 Sun 19:32]
 * server side rendering for crawler bots
-* check begin spinner in webmaset interface
+* check begin spinner in webmaster interface
 * DONE disable spinner faster if we're not in chrome
   CLOSED: [2017-05-05 Fri 18:25]
 * DONE anti-cache policy for app.js
   CLOSED: [2017-05-05 Fri 17:41]
+
 
 * _old suff_
 * DONE new chat message
