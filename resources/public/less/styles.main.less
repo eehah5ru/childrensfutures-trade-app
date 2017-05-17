@@ -3,6 +3,8 @@
 //
 // colors
 //
+@cyan-a-200: #18FFFF;
+
 @purple-a-200: #E040FB;
 
 @teal-200: #80CBC4;
@@ -36,10 +38,19 @@
 //
 @stage-unknown-color: @deep-orange-800;
 
+
 @stage-created-color: @teal-a-200;
+@stage-created-color-2: @yellow-a-200;
+
 @stage-bid-placed-color: @green-a-200;
+@stage-bid-placed-color-2: @orange-a-200;
+
 @stage-bid-selected-color: @light-green-a-200;
+@stage-bid-selected-color-2: @teal-a-200;
+
 @stage-investment-sent-color: @lime-a-200;
+@stage-investment-sent-color-2: @purple-a-200;
+
 @stage-investment-received-color: @yellow-a-200;
 @stage-goal-achieved-color: @amber-a-200;
 @stage-bonus-asked-color: @orange-a-200;
@@ -146,20 +157,55 @@ strong, b {
   // TBD
 }
 
+.goal-card-title {
+  text-align: center;
+}
+
+
+.goal-status {
+  display: flex !important;
+  margin-left: 4px !important;
+  margin-right: 4px !important;
+  background-color: rgba(127, 127, 127, 0.2) !important;
+
+  &:first-of-type {
+    margin-left: 0 !important;
+  }
+
+  &:last-of-type {
+    margin-right: 0 !important;
+  }
+}
+
 .goal-stage-created {
   .pulse-event-bkg-color(@stage-created-color);
+  .goal-card-title {
+    text-shadow: @stage-created-color-2 1px 1px;
+  }
 }
 
 .goal-stage-bid-placed {
   .pulse-event-bkg-color(@stage-bid-placed-color);
+  .goal-card-title {
+    text-shadow: @stage-bid-placed-color-2 1px 1px;
+  }
+
 }
 
 .goal-stage-bid-selected {
   .pulse-event-bkg-color(@stage-bid-selected-color);
+  .goal-card-title {
+    text-shadow: @stage-bid-selected-color-2 1px 1px;
+  }
+
 }
 
 .goal-stage-investment-sent {
   .pulse-event-bkg-color(@stage-investment-sent-color);
+  .goal-card-title {
+    text-shadow: @stage-investment-sent-color-2 1px 1px;
+  }
+
 }
 
 .goal-stage-investment-received {
