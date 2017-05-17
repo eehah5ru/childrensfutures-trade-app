@@ -62,7 +62,7 @@
    {:db (-> db
             (assoc-in [:goals goal-id :trx-on-air?] true)
             (assoc-in [:new-bid :placing?] true))
-    :dispatch [:ui.snackbar/show "Wait while bid is being saved in blockchain"]}))
+    :dispatch [:ui.snackbar/show "Wait while bid is being saved to blockchain"]}))
 
 ;;;
 ;;; confirms that bid was placed
