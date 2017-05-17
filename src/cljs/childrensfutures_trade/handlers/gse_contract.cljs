@@ -197,8 +197,8 @@
          events (apply concat (map mk-events
                                    contract-events))]
 
-     (js/console.log :gse/fetch-history from-block to-block)
-     (js/console.log :gse/fetch-history events)
+     ;; (js/console.log :gse/fetch-history from-block to-block)
+     ;; (js/console.log :gse/fetch-history events)
 
      {:web3-fx.contract/events
       {:db db
@@ -301,10 +301,10 @@
          next-events-latest-block (get block-data :number 0)
          need-to-fetch-history? (> next-events-latest-block
                                    (+ 1 prev-events-latest-block))]
-     (js/console.log :gse :got-block-number next-events-latest-block :resubscribing? need-to-fetch-history?)
+     ;; (js/console.log :gse :got-block-number next-events-latest-block :resubscribing? need-to-fetch-history?)
      (if need-to-fetch-history?
        (do
-         (js/console.log :gse :got-block-number :resubscribing (inc prev-events-latest-block) next-events-latest-block)
+         ;; (js/console.log :gse :got-block-number :resubscribing (inc prev-events-latest-block) next-events-latest-block)
          {:db (assoc-in db [:gse-contract :events-latest-block] next-events-latest-block)
           :dispatch [:gse-contract.latest-events/subscribe (inc prev-events-latest-block) next-events-latest-block]})
        {}))))
