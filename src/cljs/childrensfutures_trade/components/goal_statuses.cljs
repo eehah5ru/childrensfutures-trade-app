@@ -25,10 +25,13 @@
    (for [status statuses]
      ^{:key (:key status)}
      [ui/chip
-      {:style {:display "flex"
-               :margin-left "4px"
-               :margin-right "4px"}}
+      {:class-name "goal-status"
+       ;; :style {:display "flex"
+       ;;         :margin-left "4px"
+       ;;         :margin-right "4px"}
+       }
       (:content status)])])
+
 
 ;;;
 ;;; generic goal statuses
