@@ -304,7 +304,7 @@
      (js/console.log :gse :got-block-number next-events-latest-block :resubscribing? need-to-fetch-history?)
      (if need-to-fetch-history?
        (do
-         (js/console.log :chat :got-block-number :resubscribing (inc prev-events-latest-block) next-events-latest-block)
+         (js/console.log :gse :got-block-number :resubscribing (inc prev-events-latest-block) next-events-latest-block)
          {:db (assoc-in db [:gse-contract :events-latest-block] next-events-latest-block)
           :dispatch [:gse-contract.latest-events/subscribe (inc prev-events-latest-block) next-events-latest-block]})
        {}))))

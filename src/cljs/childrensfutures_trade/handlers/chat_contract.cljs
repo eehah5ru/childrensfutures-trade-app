@@ -129,7 +129,7 @@
 
  (fn [{:keys [db]} [latest-block]]
    (let [to-block (get latest-block :number 0)
-         from-block (get-in db [:gse-contract :from-block] 0)]
+         from-block (get-in db [:chat-contract :from-block] 0)]
      {:db (assoc-in db [:chat-contract :events-latest-block] to-block)
       :dispatch-n [[:chat-contract.block-loaded/setup-filter]
                    [:chat-contract.history/fetch from-block to-block]]})))
@@ -183,7 +183,7 @@
  (fn [{:keys [db]}]
    {:web3-fx.blockchain/filter
     {:web3 (:web3 db)
-     :db-path [:gse-contract :block-loaded-filter]
+     :db-path [:chat-contract :block-loaded-filter]
      :blockchain-filter-opts "latest"
      :dispatches [:chat-contract.block-loaded/new :log-error]}}))
 
@@ -191,7 +191,7 @@
 ;;; handler for new loaded block
 ;;;
 (reg-event-fx
- :gse-contract.block-loaded/new
+ :chat-contract.block-loaded/new
  (interceptors-fx :spec false)
  (fn [{:keys [db]} [block-hash]]
    {:web3-fx.blockchain/fns
