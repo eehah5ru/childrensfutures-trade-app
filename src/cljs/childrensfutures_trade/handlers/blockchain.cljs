@@ -45,10 +45,11 @@
    {:db (-> db
             (assoc :my-addresses addresses)
             (assoc :current-address (first addresses)))
-    :web3-fx.blockchain/balances {:web3 (:web3 db/default-db)
+    :web3-fx.blockchain/balances {:web3 (:web3 db)
                                   :addresses addresses
                                   :watch? true
                                   :blockchain-filter-opts "latest"
+                                  :db-path [:balances]
                                   :dispatches [:blockchain/balance-loaded :log-error]}
     :dispatch-n [[:new-goal.attribute/update :owner (first addresses)]
                  [:new-chat-message.attribute/update :owner (first addresses)]]}))
