@@ -18,9 +18,7 @@
    ;; event handlers
    ;;
    [childrensfutures-trade.handlers.interceptors :refer [interceptors
-                                                         interceptors-fx]]
-
-   ))
+                                                         interceptors-fx]]))
 
 ;;;
 ;;;
@@ -63,7 +61,7 @@
  :gse-contract/fetch-abi
  (interceptors-fx :spec false)
  (fn [{:keys [db]} [fetched-db-version]]
-   (js/console.log :debug :abi-loading)
+   (js/console.log :debug :gse-contract :abi-loading)
    {:http-xhrio {:method :get
                  :uri (gstring/format "/contracts/build/%s.abi"
                                       (get-in db/default-db [:gse-contract :name]))
@@ -81,7 +79,7 @@
  :gse-contract/abi-loaded
  (interceptors-fx :spec true)
  (fn [{:keys [db]} [fetched-db-version abi]]
-   (js/console.log :debug :abi-loaded)
+   (js/console.log :debug :gse-contract :abi-loaded)
 
    (let [web3 (:web3 db)
          contract-instance (web3-eth/contract-at web3 abi (-> db
@@ -197,7 +195,7 @@
                              :log-error))
                           (history-steps from-block to-block)))
          events (apply concat (map mk-events
-                             contract-events))]
+                                   contract-events))]
 
      (js/console.log :gse/fetch-history from-block to-block)
      (js/console.log :gse/fetch-history events)
@@ -303,10 +301,10 @@
          next-events-latest-block (get block-data :number 0)
          need-to-fetch-history? (> next-events-latest-block
                                    (+ 1 prev-events-latest-block))]
-     (js/console.log :got-block-number next-events-latest-block :resubscribing? need-to-fetch-history?)
+     (js/console.log :gse :got-block-number next-events-latest-block :resubscribing? need-to-fetch-history?)
      (if need-to-fetch-history?
        (do
-         (js/console.log :got-block-number :resubscribing (inc prev-events-latest-block) next-events-latest-block)
+         (js/console.log :chat :got-block-number :resubscribing (inc prev-events-latest-block) next-events-latest-block)
          {:db (assoc-in db [:gse-contract :events-latest-block] next-events-latest-block)
           :dispatch [:gse-contract.latest-events/subscribe (inc prev-events-latest-block) next-events-latest-block]})
        {}))))

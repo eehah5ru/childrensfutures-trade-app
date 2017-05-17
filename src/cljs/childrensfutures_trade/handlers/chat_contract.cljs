@@ -28,6 +28,13 @@
 
 ;;;
 ;;;
+;;; CONSTANTS
+;;;
+;;;
+(def history-step 10000)
+
+;;;
+;;;
 ;;; contract options
 ;;;
 ;;;
@@ -62,6 +69,7 @@
  :chat-contract/fetch-abi
  (interceptors-fx :spec false)
  (fn [{:keys [db]} _]
+   (js/console.log :debug :chat-contract :abi-loading)
    {:http-xhrio {:method :get
                  :uri (gstring/format "/contracts/build/%s.abi"
                                       (get-in db/default-db [:chat-contract :name]))
@@ -78,13 +86,15 @@
  :chat-contract/abi-loaded
  (interceptors-fx :spec true)
  (fn [{:keys [db]} [abi]]
+   (js/console.log :debug :chat-contract :abi-loaded)
+
    (let [web3 (:web3 db)
          contract-instance (web3-eth/contract-at web3 abi (-> db
                                                               :chat-contract
                                                               :address))
          from-block-n (from-block db)]
      {:db (assoc-in db [:chat-contract :instance] contract-instance)
-
+      :dispatch [:chat-contract.latest-block/load]
       ; :web3-fx.contract/events
       #_{:instance contract-instance
        :db db
@@ -94,6 +104,148 @@
                     contract-events)}
       })))
 
+
+;;;
+;;; load latest block when app was just run
+;;;
+(reg-event-fx
+ :chat-contract.latest-block/load
+ (interceptors-fx :spec false)
+
+ (fn [{:keys [db]}]
+   {:web3-fx.blockchain/fns
+    {:web3 (:web3 db)
+     :fns [[web3-eth/get-block "latest"
+              {}
+              [:chat-contract.latest-block/loaded]
+              :log-error]]}}))
+
+;;;
+;;; when latest block loaded
+;;;
+(reg-event-fx
+ :chat-contract.latest-block/loaded
+ (interceptors-fx :spec true)
+
+ (fn [{:keys [db]} [latest-block]]
+   (let [to-block (get latest-block :number 0)
+         from-block (get-in db [:gse-contract :from-block] 0)]
+     {:db (assoc-in db [:chat-contract :events-latest-block] to-block)
+      :dispatch-n [[:chat-contract.block-loaded/setup-filter]
+                   [:chat-contract.history/fetch from-block to-block]]})))
+
+
+(defn- history-steps [from to]
+  (for [x (range from to history-step)
+        :let [y (+ x history-step)]]
+    (if (>= y to)
+      [x to]
+      [x (dec y)])))
+
+;;;
+;;; fetch history of chat messages
+;;;
+(reg-event-fx
+ :chat-contract.history/fetch
+ (interceptors-fx :spec false)
+
+ (fn [{:keys [db]} [from-block to-block]]
+   (let [contract-instance (get-in db [:chat-contract :instance])
+         mk-events (fn [[event handler]]
+                     (map (fn [[f-block t-block]]
+                            (vector
+                             contract-instance
+                             (str event "-history-" f-block t-block)
+                             event
+                             {}
+                             {:from-block f-block
+                              :to-block t-block}
+                             handler
+                             :log-error))
+                          (history-steps from-block to-block)))
+         events (apply concat (map mk-events
+                                   contract-events))]
+
+     (js/console.log :chat.history/fetch from-block to-block)
+
+     {:web3-fx.contract/events
+      {:db db
+       :db-path [:chat-contract :events :history]
+       :events events}})))
+
+;;;
+;;; setup new block loaded filter
+;;;
+(reg-event-fx
+ :chat-contract.block-loaded/setup-filter
+ (interceptors-fx :spec false)
+
+ (fn [{:keys [db]}]
+   {:web3-fx.blockchain/filter
+    {:web3 (:web3 db)
+     :db-path [:gse-contract :block-loaded-filter]
+     :blockchain-filter-opts "latest"
+     :dispatches [:chat-contract.block-loaded/new :log-error]}}))
+
+;;;
+;;; handler for new loaded block
+;;;
+(reg-event-fx
+ :gse-contract.block-loaded/new
+ (interceptors-fx :spec false)
+ (fn [{:keys [db]} [block-hash]]
+   {:web3-fx.blockchain/fns
+    {:web3 (:web3 db)
+     :fns [[web3-eth/get-block block-hash
+            {}
+            :chat-contract.block-loaded/got-block-number
+            :log-error]]}}))
+
+;;;
+;;; when got block number of new loaded block
+;;;
+(reg-event-fx
+ :chat-contract.block-loaded/got-block-number
+ (interceptors-fx :spec true)
+
+ (fn [{:keys [db]} [block-data]]
+   ;; (js/console.log :got-block-number block-data)
+   (let [prev-events-latest-block (get-in db [:chat-contract :events-latest-block] 0)
+         next-events-latest-block (get block-data :number 0)
+         need-to-fetch-history? (> next-events-latest-block
+                                   (+ 1 prev-events-latest-block))]
+     (js/console.log :chat :got-block-number next-events-latest-block :resubscribing? need-to-fetch-history?)
+
+     (if need-to-fetch-history?
+       (do
+         (js/console.log :chat :got-block-number :resubscribing (inc prev-events-latest-block) next-events-latest-block)
+
+         {:db (assoc-in db [:chat-contract :events-latest-block] next-events-latest-block)
+          :dispatch [:chat-contract.latest-events/subscribe (inc prev-events-latest-block) next-events-latest-block]})
+       {}))))
+
+;;;
+;;; subscribe to events in few latest blocks
+;;;
+(reg-event-fx
+ :chat-contract.latest-events/subscribe
+ (interceptors-fx :spec false)
+
+ (fn [{:keys [db]} [from-block to-block]]
+   (let [contract-instance (get-in db [:chat-contract :instance])]
+     {:web3-fx.contract/events
+      {:db db
+       :db-path [:chat-contract :events :latest]
+       :events (map (fn [[event handler]]
+                      (vector contract-instance
+                              (str event "-latest")
+                              event
+                              {}
+                              {:from-block from-block
+                               :to-block to-block}
+                              handler
+                              :log-error))
+                    contract-events)}})))
 
 ;;;
 ;;;
