@@ -57,6 +57,19 @@
 ;;; db cache resource
 (def db-cache-file (io/resource "db-cache.json"))
 
+;;;
+;;;
+;;; utils
+;;;
+;;;
+
+;;;
+;;; loads cached db into db-storage
+;;;
+(defn load-cached-db [storage]
+  (let [raw-db (slurp db-cache-file)
+        new-db (edn/read-string raw-db)]
+    (db/refresh-db storage new-db)))
 
 ;;;
 ;;;
@@ -108,12 +121,10 @@
 ;;; load db cache from disk
 ;;;
 (defn load-db [req]
-  (let [raw-db (slurp db-cache-file)
-        new-db (edn/read-string raw-db)]
-    (db/refresh-db db-storage new-db)
-    {:status 200
-     :headers {"Content-Type" "text/plain"}
-     :body "ok"}))
+  (load-cached-db db-storage)
+  {:status 200
+   :headers {"Content-Type" "text/plain"}
+   :body "ok"})
 
 ;;;
 ;;; define routes
@@ -160,6 +171,7 @@
 
 (defn -main [& [port]]
   (set-logger!)
+  (load-cached-db db-storage)
   (let [port (Integer. (or port (env :port) 6655))]
     (alter-var-root (var *server*)
                     (constantly (run-server http-handler {:port port :join? false})))))
