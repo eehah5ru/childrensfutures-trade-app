@@ -48,11 +48,21 @@
 ;;    :body "ok"})
 
 ;;;
-;;; db handlers
+;;; vars
 ;;;
 
 ;;; storage adaptor
 (def db-storage (in-memory/create))
+
+;;; db cache resource
+(def db-cache-file (io/resource "db-cache.json"))
+
+
+;;;
+;;;
+;;; handlers
+;;;
+;;;
 
 ;;;
 ;;; refresh db
@@ -94,6 +104,16 @@
    :headers {"Content-Type" "text/plain"}
    :body "ok"})
 
+;;;
+;;; load db cache from disk
+;;;
+(defn load-db [req]
+  (let [raw-db (slurp db-cache-file)
+        new-db (edn/read-string raw-db)]
+    (db/refresh-db db-storage new-db)
+    {:status 200
+     :headers {"Content-Type" "text/plain"}
+     :body "ok"}))
 
 ;;;
 ;;; define routes
@@ -111,6 +131,10 @@
   (GET "/reset-db"
        req
        (reset-db req))
+
+  (GET "/load-db"
+       req
+       (load-db req))
 
   ;; (wrap-multipart-params
   ;;  (POST "/print-body"

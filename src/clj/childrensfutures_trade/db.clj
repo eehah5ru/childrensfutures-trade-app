@@ -6,10 +6,22 @@
 
 
 (defprotocol IStorage
+  ;;
+  ;; update db
+  ;;
   (refresh-db [this new-db])
 
+  ;;
+  ;; get db content
+  ;;
   (get-db [this])
 
+  ;;
+  ;; get db version
+  ;;
   (db-version [this])
 
+  ;;
+  ;; reset db to default state
+  ;;
   (reset-db [this]))

@@ -13,10 +13,10 @@
 
   (refresh-db [this new-db]
     (let [current-version (get @db-storage :db-version 0)
-        next-version (get new-db :db-version 0)]
-    (do
-      (reset! db-storage new-db)
-      true)))
+          next-version (get new-db :db-version 0)]
+      (do
+        (reset! db-storage new-db)
+        true)))
 
   (get-db [_]
     @db-storage)
@@ -28,4 +28,4 @@
     (reset! db-storage db/default-db)))
 
 (defn create []
-  (InMemoryStorage. (new-db-storage)))
+  (->InMemoryStorage (new-db-storage)))
